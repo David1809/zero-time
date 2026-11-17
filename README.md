@@ -30,3 +30,9 @@ Phase 2 de la procédure : spécification du prototype à valider. Aucun code po
 - Aucun mot de passe, clé d'API ni secret dans ce dépôt.
 - Aucune règle de jeu inventée : les points non tranchés sont marqués À DÉFINIR.
 - Aucun service payant sans validation.
+
+## Prototype (lots 1 et 2)
+
+- Appli : `index.html`, `css/`, `js/` à la racine, publiée par GitHub Pages (branche `main`, dossier racine). URL : https://david1809.github.io/zero-time/
+- Serveur : schéma `zt` du projet Supabase partagé avec Dé-lire ; migration dans `supabase/migrations/001_zt_salles.sql` (déjà appliquée). L'appli n'appelle que les fonctions `zt_*`, jamais les tables.
+- Fait : créer une salle, rejoindre par code, choisir son rôle ou tirage au sort, lancer. Reste : écrans opérateur et technicien (lot 3), état de jeu, minuteur et pénalités (lots 4 à 6).

@@ -1,0 +1,9 @@
+{
+  "name": "ZERO TIME",
+  "short_name": "ZERO TIME",
+  "start_url": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#101820",
+  "theme_color": "#101820"
+}
