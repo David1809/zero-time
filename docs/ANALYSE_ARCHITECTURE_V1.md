@@ -80,7 +80,7 @@ Chiffres vérifiés en novembre 2026, voir les sources en fin de document.
 
 ## 5. Solution recommandée pour la synchronisation
 
-**Prototype (Jalon 0) : option A.** Elle donne un prototype jouable le plus vite possible, avec ce que tu as déjà. C'est jetable, conformément au §18.7 du cahier. Deux précautions à garder dans le code, pour ne pas tout réécrire ensuite :
+**Décision de David : option B dès le prototype (Jalon 0).** Le serveur Supabase fait autorité (base Postgres, fonctions, Realtime, règles d'accès par rôle), au lieu du moteur sur le téléphone de l'hôte (option A, écartée). Cela évite de refaire l'architecture après le Jalon 0 et traite d'emblée la déconnexion de l'hôte et la pénalité « une seule fois ». Contrepartie : plus de travail au départ (tables, règles d'accès, fonctions) et plus de tests. Deux précautions restent valables :
 - Séparer le **moteur** (règles, validation, pénalités, temps) de l'**affichage**, comme `engine.js` / `app.js` dans Dé-lire. Le moteur doit pouvoir tourner en Node pour les tests.
 - Le temps est toujours une **heure de fin** (`ends_at`), jamais un compteur décrémenté chaque seconde.
 
@@ -115,9 +115,9 @@ Chiffres vérifiés en novembre 2026, voir les sources en fin de document.
 
 ## 8. Plan de réalisation par étapes
 
-Il suit les lots de la procédure (phase 5), avec l'option A pour le prototype.
+Il suit les lots de la procédure (phase 5), avec l'option B dès le prototype. Les tables ZERO TIME vivent dans le projet Supabase de Dé-lire, dans un **schéma dédié `zt`**, sans toucher aux tables existantes de Dé-lire.
 
-1. **Lots 1 et 2.** Structure de l'appli, salle et connexion par code : reprendre le principe de Dé-lire (à faire valider avant de copier du code).
+1. **Lots 1 et 2.** Structure de l'appli publiée sur GitHub Pages, schéma `zt` dans Supabase, salle et connexion par code : reprendre le principe de Dé-lire (à faire valider avant de copier du code).
 2. **Lot 3.** Rôles opérateur et technicien, avec leur vue filtrée.
 3. **Lot 4.** État partagé sur deux téléphones.
 4. **Lot 5.** Minuteur en heure de fin, erreurs et pénalités dans un moteur testable en Node, y compris le cas « même action envoyée deux fois ».
@@ -127,9 +127,9 @@ Il suit les lots de la procédure (phase 5), avec l'option A pour le prototype.
 
 ## Décisions à prendre par David
 
-1. Valider l'option A pour le prototype ?
-2. Pour le MVP : accepter de trancher après le Jalon 0 (préférence B) ?
-3. Projet Supabase : partagé avec Dé-lire ou dédié ? (Il y a une limite de 2 projets actifs sur l'offre gratuite ; elle est peut-être déjà atteinte chez toi.)
+1. ~~Architecture du prototype~~ **Décidé par David : option B dès le prototype** (serveur Supabase qui fait autorité). Il n'y a plus de décision séparée pour le MVP.
+2. ~~MVP~~ Sans objet, voir 1.
+3. ~~Projet Supabase~~ **Décidé par David : projet partagé avec Dé-lire**, avec un schéma `zt` séparé. Les deux jeux partagent les quotas (200 connexions Realtime, 2 millions de messages par mois).
 4. ~~Dépôt public pour GitHub Pages~~ **Décidé par David : le dépôt `zero-time` est rendu public (option b) et GitHub Pages est activé.** Conséquences : tout le contenu du dépôt (cahier, spécification, analyse) est lisible par tous ; aucun secret ne doit y être commité (jamais la clé « service » de Supabase) ; la page du jeu contiendra une balise `noindex` pour limiter son référencement ; le dépôt n'aura ni description ni topics.
 
 ## Sources
