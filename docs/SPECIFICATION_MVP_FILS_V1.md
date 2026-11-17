@@ -2,7 +2,7 @@
 
 **Version :** V1.1 — décisions de David du 17 novembre 2026 intégrées
 **Référence :** cahier des charges maître (§5, §11, §12, §18) et procédure, phase 2
-**Statut :** les points 1 à 10 sont décidés par David (voir le récapitulatif §10). Un nouveau point, le **11**, reste **À DÉFINIR** ; Claude ne doit pas le trancher à sa place.
+**Statut :** les points 1 à 11 sont tous décidés par David (voir le récapitulatif §10). Il ne reste aucun point À DÉFINIR dans cette spécification.
 
 ---
 
@@ -177,7 +177,7 @@ Principe du cahier (§14.6) : une reconnexion ne réinitialise pas la partie et 
 
 **Décidé 10 — Départ définitif.** Le **créateur de la salle** peut abandonner la partie. Le bouton **Abandonner** n'apparaît que lorsqu'un membre de l'équipe a disparu (connexion perdue).
 
-**À DÉFINIR 11 — Si c'est le créateur qui disparaît.** Il est le seul à pouvoir abandonner : l'autre joueur resterait bloqué sur l'écran d'attente. Proposition : dans ce cas, c'est l'autre joueur qui reçoit le bouton **Abandonner**.
+**Décidé 11 — Si c'est le créateur qui disparaît.** Le créateur étant le seul à pouvoir abandonner, l'autre joueur resterait bloqué sur l'écran d'attente. Dans ce cas, c'est l'autre joueur qui reçoit le bouton **Abandonner**, avec la même règle : il n'apparaît que si un membre de l'équipe a disparu.
 
 ---
 
@@ -203,4 +203,4 @@ Télévision, générateur, Code PIN, Symboles, 3 bombes, rotation des rôles, s
 | 8 bis | Alertes de temps | Uniquement chez l'opérateur, qui prévient les autres |
 | 9 | Connexion perdue | Pause de la partie |
 | 10 | Départ définitif | Le créateur peut abandonner ; le bouton n'apparaît que si un membre a disparu |
-| 11 | Créateur disparu | **À DÉFINIR** (proposition au §8) |
+| 11 | Créateur disparu | L'autre joueur reçoit le bouton Abandonner (même règle d'apparition) |
