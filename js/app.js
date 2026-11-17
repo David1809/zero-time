@@ -70,7 +70,9 @@
   }
   // Signal de présence (toutes les 5 s) : le serveur détecte les absences, met en pause et reprend.
   function heartbeat() {
-    if (!session) return;
+    // Un onglet caché ou un écran verrouillé n'est pas « présent » : pas de signal, même si le
+    // navigateur réveille brièvement la page (sinon la partie reprendrait par à-coups).
+    if (!session || document.hidden) return;
     var code = session.code;
     sb.rpc("zt_heartbeat", { p_code: session.code, p_token: session.token }).then(function (r) {
       if (!session || session.code !== code) return;
