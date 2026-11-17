@@ -101,13 +101,13 @@ Les fils sont comptés de haut en bas. Le « chiffre de série » est le dernier
 | 5.1 | Le dernier fil est noir **et** le chiffre de série est impair | Couper le **4e** fil |
 | 5.2 | Sinon, exactement un fil rouge **et** plus d'un fil jaune | Couper le **1er** fil |
 | 5.3 | Sinon, aucun fil noir | Couper le **2e** fil |
-| 5.4 | Sinon | Couper le **1er** fil |
+| 5.4 | Sinon | Couper le **dernier** fil (le plus bas) |
 
 **Vérification faite par script :**
 - Chacune des 7 500 combinaisons possibles (4 ou 5 fils, 5 couleurs, série paire ou impaire) donne une réponse unique et un fil qui existe.
 - Les 8 configurations du §6 couvrent chacune une des 8 règles.
 
-**Réserve à connaître avant le générateur.** Les règles ne sont pas équilibrées sur des tirages aléatoires : à 5 fils, la réponse « 1er fil » sort dans environ 62 % des cas, et à 4 fils les 2e et 3e fils représentent environ 86 %. Pour le prototype ce n'est pas un problème, car les 8 configurations sont choisies à la main. Il faudra rééquilibrer les règles avant d'écrire le générateur.
+**Réserve à connaître avant le générateur.** Les règles ne sont pas équilibrées sur des tirages aléatoires : à 5 fils, la réponse « dernier fil » sort dans environ 52 % des cas (règle 5.4 modifiée par David le 17 novembre 2026 ; auparavant « 1er fil » à 62 %), et à 4 fils les 2e et 3e fils représentent environ 86 %. Pour le prototype ce n'est pas un problème, car les 8 configurations sont choisies à la main. Il faudra rééquilibrer les règles avant d'écrire le générateur.
 
 ---
 
@@ -124,7 +124,7 @@ Fils listés de haut en bas. Chaque configuration a été vérifiée par script.
 | P5 | XD-2605 | Jaune, Rouge, Blanc, Bleu, Noir | impair | 5.1 | **Fil 4** (Bleu) |
 | P6 | FV-8140 | Jaune, Rouge, Jaune, Blanc, Noir | pair | 5.2 | **Fil 1** (Jaune) |
 | P7 | GN-5273 | Bleu, Blanc, Rouge, Bleu, Blanc | impair | 5.3 | **Fil 2** (Blanc) |
-| P8 | CS-6908 | Noir, Blanc, Bleu, Noir, Jaune | pair | 5.4 | **Fil 1** (Noir) |
+| P8 | CS-6908 | Noir, Blanc, Bleu, Noir, Jaune | pair | 5.4 | **Fil 5** (Jaune) |
 
 **Explications pas à pas :**
 
@@ -135,7 +135,7 @@ Fils listés de haut en bas. Chaque configuration a été vérifiée par script.
 - **P5** : dernier fil noir **et** série impaire (5) → 5.1 → 4e fil (Bleu).
 - **P6** : dernier fil noir mais série **paire** (0) → 5.1 ne s'applique pas ; exactement un rouge et deux jaunes → 5.2 → 1er fil (Jaune).
 - **P7** : pas de noir ; un seul rouge mais aucun jaune → 5.2 ne s'applique pas ; aucun fil noir → 5.3 → 2e fil (Blanc).
-- **P8** : dernier fil jaune ; aucun rouge ; il y a du noir → on arrive à 5.4 → 1er fil (Noir).
+- **P8** : dernier fil jaune ; aucun rouge ; il y a du noir → on arrive à 5.4 → dernier fil, le 5e (Jaune).
 
 ---
 
