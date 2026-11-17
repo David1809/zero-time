@@ -34,6 +34,7 @@
   function el(tag, attrs, children) {
     var n = document.createElement(tag);
     Object.keys(attrs || {}).forEach(function (k) {
+      if (attrs[k] === null || attrs[k] === undefined || attrs[k] === false) return;
       if (k === "text") n.textContent = attrs[k];
       else if (k === "class") n.className = attrs[k];
       else if (k.indexOf("on") === 0) n.addEventListener(k.slice(2), attrs[k]);
