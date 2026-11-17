@@ -11,6 +11,7 @@ Le cahier des charges (partie A) a reçu les trois premières modifications ; la
 | 4 joueurs maximum par équipe | « 2 à 8 joueurs » devient « 2 à 4 joueurs par équipe » (§2.1, §17.2, §22.7, synthèse, phase 9 de la procédure). |
 | Rôle réduit de la télévision | La télévision devient optionnelle : écran spectateur en lecture seule, hors prototype et hors MVP, ajouté après validation. Le compte à rebours, les erreurs et les alertes sont affichés sur les smartphones. Les maquettes TV passent en optionnel dans la procédure. |
 | Hébergement en ligne comme Dé-lire | Le §14.5 (fonctionnement local sans Internet) devient « Fonctionnement en ligne » ; le fonctionnement local est repoussé à plus tard. Le prompt d'analyse d'architecture de la procédure est aligné. |
+| Répartition GitHub / Drive | GitHub contient le code et tous les documents texte (.md), qui y ont une seule version de référence ; Drive contient les images, les exports Stitch, les photos et vidéos de test, et les archives .docx d'origine. Les étapes de la procédure sont ajustées (étapes 9, 10, 13, décision d'architecture, tests du Jalon 0). |
 | Procédure réordonnée (partie B) | Le prototype jouable passe avant les maquettes Stitch ; le prototype utilise des configurations Fils écrites à la main (conforme au §18.2) et le générateur n'arrive qu'après la validation du plaisir de jeu (Jalon 0) ; fragmentation « 1 technicien = 1 module » ajoutée ; rotation de l'opérateur à 4 joueurs marquée « À DÉFINIR ». Les phases, étapes et points de contrôle sont renumérotés. |
 
 ---
@@ -2196,7 +2197,7 @@ Version 1.0 — 17 novembre 2026
 
 Ce guide décrit l’ordre d’exécution. Il ne faut pas tout faire d’un coup. Chaque phase possède un résultat attendu et un point de contrôle. Le cahier des charges maître est la référence pour le contenu ; ce document explique comment le mettre en œuvre.
 
-Rôle des outils : ChatGPT = cadrage et contrôle ; Stitch = maquettes ; Claude = analyse et développement ; GitHub = code et historique ; Google Drive = documents et exports.
+Rôle des outils : ChatGPT = cadrage et contrôle ; Stitch = maquettes ; Claude = analyse et développement ; GitHub = code, documents texte (.md) et historique ; Google Drive = images, exports et archives.
 
 | **Règle de pilotage**          | **Application**                                                     |
 |--------------------------------|---------------------------------------------------------------------|
@@ -2204,7 +2205,7 @@ Rôle des outils : ChatGPT = cadrage et contrôle ; Stitch = maquettes ; Claude 
 | Pas d’invention                | Claude doit signaler les règles manquantes au lieu de les imaginer. |
 | Pas de dépense surprise        | Aucun service payant, API ou dépassement de quota sans validation.  |
 | Pas de gros chantier d’un coup | Faire construire et tester le prototype avant les extensions.       |
-| Tout garder traçable           | Documents dans Drive, code dans GitHub, décisions écrites.          |
+| Tout garder traçable           | Code et documents texte dans GitHub, images, exports et archives dans Drive, décisions écrites. |
 | Le plaisir de jeu d’abord      | Pas de maquettes Stitch ni de générateur avant la validation du plaisir de jeu (Jalon 0). |
 
 ## Phase 1 — Préparer l’espace de travail
@@ -2229,9 +2230,9 @@ Rôle des outils : ChatGPT = cadrage et contrôle ; Stitch = maquettes ; Claude 
 
 8.  Créer à l’intérieur : 01_CADRAGE ; 02_DESIGN ; 03_TECHNIQUE ; 04_DEVELOPPEMENT ; 05_TESTS ; 06_EXPORTS.
 
-9.  Enregistrer le Cahier des charges maître dans 01_CADRAGE.
+9.  Enregistrer le cahier des charges maître (version .docx d’origine) dans 01_CADRAGE comme archive ; la version de travail est dans le dépôt GitHub (dossier docs).
 
-10. Enregistrer ce guide dans 01_CADRAGE.
+10. Enregistrer ce guide (version .docx d’origine) dans 01_CADRAGE comme archive ; la version de travail est dans le dépôt GitHub (dossier docs).
 
 11. Enregistrer le visuel du zéro lumineux et la vignette 1 dans 02_DESIGN.
 
@@ -2245,7 +2246,7 @@ Tu dois avoir un dossier ZERO TIME avec deux documents de référence et les deu
 
 ### Étape 2.1 — Créer la spécification MVP
 
-13. Créer dans 01_CADRAGE un document nommé SPECIFICATION_MVP_FILS_V1.
+13. Créer dans le dépôt GitHub (dossier docs) un document nommé SPECIFICATION_MVP_FILS_V1.md.
 
 14. Reprendre du cahier des charges le périmètre : deux joueurs, une mission, module Fils, trois minutes comme scénario de test.
 
@@ -2311,7 +2312,7 @@ Le dépôt existe, il est privé et son accès est maîtrisé.
 
 ### Étape 4.3 — Décider
 
-Lire l’analyse. Vérifier les coûts récurrents, limites gratuites, contraintes de temps réel, compatibilité mobile (et TV, en option) et facilité de maintenance. Ne valider aucune architecture si les coûts ou limites ne sont pas compris. Enregistrer la décision dans 03_TECHNIQUE/DECISION_ARCHITECTURE_V1.
+Lire l’analyse. Vérifier les coûts récurrents, limites gratuites, contraintes de temps réel, compatibilité mobile (et TV, en option) et facilité de maintenance. Ne valider aucune architecture si les coûts ou limites ne sont pas compris. Enregistrer la décision dans le dépôt GitHub : docs/DECISION_ARCHITECTURE_V1.md.
 
 ### Point de contrôle 4
 
@@ -2431,9 +2432,9 @@ Le prototype est jouable de bout en bout, avec une interface volontairement simp
 
 59. Observer la compréhension des rôles, la qualité des échanges, la nécessité de communiquer, la tension générée par le temps, la compréhension du manuel, le plaisir ressenti et les frustrations éventuelles (cahier §18.5).
 
-60. Noter les observations dans 05_TESTS.
+60. Noter les observations dans le dépôt GitHub (docs/TESTS_JALON_0.md) ; les photos et vidéos vont dans 05_TESTS sur Drive.
 
-61. Décider si le Jalon 0 est validé : le mécanisme central provoque naturellement des échanges et une coopération réelle (cahier §18.6). Consigner la décision dans 05_TESTS.
+61. Décider si le Jalon 0 est validé : le mécanisme central provoque naturellement des échanges et une coopération réelle (cahier §18.6). Consigner la décision dans docs/TESTS_JALON_0.md.
 
 ### Point de contrôle 6
 

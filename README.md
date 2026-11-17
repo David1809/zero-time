@@ -14,6 +14,11 @@ Jeu coopératif de désamorçage de bombes pour smartphones : un opérateur voit
 | `docs/SPECIFICATION_MVP_FILS_V1.md` | Spécification du prototype fondateur (module Fils), points À DÉFINIR à valider |
 | `docs/ANALYSE_ARCHITECTURE_V1.md` | Analyse d'architecture, décision à prendre |
 
+## Où ranger quoi
+
+- **GitHub (ce dépôt)** : le code et tous les documents texte (`.md`). C'est la seule version de référence.
+- **Google Drive (dossier ZERO TIME)** : images (zéro lumineux, Vignette 1), exports et captures Stitch, photos et vidéos de test, archives `.docx` d'origine.
+
 ## État
 
 Phase 2 de la procédure : spécification du prototype à valider. Aucun code pour l'instant.
