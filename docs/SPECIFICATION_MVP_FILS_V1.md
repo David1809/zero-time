@@ -1,8 +1,8 @@
 # ZERO TIME — Spécification du prototype fondateur (Jalon 0) — Module Fils
 
-**Version :** V1 — premier jet à valider
+**Version :** V1.1 — décisions de David du 17 novembre 2026 intégrées
 **Référence :** cahier des charges maître (§5, §11, §12, §18) et procédure, phase 2
-**Statut :** tout ce qui est marqué **À DÉFINIR** est une proposition de ma part. Rien n'est acquis tant que David ne l'a pas validé, et Claude ne doit pas trancher à sa place.
+**Statut :** les points 1 à 10 sont décidés par David (voir le récapitulatif §10). Un nouveau point, le **11**, reste **À DÉFINIR** ; Claude ne doit pas le trancher à sa place.
 
 ---
 
@@ -18,9 +18,9 @@
 | Hébergement | En ligne, comme Dé-lire (§14.5) |
 | Erreurs | 1re : −20 s ; 2e : −30 s ; 3e : explosion (§11.2) |
 
-**À DÉFINIR 1 — Contenu de la bombe.** Un seul fil à couper ne remplirait pas 3 minutes. Proposition : la bombe contient **3 panneaux Fils** (3 instances du module), sans dépendance entre eux, à traiter dans l'ordre que l'équipe veut. Chaque panneau a sa propre règle de décision et sa propre réponse.
+**Décidé 1 — Contenu de la bombe (validé).** Un seul fil à couper ne remplirait pas 3 minutes. La bombe contient **3 panneaux Fils** (3 instances du module), sans dépendance entre eux, à traiter dans l'ordre que l'équipe veut. Chaque panneau a sa propre règle de décision et sa propre réponse.
 
-**À DÉFINIR 2 — Choix des panneaux.** Proposition : à chaque partie, la bombe tire **3 panneaux au hasard parmi les 8 configurations du §6**, sans répétition. Alternative : ordre fixe P1, P2, P3 (plus simple à tester, mais mémorisable dès la 2e partie).
+**Décidé 2 — Choix des panneaux : au hasard.** À chaque partie, la bombe tire **3 panneaux au hasard parmi les 8 configurations du §6**, sans répétition.
 
 ---
 
@@ -31,7 +31,7 @@
 3. Chacun saisit un pseudo.
 4. Les rôles sont attribués, puis le créateur appuie sur **Lancer**.
 
-**À DÉFINIR 3 — Attribution des rôles.** Proposition : le créateur de la salle choisit son rôle (opérateur ou technicien), l'autre prend l'autre rôle. Alternative : tirage au sort.
+**Décidé 3 — Attribution des rôles : les deux possibilités.** Avant de lancer, le créateur de la salle choisit entre **choisir son rôle** (l'autre joueur prend l'autre rôle) et **tirage au sort**.
 
 ---
 
@@ -48,15 +48,17 @@
 
 **Un panneau ouvert montre :**
 - Le **numéro de série** du panneau, par exemple `KB-4821`.
-- Les fils, **de haut en bas**, numérotés 1, 2, 3… Chaque fil est dessiné dans sa couleur et porte son **nom écrit** (`Rouge`, `Bleu`, `Jaune`, `Blanc`, `Noir`).
+- Les fils, **de haut en bas**, numérotés 1, 2, 3… Chaque fil est dessiné dans sa couleur (rouge, bleu, jaune, blanc, noir). **Aucun nom de couleur n'est écrit : les fils sont identifiés uniquement par leur couleur** (décision de David).
 - Un fil déjà coupé est dessiné coupé et grisé.
+
+**Dérogation au §12.4 du cahier** (« les informations importantes ne doivent jamais être identifiables uniquement par leur couleur »), décidée par David. Conséquence à connaître : un joueur daltonien ne pourra pas distinguer certains fils. À revoir si ce cas se présente.
 
 **Pour couper :**
 1. L'opérateur touche un fil : il est mis en surbrillance (sélection).
 2. Un bouton **Couper ce fil** apparaît en bas, assez grand, séparé des fils.
 3. Il confirme. Le fil est coupé et le serveur renvoie le résultat.
 
-**À DÉFINIR 4 — Confirmation en deux temps.** Proposition : sélection puis bouton (limite les coupes involontaires, §12.6). Alternative : un seul toucher.
+**Décidé 4 — Confirmation en deux temps.** Sélection puis bouton **Couper ce fil** (limite les coupes involontaires, §12.6).
 
 **L'opérateur ne voit jamais** les règles, ni quel fil est le bon.
 
@@ -64,13 +66,9 @@
 
 ## 4. Ce que voit le technicien
 
-Le technicien ne voit pas les fils. Il voit :
+Le technicien ne voit pas les fils. Il ne voit **que le manuel Fils**. Il ne voit **jamais le temps**, ni les erreurs, ni la progression : c'est à l'opérateur de les lui annoncer à voix haute.
 
-- Le **compte à rebours** et le nombre d'erreurs (informations partagées).
-- `Panneaux résolus x/3`, sans le détail de ce qui est coupé.
-- Le **manuel Fils**.
-
-**À DÉFINIR 5 — Informations partagées.** Proposition ci-dessus (temps, erreurs, nombre de panneaux résolus). Alternative : le technicien ne voit que le manuel et le temps.
+**Décidé 5 — Informations partagées : seulement le manuel.** Aucune information de jeu en direct n'est affichée chez le technicien. Seuls les écrans de fin de partie (victoire, explosion) apparaissent aussi chez lui.
 
 **Contenu du manuel (4 blocs, dans cet ordre) :**
 
@@ -81,7 +79,7 @@ Le technicien ne voit pas les fils. Il voit :
 
 ---
 
-## 5. Règles du module Fils (proposition, À DÉFINIR 6)
+## 5. Règles du module Fils (validées par David, décision 6)
 
 Les fils sont comptés de haut en bas. Le « chiffre de série » est le dernier chiffre du numéro de série du panneau.
 
@@ -143,28 +141,30 @@ Fils listés de haut en bas. Chaque configuration a été vérifiée par script.
 
 **Ce qui compte comme une erreur :** couper un fil qui n'est pas la bonne réponse du panneau.
 
-| Erreur | Conséquence | Retour affiché (opérateur, et résumé chez le technicien) |
+| Erreur | Conséquence | Retour affiché (chez l'opérateur) |
 | --- | --- | --- |
 | 1re | −20 s | Flash rouge court, vibration, texte `ERREUR 1/3 — −20 s` |
 | 2e | −30 s | Idem avec `ERREUR 2/3 — −30 s` |
-| 3e | Explosion immédiate | Écran d'explosion |
+| 3e | Explosion immédiate | Écran d'explosion (sur les deux téléphones) |
+
+Le technicien ne reçoit aucun retour d'erreur : l'opérateur le lui annonce.
 
 **Règles côté serveur (§11.3 et §11.4) :**
 - Le serveur seul décide si une coupe est bonne ou mauvaise, et applique la pénalité.
 - Chaque action porte un identifiant unique : un double clic, une requête répétée ou une reconnexion ne compte **qu'une seule fois**.
 - Le temps ne descend jamais sous 0. Si une pénalité dépasse le temps restant, le temps passe à 0 et la bombe explose.
 
-**À DÉFINIR 7 — Après une erreur.** Proposition : le fil coupé reste coupé, le panneau reste en jeu et le bon fil peut encore être coupé. Une erreur ne bloque donc jamais un panneau.
+**Décidé 7 — Après une erreur (validé).** Le fil coupé reste coupé, le panneau reste en jeu et le bon fil peut encore être coupé. Une erreur ne bloque donc jamais un panneau.
 
-**À DÉFINIR 8 — Portée du compteur d'erreurs.** Le cahier dit « sur la bombe en cours ». Comme le prototype n'a qu'une bombe, la question est sans effet ici. À trancher pour le MVP : compteur par bombe ou par partie.
+**Décidé 8 — Compteur d'erreurs : par bombe.** Les trois erreurs sont comptées sur la bombe en cours.
 
 **Bonne coupe :** le panneau passe à `Résolu ✓` (icône et texte), vibration courte. Quand les 3 panneaux sont résolus, la bombe est **désamorcée**.
 
-**Alertes de temps (§11.5) :** à 2:00, 1:00, 0:30 et 0:10 sur les deux téléphones : bannière avec le temps, son et vibration. Elles ne doivent pas masquer le manuel ni les fils.
+**Alertes de temps (§11.5) :** à 2:00, 1:00, 0:30 et 0:10, **uniquement sur le téléphone de l'opérateur** (décision de David) : bannière avec le temps, son et vibration. Elles ne doivent pas masquer les fils. C'est à l'opérateur de prévenir les autres joueurs à voix haute.
 
 **Temps à zéro :** la bombe explose, écran d'explosion sur les deux téléphones. Les actions reçues après 0:00 sont ignorées par le serveur.
 
-**Écran de victoire :** `BOMBE DÉSAMORCÉE`, temps restant, nombre d'erreurs, bouton `Rejouer`.
+**Écran de victoire :** `BOMBE DÉSAMORCÉE`, temps restant, nombre d'erreurs, bouton `Rejouer`. Chez le technicien, l'écran de fin n'affiche pas le temps restant.
 **Écran d'explosion :** `EXPLOSION`, cause (temps écoulé ou 3 erreurs), panneaux résolus x/3, bouton `Rejouer`.
 
 ---
@@ -173,11 +173,11 @@ Fils listés de haut en bas. Chaque configuration a été vérifiée par script.
 
 Principe du cahier (§14.6) : une reconnexion ne réinitialise pas la partie et ne provoque aucune pénalité.
 
-**À DÉFINIR 9 — Que fait le temps quand un joueur perd la connexion ?**
-- **Option A (proposée) :** le compte à rebours **continue**. À son retour, le joueur retrouve l'état exact de la partie. Il faut mémoriser son identité sur son téléphone pour qu'il reprenne sa place.
-- **Option B :** la partie se met en **pause** tant qu'un joueur est absent.
+**Décidé 9 — Connexion perdue : la partie se met en pause.** Dès qu'un joueur est absent, le compte à rebours est figé et l'autre joueur voit `En attente de <pseudo>`. Quand le joueur revient, la partie reprend à l'état exact, sans pénalité. Le téléphone mémorise l'identité du joueur pour qu'il retrouve sa place.
 
-**À DÉFINIR 10 — Départ définitif.** Si un joueur ne revient pas, la partie va jusqu'à son terme (explosion au temps zéro). Option : le créateur peut abandonner la partie.
+**Décidé 10 — Départ définitif.** Le **créateur de la salle** peut abandonner la partie. Le bouton **Abandonner** n'apparaît que lorsqu'un membre de l'équipe a disparu (connexion perdue).
+
+**À DÉFINIR 11 — Si c'est le créateur qui disparaît.** Il est le seul à pouvoir abandonner : l'autre joueur resterait bloqué sur l'écran d'attente. Proposition : dans ce cas, c'est l'autre joueur qui reçoit le bouton **Abandonner**.
 
 ---
 
@@ -187,17 +187,20 @@ Télévision, générateur, Code PIN, Symboles, 3 bombes, rotation des rôles, s
 
 ---
 
-## 10. Récapitulatif des points À DÉFINIR
+## 10. Récapitulatif des décisions
 
-| N° | Sujet | Ma proposition |
+| N° | Sujet | Décision de David |
 | --- | --- | --- |
 | 1 | Contenu de la bombe | 3 panneaux Fils sans dépendance |
-| 2 | Choix des panneaux | 3 tirés au hasard parmi 8 |
-| 3 | Attribution des rôles | Le créateur choisit |
+| 2 | Choix des panneaux | Au hasard : 3 tirés parmi 8 |
+| 3 | Attribution des rôles | Les deux possibilités : choix du créateur ou tirage au sort |
+| 3 bis | Identification des fils | Uniquement par la couleur, aucun nom écrit (dérogation au §12.4) |
 | 4 | Confirmation de la coupe | En deux temps |
-| 5 | Informations partagées avec le technicien | Temps, erreurs, nombre de panneaux résolus |
-| 6 | Règles du module Fils | §5, à valider ou modifier |
+| 5 | Informations chez le technicien | Seulement le manuel ; il ne voit jamais le temps |
+| 6 | Règles du module Fils | Validées (§5) |
 | 7 | Après une erreur | Le fil reste coupé, le panneau reste jouable |
-| 8 | Compteur d'erreurs | Sans effet ici, à trancher pour le MVP |
-| 9 | Temps pendant une déconnexion | Il continue, sans pénalité |
-| 10 | Départ définitif | La partie va à son terme |
+| 8 | Compteur d'erreurs | Par bombe |
+| 8 bis | Alertes de temps | Uniquement chez l'opérateur, qui prévient les autres |
+| 9 | Connexion perdue | Pause de la partie |
+| 10 | Départ définitif | Le créateur peut abandonner ; le bouton n'apparaît que si un membre a disparu |
+| 11 | Créateur disparu | **À DÉFINIR** (proposition au §8) |
