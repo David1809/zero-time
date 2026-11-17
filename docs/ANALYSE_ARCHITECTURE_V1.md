@@ -15,7 +15,7 @@
 ## 1. Résumé des exigences qui pèsent sur l'architecture
 
 - 2 à 4 joueurs par équipe, un opérateur et 1 à 3 techniciens ; smartphones, télévision optionnelle et plus tard (§2.1, §12.5).
-- Hébergement **en ligne comme Dé-lire** (§14.5) ; PWA, sans installation (§2.1).
+- Hébergement **en ligne** (§14.5), site publié sur **GitHub Pages** (pas de Netlify) ; PWA, sans installation (§2.1).
 - Le serveur est l'autorité : état, rôles, solutions, compte à rebours, validation, pénalités (§4.3, §14.3).
 - Un opérateur ne doit pas recevoir les règles, un technicien ne doit pas recevoir la bombe ; les solutions ne sont jamais dans des données accessibles à tous (§3.2, règles de la procédure).
 - Compte à rebours synchronisé, jamais négatif ; une erreur n'est comptée qu'une fois, même avec double clic, requête répétée ou reconnexion (§11.3, §11.4).
@@ -70,13 +70,13 @@ Chiffres vérifiés en novembre 2026, voir les sources en fin de document.
 | Service | Gratuit | Ce qui compte pour ZERO TIME |
 | --- | --- | --- |
 | **Supabase** (Realtime et base) | 200 connexions simultanées, 2 millions de messages par mois, 100 messages par seconde, 500 000 appels de fonctions Edge, 2 projets actifs, **pause après 7 jours d'inactivité** | Très largement suffisant pour des soirées en famille. Le risque réel est la **pause du projet** s'il n'est utilisé qu'à l'occasion : un projet partagé avec Dé-lire resterait actif. |
-| **Netlify** (hébergement du site statique) | 300 crédits par mois, plafond strict sur les comptes récents ; 15 crédits par mise en production réussie | Environ 20 mises en production par mois sur un compte au nouveau modèle. Les comptes créés avant le 4 septembre 2025 sont sur l'ancien modèle (100 Go de bande passante, 300 minutes de build). **À vérifier dans ton compte.** À éviter : un déploiement à chaque petit changement. |
+| **GitHub Pages** (hébergement du site statique, retenu à la place de Netlify) | Gratuit pour un dépôt **public** ; sites statiques uniquement ; limites indicatives : site de 1 Go maximum, environ 100 Go de bande passante par mois, 10 mises en ligne par heure (à re-vérifier dans la documentation GitHub) | Largement suffisant pour une PWA de quelques Mo. **Un dépôt privé exige une offre GitHub payante** pour publier via Pages (voir décision 4). Le jeu est joué depuis l'URL GitHub Pages ; il n'y a plus de quota de déploiement à surveiller. |
 | **Cloudflare Workers + Durable Objects** | 100 000 requêtes par jour, opérations refusées au-delà ; les messages WebSocket entrants sont comptés 1 pour 20 | Largement suffisant ; remise à zéro chaque jour à 00:00 UTC. |
 | **Render** (option écartée) | 750 heures par mois, arrêt après 15 min d'inactivité, démarrage d'environ 1 min | Inadapté tel quel. |
 
 **Estimation du trafic (mon calcul, non mesuré).** Avec un minuteur en heure de fin, il n'y a pas de message toutes les secondes. Une partie de 4 joueurs devrait échanger quelques centaines à quelques milliers de messages. Les 2 millions de messages par mois couvrent donc de l'ordre de plusieurs centaines de parties.
 
-**Coût récurrent : 0 €** pour A et B si le compte Netlify et le projet Supabase existent déjà. Aucun service payant n'est nécessaire dans les trois options retenues.
+**Coût récurrent : 0 €** pour A et B si le projet Supabase existe déjà ; GitHub Pages est gratuit pour un dépôt public. Aucun service payant n'est nécessaire dans les trois options retenues.
 
 ## 5. Solution recommandée pour la synchronisation
 
@@ -108,7 +108,7 @@ Chiffres vérifiés en novembre 2026, voir les sources en fin de document.
 | L'hôte perd le réseau ou verrouille son écran, la partie s'arrête | A | Élevée | Acceptée au prototype ; à lever au MVP |
 | Pénalité comptée deux fois (double clic, requête répétée) | Toutes | Élevée | Identifiant d'action unique, traité une seule fois par le moteur ; test dédié |
 | Projet Supabase en pause avant une soirée | B (et A) | Moyenne | Projet partagé avec Dé-lire, ou le « réveiller » avant de jouer |
-| Quota Netlify atteint (comptes récents) | A, B | Moyenne | Regrouper les déploiements, vérifier le modèle de ton compte |
+| Dépôt privé : GitHub Pages indisponible sans offre payante | A, B | Moyenne | Publier le jeu depuis un dépôt public dédié au code, ou rendre le dépôt public (décision 4) |
 | RLS mal conçue : un rôle lit ce qu'il ne devrait pas | B | Moyenne | Tests d'accès par rôle dès le départ |
 | Dérive d'horloge entre téléphones sur le compte à rebours | Toutes | Faible | Calcul local à partir de `ends_at` plus un décalage d'horloge mesuré à la connexion |
 | Règles déséquilibrées une fois générées (voir spécification §5) | Générateur | Moyenne | Rééquilibrer avant d'écrire le générateur |
@@ -130,7 +130,7 @@ Il suit les lots de la procédure (phase 5), avec l'option A pour le prototype.
 1. Valider l'option A pour le prototype ?
 2. Pour le MVP : accepter de trancher après le Jalon 0 (préférence B) ?
 3. Projet Supabase : partagé avec Dé-lire ou dédié ? (Il y a une limite de 2 projets actifs sur l'offre gratuite ; elle est peut-être déjà atteinte chez toi.)
-4. Netlify : quel modèle de crédits sur ton compte ?
+4. GitHub Pages exige un dépôt public (sauf offre payante). Quelle solution : (a) dépôt séparé et public contenant uniquement le jeu, les documents restant dans ce dépôt privé ; (b) rendre ce dépôt public ? Recommandation : (a).
 
 ## Sources
 
@@ -140,4 +140,4 @@ Il suit les lots de la procédure (phase 5), avec l'option A pour le prototype.
 - Cloudflare, tarifs des Durable Objects : https://developers.cloudflare.com/durable-objects/platform/pricing
 - Cloudflare, limites : https://developers.cloudflare.com/durable-objects/platform/limits
 - Render, offre gratuite : https://render.com/docs/free
-- Netlify, modèle à crédits : https://netli.fyi/blog/netlify-free-plan-limits-2026 et https://costbench.com/software/cloud-infrastructure/netlify/free-plan/
+- GitHub Pages, limites et prérequis : https://docs.github.com/pages (limites chiffrées de ma connaissance, à re-vérifier)

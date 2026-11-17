@@ -10,7 +10,7 @@ Le cahier des charges (partie A) a reçu les trois premières modifications ; la
 | --- | --- |
 | 4 joueurs maximum par équipe | « 2 à 8 joueurs » devient « 2 à 4 joueurs par équipe » (§2.1, §17.2, §22.7, synthèse, phase 9 de la procédure). |
 | Rôle réduit de la télévision | La télévision devient optionnelle : écran spectateur en lecture seule, hors prototype et hors MVP, ajouté après validation. Le compte à rebours, les erreurs et les alertes sont affichés sur les smartphones. Les maquettes TV passent en optionnel dans la procédure. |
-| Hébergement en ligne comme Dé-lire | Le §14.5 (fonctionnement local sans Internet) devient « Fonctionnement en ligne » ; le fonctionnement local est repoussé à plus tard. Le prompt d'analyse d'architecture de la procédure est aligné. |
+| Hébergement en ligne (GitHub Pages, sans Netlify) | Le §14.5 (fonctionnement local sans Internet) devient « Fonctionnement en ligne » ; le fonctionnement local est repoussé à plus tard. Le prompt d'analyse d'architecture de la procédure est aligné. |
 | Répartition GitHub / Drive | GitHub contient le code et tous les documents texte (.md), qui y ont une seule version de référence ; Drive contient les images, les exports Stitch, les photos et vidéos de test, et les archives .docx d'origine. Les étapes de la procédure sont ajustées (étapes 9, 10, 13, décision d'architecture, tests du Jalon 0). |
 | Procédure réordonnée (partie B) | Le prototype jouable passe avant les maquettes Stitch ; le prototype utilise des configurations Fils écrites à la main (conforme au §18.2) et le générateur n'arrive qu'après la validation du plaisir de jeu (Jalon 0) ; fragmentation « 1 technicien = 1 module » ajoutée ; rotation de l'opérateur à 4 joueurs marquée « À DÉFINIR ». Les phases, étapes et points de contrôle sont renumérotés. |
 
@@ -1197,7 +1197,9 @@ Le système doit éviter les décalages importants entre le compte à rebours af
 
 ### 14.5. Fonctionnement en ligne
 
-Le jeu est hébergé en ligne, comme Dé-lire.
+Le jeu est hébergé en ligne.
+
+Le site du jeu (l'application web) est publié sur GitHub Pages et se joue depuis son URL GitHub. Netlify n'est pas utilisé pour ZERO TIME.
 
 Le fonctionnement est le suivant :
 
@@ -1266,6 +1268,8 @@ Cela doit faciliter :
 La solution devra privilégier les technologies gratuites ou disposant d'une offre gratuite suffisante.
 
 Aucune API payante ni aucun service générant des coûts récurrents ne doit être introduit sans validation préalable.
+
+Le site est publié sur GitHub Pages, gratuit pour un dépôt public. Un dépôt privé nécessiterait une offre GitHub payante ; le dépôt qui publie le jeu doit donc être public, ce qui est à trancher avant la publication (voir l'analyse d'architecture, décision 4).
 
 Les éventuelles limites des offres gratuites devront être identifiées avant de retenir une solution.
 
@@ -2308,7 +2312,7 @@ Le dépôt existe, il est privé et son accès est maîtrisé.
 
 ### Étape 4.2 — Prompt d’analyse sans développement
 
-« Tu interviens comme architecte logiciel du projet ZERO TIME. Lis les documents et les maquettes disponibles. Pour l’instant, ne crée, ne modifie et ne supprime aucun fichier. Ne commence aucun développement. Produis : 1) résumé des exigences ; 2) liste des ambiguïtés et décisions manquantes ; 3) deux ou trois architectures possibles, toutes hébergées en ligne comme Dé-lire (§14.5 du cahier) ; 4) comparaison des coûts, quotas gratuits et limites ; 5) solution recommandée pour synchroniser les smartphones (et la télévision, en option) ; 6) gestion des rôles et de la confidentialité des informations ; 7) risques ; 8) plan de réalisation par étapes. N’invente aucune règle de jeu. N’engage aucun service payant. Signale les limites de ton analyse. »
+« Tu interviens comme architecte logiciel du projet ZERO TIME. Lis les documents et les maquettes disponibles. Pour l’instant, ne crée, ne modifie et ne supprime aucun fichier. Ne commence aucun développement. Produis : 1) résumé des exigences ; 2) liste des ambiguïtés et décisions manquantes ; 3) deux ou trois architectures possibles, toutes hébergées en ligne, le site étant publié sur GitHub Pages et non sur Netlify (§14.5 du cahier) ; 4) comparaison des coûts, quotas gratuits et limites ; 5) solution recommandée pour synchroniser les smartphones (et la télévision, en option) ; 6) gestion des rôles et de la confidentialité des informations ; 7) risques ; 8) plan de réalisation par étapes. N’invente aucune règle de jeu. N’engage aucun service payant. Signale les limites de ton analyse. »
 
 ### Étape 4.3 — Décider
 

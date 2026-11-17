@@ -15,7 +15,7 @@
 | Module | Fils uniquement |
 | Écrans | Smartphones uniquement (pas de télévision) |
 | Règles | Codées en dur, configurations fixes écrites à la main (§18.2) |
-| Hébergement | En ligne, comme Dé-lire (§14.5) |
+| Hébergement | En ligne (§14.5), site publié sur GitHub Pages, jouable depuis l'URL GitHub |
 | Erreurs | 1re : −20 s ; 2e : −30 s ; 3e : explosion (§11.2) |
 
 **Décidé 1 — Contenu de la bombe (validé).** Un seul fil à couper ne remplirait pas 3 minutes. La bombe contient **3 panneaux Fils** (3 instances du module), sans dépendance entre eux, à traiter dans l'ordre que l'équipe veut. Chaque panneau a sa propre règle de décision et sa propre réponse.

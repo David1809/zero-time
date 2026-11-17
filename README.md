@@ -4,7 +4,7 @@ Jeu coopératif de désamorçage de bombes pour smartphones : un opérateur voit
 
 - 2 à 4 joueurs par équipe
 - Smartphones uniquement pour le prototype (télévision optionnelle plus tard)
-- Hébergé en ligne
+- Hébergé en ligne : site publié sur GitHub Pages, jouable depuis l'URL GitHub (pas de Netlify)
 
 ## Documents
 
