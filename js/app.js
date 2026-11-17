@@ -116,7 +116,7 @@
     if (view.is_creator) {
       var mode = view.role_mode, cr = view.creator_role;
       function setMode(m, role) {
-        sb.rpc("zt_set_role_mode", { p_code: view.code, p_token: session.token, p_mode: m, p_role: role || null }).then(function (r) { if (r.error) fail(r.error); });
+        sb.rpc("zt_set_role_mode", { p_code: view.code, p_token: session.token, p_mode: m, p_role: role || null }).then(function (r) { if (r.error) return fail(r.error); view = r.data; render(); });
       }
       var card = el("div", { class: "card" }, [
         el("label", { text: "Attribution des rôles" }),
@@ -129,7 +129,7 @@
       app.appendChild(card);
       var ready = view.players.length === 2 && (mode === "random" || !!cr);
       app.appendChild(el("button", { class: "primary", text: "Lancer", disabled: ready ? null : "disabled", onclick: function () {
-        sb.rpc("zt_start", { p_code: view.code, p_token: session.token }).then(function (r) { if (r.error) fail(r.error); });
+        sb.rpc("zt_start", { p_code: view.code, p_token: session.token }).then(function (r) { if (r.error) return fail(r.error); view = r.data; render(); });
       } }));
     } else {
       app.appendChild(el("div", { class: "muted", text: "Le créateur choisit les rôles et lance la partie." }));
