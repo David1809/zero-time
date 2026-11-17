@@ -35,4 +35,4 @@ Phase 2 de la procédure : spécification du prototype à valider. Aucun code po
 
 - Appli : `index.html`, `css/`, `js/` à la racine, publiée par GitHub Pages (branche `main`, dossier racine). URL : https://david1809.github.io/zero-time/
 - Serveur : schéma `zt` du projet Supabase partagé avec Dé-lire ; migration dans `supabase/migrations/001_zt_salles.sql` (déjà appliquée). L'appli n'appelle que les fonctions `zt_*`, jamais les tables.
-- Fait : créer une salle, rejoindre par code, choisir son rôle ou tirage au sort, lancer. Reste : écrans opérateur et technicien (lot 3), état de jeu, minuteur et pénalités (lots 4 à 6).
+- Fait : créer une salle, rejoindre par code, choisir son rôle ou tirage au sort, lancer. Lot 3 : vue opérateur (compte à rebours affiché, erreurs, 3 panneaux tirés au hasard, sélection d'un fil) et vue technicien (manuel Fils seul), filtrées côté serveur. Reste : la coupe, les pénalités et la fin de partie (lots 4 à 6), puis déconnexion et reconnexion.

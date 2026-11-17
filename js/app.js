@@ -137,20 +137,98 @@
     app.appendChild(el("button", { text: "Quitter", onclick: function () { forget(); render(); } }));
   }
 
+  var COLORS = { red: "Rouge", blue: "Bleu", yellow: "Jaune", white: "Blanc", black: "Noir" };
+  var activePanel = 0, selectedWire = null, manualTab = "w4";
+  var timerId = null, offsetMs = 0;
+
+  function stopTimer() { if (timerId) { clearInterval(timerId); timerId = null; } }
+  function fmt(ms) {
+    var s = Math.max(0, Math.ceil(ms / 1000));
+    return Math.floor(s / 60) + ":" + (s % 60 < 10 ? "0" : "") + (s % 60);
+  }
+
+  function renderOperator() {
+    var g = view.game;
+    offsetMs = new Date(g.server_now).getTime() - Date.now();
+    var endsAt = new Date(g.ends_at).getTime();
+    var solved = g.panels.filter(function (p) { return p.state === "solved"; }).length;
+    var panel = g.panels[activePanel] || g.panels[0];
+
+    var timer = el("div", { class: "timer", text: fmt(endsAt - (Date.now() + offsetMs)) });
+    stopTimer();
+    timerId = setInterval(function () { timer.textContent = fmt(endsAt - (Date.now() + offsetMs)); }, 250);
+
+    var dots = el("div", { class: "dots" });
+    for (var i = 0; i < 3; i++) dots.appendChild(el("span", { class: "dot" + (i < g.errors ? " full" : "") }));
+
+    app.appendChild(el("div", { class: "hud" }, [
+      timer,
+      el("div", { class: "row2" }, [dots, el("span", { text: "Erreurs " + g.errors + "/3" })]),
+      el("div", { class: "muted", text: "Panneaux " + solved + "/3" })
+    ]));
+
+    var tabs = el("div", { class: "row" });
+    g.panels.forEach(function (p, idx) {
+      tabs.appendChild(el("button", {
+        class: idx === activePanel ? "on" : "",
+        text: "Panneau " + p.pos + (p.state === "solved" ? " ✓" : ""),
+        onclick: function () { activePanel = idx; selectedWire = null; render(); }
+      }));
+    });
+    app.appendChild(tabs);
+
+    var card = el("div", { class: "card" }, [
+      el("div", { class: "muted", text: "N° de série" }),
+      el("div", { class: "serial", text: panel.serial }),
+      el("div", { class: "muted", text: panel.state === "solved" ? "Résolu ✓" : "À faire" })
+    ]);
+    panel.wires.forEach(function (color, idx) {
+      var n = idx + 1, isCut = panel.cut.indexOf(n) !== -1;
+      var wire = el("button", {
+        class: "wire w-" + color + (isCut ? " cut" : "") + (selectedWire === n ? " sel" : ""),
+        "aria-label": "Fil " + n + (isCut ? " coupé" : ""),
+        onclick: function () { if (!isCut && panel.state !== "solved") { selectedWire = n; render(); } }
+      }, [el("span", { class: "num", text: String(n) }), el("span", { class: "bar" }), el("span", { class: "state", text: isCut ? "✂" : (selectedWire === n ? "●" : "") })]);
+      card.appendChild(wire);
+    });
+    app.appendChild(card);
+
+    app.appendChild(el("button", { class: "primary", text: "Couper ce fil", disabled: selectedWire ? null : "disabled",
+      onclick: function () { toast("La coupe sera active au prochain lot."); } }));
+    app.appendChild(el("div", { class: "muted", text: "Annonce le temps et les erreurs à voix haute au technicien." }));
+  }
+
+  function renderTechnician() {
+    stopTimer();
+    var m = view.manual;
+    function list(items, cls) {
+      var ol = el("ol", { class: cls || "rules" });
+      items.forEach(function (x) {
+        ol.appendChild(typeof x === "string" ? el("li", { text: x }) : el("li", {}, [el("b", { text: x.n + "  " }), document.createTextNode(x.t)]));
+      });
+      return ol;
+    }
+    app.appendChild(el("div", { class: "card" }, [el("h2", { text: "Manuel Fils" }), el("div", { class: "muted", text: m.rule_order })]));
+    app.appendChild(el("div", { class: "card" }, [el("h3", { text: "1. Lire un panneau" }), list(m.read)]));
+    app.appendChild(el("div", { class: "row" }, [
+      el("button", { class: manualTab === "w4" ? "on" : "", text: "4 fils", onclick: function () { manualTab = "w4"; render(); } }),
+      el("button", { class: manualTab === "w5" ? "on" : "", text: "5 fils", onclick: function () { manualTab = "w5"; render(); } })
+    ]));
+    app.appendChild(el("div", { class: "card" }, [el("h3", { text: manualTab === "w4" ? "2. Panneau à 4 fils" : "2. Panneau à 5 fils" }), list(m[manualTab])]));
+    app.appendChild(el("div", { class: "card" }, [el("h3", { text: "3. Lexique" }), list(m.lexicon, "lex")]));
+    app.appendChild(el("div", { class: "card" }, [el("h3", { text: "4. Erreurs" }), el("div", { text: m.penalties })]));
+  }
+
   function renderPlaying() {
     clear();
-    header().forEach(function (n) { app.appendChild(n); });
-    app.appendChild(el("div", { class: "card" }, [
-      el("div", { class: "muted", text: "Ton rôle" }),
-      el("div", { class: "code", style: "font-size:32px;letter-spacing:.05em", text: roleLabel(view.me.role) }),
-      el("div", { class: "muted", text: "Partie lancée. L'écran de jeu arrive au prochain lot." })
-    ]));
-    app.appendChild(el("button", { text: "Quitter", onclick: function () { forget(); render(); } }));
+    if (view.me.role === "operator" && view.game) return renderOperator();
+    if (view.me.role === "technician" && view.manual) return renderTechnician();
+    app.appendChild(el("div", { class: "card" }, [el("div", { class: "muted", text: "Chargement…" })]));
   }
 
   function render() {
-    if (!session || !view) return renderHome();
-    if (view.status === "lobby") return renderLobby();
+    if (!session || !view) { stopTimer(); return renderHome(); }
+    if (view.status === "lobby") { stopTimer(); return renderLobby(); }
     return renderPlaying();
   }
 

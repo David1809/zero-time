@@ -20,3 +20,19 @@ button:disabled{opacity:.4}
 .tag{color:var(--txt2);font-size:13px}
 #toast{position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));background:var(--red);color:#fff;padding:14px;border-radius:10px;text-align:center;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none}
 #toast.show{opacity:1;transform:none}
+
+h2,h3{margin:0}h3{font-size:16px;color:var(--orange)}
+.hud{display:flex;flex-direction:column;align-items:center;gap:6px}
+.timer{font-size:84px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
+.row2{display:flex;gap:10px;align-items:center}
+.dots{display:flex;gap:6px}.dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--red)}.dot.full{background:var(--red)}
+.serial{font-size:28px;font-weight:700;letter-spacing:.1em;text-align:center}
+.wire{display:flex;align-items:center;gap:12px;width:100%;min-height:60px;background:var(--sec);border-radius:10px;padding:0 14px}
+.wire.sel{outline:3px solid var(--orange);background:#2f4350}
+.wire .num{font-size:22px;font-weight:700;width:26px}
+.wire .bar{flex:1;height:14px;border-radius:7px;border:2px solid var(--txt2)}
+.wire .state{width:24px;font-size:22px;color:var(--orange)}
+.w-red .bar{background:#F04444}.w-blue .bar{background:#3B82F6}.w-yellow .bar{background:#F5D90A}.w-white .bar{background:#F3F5F5}.w-black .bar{background:#0B0F14}
+.wire.cut{opacity:.45}.wire.cut .bar{background:repeating-linear-gradient(90deg,var(--sec) 0 10px,transparent 10px 20px)!important}
+.rules,.lex{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:10px;line-height:1.35}
+.lex{list-style:disc}
