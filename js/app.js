@@ -22,7 +22,8 @@
     role_non_choisi: "Choisis ton rôle ou le tirage au sort.",
     reserve_operateur: "Action réservée à l'opérateur.",
     coupe_invalide: "Ce fil ne peut pas être coupé.",
-    panneau_inconnu: "Panneau inconnu."
+    panneau_inconnu: "Panneau inconnu.",
+    abandon_indisponible: "Abandon impossible pour le moment."
   };
 
   function toast(msg, ok) {
@@ -50,7 +51,7 @@
   function clear() { while (app.firstChild) app.removeChild(app.firstChild); }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(session)); } catch (e) {} }
   function load() { try { return JSON.parse(localStorage.getItem(KEY)); } catch (e) { return null; } }
-  function forget() { try { localStorage.removeItem(KEY); } catch (e) {} session = null; view = null; unsubscribe(); }
+  function forget() { try { localStorage.removeItem(KEY); } catch (e) {} session = null; view = null; unsubscribe(); stopHeartbeat(); }
 
   function unsubscribe() { if (channel) { sb.removeChannel(channel); channel = null; } }
   function subscribe() {
@@ -60,16 +61,34 @@
       .on("broadcast", { event: "state" }, function (msg) { view = msg.payload; render(); })
       .subscribe(function (status) { if (status === "SUBSCRIBED") refresh(); });
   }
-  function refresh() {
+  var hbId = null;
+  function sig(v) {
+    if (!v) return "";
+    var c = JSON.parse(JSON.stringify(v));
+    if (c.game) delete c.game.server_now;
+    return JSON.stringify(c);
+  }
+  // Signal de présence (toutes les 5 s) : le serveur détecte les absences, met en pause et reprend.
+  function heartbeat() {
     if (!session) return;
-    sb.rpc("zt_get_state", { p_code: session.code, p_token: session.token }).then(function (r) {
-      if (r.error) { forget(); render(); return; }
-      view = r.data; render();
+    var code = session.code;
+    sb.rpc("zt_heartbeat", { p_code: session.code, p_token: session.token }).then(function (r) {
+      if (!session || session.code !== code) return;
+      if (r.error) {
+        if ((r.error.message || "").indexOf("joueur_inconnu") !== -1) { forget(); render(); }
+        return; // réseau coupé : on réessaiera au prochain signal
+      }
+      if (sig(r.data) !== sig(view)) { view = r.data; render(); }
     });
   }
+  function startHeartbeat() { stopHeartbeat(); hbId = setInterval(heartbeat, 5000); }
+  function stopHeartbeat() { if (hbId) { clearInterval(hbId); hbId = null; } }
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) heartbeat(); });
+  window.addEventListener("online", heartbeat);
+  function refresh() { heartbeat(); }
   function enter(data) {
     session = { code: data.code, player_id: data.player_id, token: data.token };
-    save(); subscribe(); refresh();
+    save(); subscribe(); startHeartbeat(); refresh();
   }
 
   function header() {
@@ -161,6 +180,19 @@
     return Math.floor(s / 60) + ":" + (s % 60 < 10 ? "0" : "") + (s % 60);
   }
 
+  function pauseCard() {
+    var p = view.paused;
+    var kids = [
+      el("div", { class: "code", style: "font-size:26px;letter-spacing:.02em", text: "En attente de " + p.pseudo }),
+      el("div", { class: "muted", text: "La partie est en pause. Le temps ne s'écoule plus." })
+    ];
+    if (p.can_abandon) kids.push(el("button", { text: "Abandonner la partie", onclick: function () {
+      if (!window.confirm("Abandonner la partie ?")) return;
+      sb.rpc("zt_abandon", { p_code: session.code, p_token: session.token }).then(function (r) { if (r.error) return fail(r.error); view = r.data; render(); });
+    } }));
+    return el("div", { class: "card pause" }, kids);
+  }
+
   function renderOperator() {
     var g = view.game;
     offsetMs = new Date(g.server_now).getTime() - Date.now();
@@ -168,11 +200,12 @@
     var solved = g.panels.filter(function (p) { return p.state === "solved"; }).length;
     var panel = g.panels[activePanel] || g.panels[0];
 
-    var timer = el("div", { class: "timer", text: fmt(endsAt - (Date.now() + offsetMs)) });
+    var paused = view.paused;
+    var timer = el("div", { class: "timer", text: paused ? fmt(paused.remaining_ms) : fmt(endsAt - (Date.now() + offsetMs)) });
     stopTimer();
     var remInit = (endsAt - (Date.now() + offsetMs)) / 1000;
     if (!alertInit) { alertInit = true; ALERTS.forEach(function (T) { if (remInit <= T) alerted[T] = true; }); }
-    timerId = setInterval(function () {
+    if (!paused) timerId = setInterval(function () {
       var ms = endsAt - (Date.now() + offsetMs), rem = ms / 1000;
       timer.textContent = fmt(ms);
       var fire = null;
@@ -203,6 +236,7 @@
       el("div", { class: "muted", text: "Panneaux " + solved + "/3" })
     ]));
 
+    if (paused) app.appendChild(pauseCard());
     var tabs = el("div", { class: "row" });
     g.panels.forEach(function (p, idx) {
       tabs.appendChild(el("button", {
@@ -230,9 +264,9 @@
     });
     app.appendChild(card);
 
-    app.appendChild(el("button", { class: "primary", text: "Couper ce fil", disabled: selectedWire ? null : "disabled",
+    app.appendChild(el("button", { class: "primary", text: "Couper ce fil", disabled: (selectedWire && !paused) ? null : "disabled",
       onclick: function () {
-        if (cutting || !selectedWire) return;
+        if (cutting || !selectedWire || view.paused) return;
         cutting = true;
         sb.rpc("zt_cut", { p_code: session.code, p_token: session.token, p_action: uuid(), p_pos: panel.pos, p_wire: selectedWire }).then(function (r) {
           cutting = false;
@@ -246,6 +280,7 @@
   function renderTechnician() {
     stopTimer();
     var m = view.manual;
+    if (view.paused) app.appendChild(pauseCard());
     function list(items, cls) {
       var ol = el("ol", { class: cls || "rules" });
       items.forEach(function (x) {
@@ -274,6 +309,16 @@
     stopTimer(); clear();
     var e = view.end, win = e.outcome === "defused";
     var lines = [];
+    if (e.outcome === "abandoned") {
+      app.appendChild(el("div", { class: "card end boom" }, [
+        el("div", { class: "code", style: "font-size:30px;letter-spacing:.03em;color:#FF9F32", text: "PARTIE ABANDONNÉE" })
+      ]));
+      app.appendChild(el("button", { class: "primary", text: "Rejouer", onclick: function () {
+        sb.rpc("zt_replay", { p_code: session.code, p_token: session.token }).then(function (r) { if (r.error) return fail(r.error); view = r.data; resetGameFlags(); selectedWire = null; activePanel = 0; render(); });
+      } }));
+      app.appendChild(el("button", { text: "Quitter", onclick: function () { forget(); render(); } }));
+      return;
+    }
     if (win) {
       if (typeof e.remaining_ms === "number") lines.push("Temps restant : " + fmt(e.remaining_ms));
       lines.push("Erreurs : " + e.errors + "/3");
@@ -293,11 +338,11 @@
   function render() {
     if (!session || !view) { stopTimer(); return renderHome(); }
     if (view.status === "lobby") { stopTimer(); resetGameFlags(); return renderLobby(); }
-    if (view.status === "ended") return renderEnded();
+    if (view.status === "ended" || view.status === "abandoned") return renderEnded();
     return renderPlaying();
   }
 
   session = load();
-  if (session) { subscribe(); } 
+  if (session) { subscribe(); startHeartbeat(); } 
   render();
 })();
