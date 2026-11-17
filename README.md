@@ -14,6 +14,8 @@ Jeu coopératif de désamorçage de bombes pour smartphones : un opérateur voit
 | `docs/SPECIFICATION_MVP_FILS_V1.md` | Spécification du prototype fondateur (module Fils), points À DÉFINIR à valider |
 | `docs/ANALYSE_ARCHITECTURE_V1.md` | Analyse d'architecture, décision à prendre |
 
+> Dépôt **public** (nécessaire à GitHub Pages) : n'y mettre aucun secret.
+
 ## Où ranger quoi
 
 - **GitHub (ce dépôt)** : le code et tous les documents texte (`.md`). C'est la seule version de référence.

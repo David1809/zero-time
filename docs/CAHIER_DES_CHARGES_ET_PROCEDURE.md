@@ -1269,7 +1269,7 @@ La solution devra privilégier les technologies gratuites ou disposant d'une off
 
 Aucune API payante ni aucun service générant des coûts récurrents ne doit être introduit sans validation préalable.
 
-Le site est publié sur GitHub Pages, gratuit pour un dépôt public. Un dépôt privé nécessiterait une offre GitHub payante ; le dépôt qui publie le jeu doit donc être public, ce qui est à trancher avant la publication (voir l'analyse d'architecture, décision 4).
+Le site est publié sur GitHub Pages, gratuit pour un dépôt public. Un dépôt privé nécessiterait une offre GitHub payante ; le dépôt du jeu est donc public (décision de David). Aucun secret ne doit y figurer, et la page du jeu porte une balise « noindex » pour limiter son référencement.
 
 Les éventuelles limites des offres gratuites devront être identifiées avant de retenir une solution.
 

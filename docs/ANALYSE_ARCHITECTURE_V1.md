@@ -108,7 +108,7 @@ Chiffres vérifiés en novembre 2026, voir les sources en fin de document.
 | L'hôte perd le réseau ou verrouille son écran, la partie s'arrête | A | Élevée | Acceptée au prototype ; à lever au MVP |
 | Pénalité comptée deux fois (double clic, requête répétée) | Toutes | Élevée | Identifiant d'action unique, traité une seule fois par le moteur ; test dédié |
 | Projet Supabase en pause avant une soirée | B (et A) | Moyenne | Projet partagé avec Dé-lire, ou le « réveiller » avant de jouer |
-| Dépôt privé : GitHub Pages indisponible sans offre payante | A, B | Moyenne | Publier le jeu depuis un dépôt public dédié au code, ou rendre le dépôt public (décision 4) |
+| Dépôt public : contenu lisible par tous, secret commité par erreur | A, B | Moyenne | Décision 4 prise (dépôt public) ; jamais de clé « service » dans le dépôt ; seule la clé « anon » de Supabase, protégée par les règles d'accès (RLS) |
 | RLS mal conçue : un rôle lit ce qu'il ne devrait pas | B | Moyenne | Tests d'accès par rôle dès le départ |
 | Dérive d'horloge entre téléphones sur le compte à rebours | Toutes | Faible | Calcul local à partir de `ends_at` plus un décalage d'horloge mesuré à la connexion |
 | Règles déséquilibrées une fois générées (voir spécification §5) | Générateur | Moyenne | Rééquilibrer avant d'écrire le générateur |
@@ -130,7 +130,7 @@ Il suit les lots de la procédure (phase 5), avec l'option A pour le prototype.
 1. Valider l'option A pour le prototype ?
 2. Pour le MVP : accepter de trancher après le Jalon 0 (préférence B) ?
 3. Projet Supabase : partagé avec Dé-lire ou dédié ? (Il y a une limite de 2 projets actifs sur l'offre gratuite ; elle est peut-être déjà atteinte chez toi.)
-4. GitHub Pages exige un dépôt public (sauf offre payante). Quelle solution : (a) dépôt séparé et public contenant uniquement le jeu, les documents restant dans ce dépôt privé ; (b) rendre ce dépôt public ? Recommandation : (a).
+4. ~~Dépôt public pour GitHub Pages~~ **Décidé par David : le dépôt `zero-time` est rendu public (option b) et GitHub Pages est activé.** Conséquences : tout le contenu du dépôt (cahier, spécification, analyse) est lisible par tous ; aucun secret ne doit y être commité (jamais la clé « service » de Supabase) ; la page du jeu contiendra une balise `noindex` pour limiter son référencement ; le dépôt n'aura ni description ni topics.
 
 ## Sources
 
