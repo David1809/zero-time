@@ -36,3 +36,7 @@ h2,h3{margin:0}h3{font-size:16px;color:var(--orange)}
 .wire.cut{opacity:.45}.wire.cut .bar{background:repeating-linear-gradient(90deg,var(--sec) 0 10px,transparent 10px 20px)!important}
 .rules,.lex{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:10px;line-height:1.35}
 .lex{list-style:disc}
+
+@keyframes flash{0%{background:#7a1c1c}100%{background:var(--bg)}}
+body.flash{animation:flash .7s ease-out}
+.rules{list-style:none;padding-left:0}

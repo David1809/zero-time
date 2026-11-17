@@ -1,0 +1,3 @@
+-- Manuel : précise que 0 est pair (chiffre pair : 0, 2, 4, 6, 8 ; impair : 1, 3, 5, 7, 9).
+-- Contenu identique à la fonction zt.manual() de 002, avec cette seule précision dans le bloc « Lire un panneau ».
+-- (Appliquée directement ; voir la fonction zt.manual() dans la base pour le texte complet.)

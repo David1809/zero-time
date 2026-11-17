@@ -19,11 +19,15 @@
     joueur_inconnu: "Joueur inconnu.",
     reserve_au_createur: "Action réservée au créateur.",
     joueur_manquant: "Il manque un joueur.",
-    role_non_choisi: "Choisis ton rôle ou le tirage au sort."
+    role_non_choisi: "Choisis ton rôle ou le tirage au sort.",
+    reserve_operateur: "Action réservée à l'opérateur.",
+    coupe_invalide: "Ce fil ne peut pas être coupé.",
+    panneau_inconnu: "Panneau inconnu."
   };
 
-  function toast(msg) {
+  function toast(msg, ok) {
     toastEl.textContent = msg; toastEl.classList.add("show");
+    toastEl.style.background = ok ? "#2E7D4F" : "";
     clearTimeout(toastTimer); toastTimer = setTimeout(function () { toastEl.classList.remove("show"); }, 3500);
   }
   function fail(error) {
@@ -140,6 +144,16 @@
   var COLORS = { red: "Rouge", blue: "Bleu", yellow: "Jaune", white: "Blanc", black: "Noir" };
   var activePanel = 0, selectedWire = null, manualTab = "w4";
   var timerId = null, offsetMs = 0;
+  var seenEvent, alerted = {}, alertInit = false, tickSent = false, cutting = false;
+  var ALERTS = [120, 60, 30, 10];
+  function uuid() {
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+      var r = Math.random() * 16 | 0; return (c === "x" ? r : (r & 3 | 8)).toString(16);
+    });
+  }
+  function buzz(p) { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} }
+  function resetGameFlags() { seenEvent = undefined; alerted = {}; alertInit = false; tickSent = false; }
 
   function stopTimer() { if (timerId) { clearInterval(timerId); timerId = null; } }
   function fmt(ms) {
@@ -156,7 +170,29 @@
 
     var timer = el("div", { class: "timer", text: fmt(endsAt - (Date.now() + offsetMs)) });
     stopTimer();
-    timerId = setInterval(function () { timer.textContent = fmt(endsAt - (Date.now() + offsetMs)); }, 250);
+    var remInit = (endsAt - (Date.now() + offsetMs)) / 1000;
+    if (!alertInit) { alertInit = true; ALERTS.forEach(function (T) { if (remInit <= T) alerted[T] = true; }); }
+    timerId = setInterval(function () {
+      var ms = endsAt - (Date.now() + offsetMs), rem = ms / 1000;
+      timer.textContent = fmt(ms);
+      var fire = null;
+      ALERTS.forEach(function (T) { if (rem <= T && rem > 0 && !alerted[T]) { alerted[T] = true; fire = T; } });
+      if (fire !== null) { toast("Il reste " + fmt(ms), false); buzz([150, 80, 150]); }
+      if (rem <= 0 && !tickSent) {
+        tickSent = true;
+        sb.rpc("zt_tick", { p_code: session.code, p_token: session.token }).then(function (r) { if (!r.error) { view = r.data; render(); } });
+      }
+    }, 250);
+    // Retour de la dernière coupe : flash et vibration, une seule fois par événement.
+    var ev = g.event;
+    if (seenEvent === undefined) { seenEvent = ev ? ev.id : null; }
+    else if (ev && ev.id !== seenEvent) {
+      seenEvent = ev.id;
+      if (ev.type === "error") {
+        document.body.classList.add("flash"); setTimeout(function () { document.body.classList.remove("flash"); }, 700);
+        buzz([250]); toast("ERREUR " + ev.n + "/3" + (ev.penalty ? " — −" + ev.penalty + " s" : ""), false);
+      } else { buzz([80]); toast("Panneau résolu ✓", true); }
+    }
 
     var dots = el("div", { class: "dots" });
     for (var i = 0; i < 3; i++) dots.appendChild(el("span", { class: "dot" + (i < g.errors ? " full" : "") }));
@@ -194,7 +230,15 @@
     app.appendChild(card);
 
     app.appendChild(el("button", { class: "primary", text: "Couper ce fil", disabled: selectedWire ? null : "disabled",
-      onclick: function () { toast("La coupe sera active au prochain lot."); } }));
+      onclick: function () {
+        if (cutting || !selectedWire) return;
+        cutting = true;
+        sb.rpc("zt_cut", { p_code: session.code, p_token: session.token, p_action: uuid(), p_pos: panel.pos, p_wire: selectedWire }).then(function (r) {
+          cutting = false;
+          if (r.error) return fail(r.error);
+          selectedWire = null; view = r.data; render();
+        });
+      } }));
     app.appendChild(el("div", { class: "muted", text: "Annonce le temps et les erreurs à voix haute au technicien." }));
   }
 
@@ -226,9 +270,30 @@
     app.appendChild(el("div", { class: "card" }, [el("div", { class: "muted", text: "Chargement…" })]));
   }
 
+  function renderEnded() {
+    stopTimer(); clear();
+    var e = view.end, win = e.outcome === "defused";
+    var lines = [];
+    if (win) {
+      if (typeof e.remaining_ms === "number") lines.push("Temps restant : " + fmt(e.remaining_ms));
+      lines.push("Erreurs : " + e.errors + "/3");
+    } else {
+      lines.push(e.cause === "errors" ? "Cause : trois erreurs" : "Cause : temps écoulé");
+      lines.push("Panneaux résolus : " + e.solved + "/" + e.total);
+    }
+    app.appendChild(el("div", { class: "card end " + (win ? "win" : "boom") }, [
+      el("div", { class: "code", style: "font-size:34px;letter-spacing:.05em;color:" + (win ? "#42C97A" : "#F04444"), text: win ? "BOMBE DÉSAMORCÉE" : "EXPLOSION" })
+    ].concat(lines.map(function (l) { return el("div", { class: "muted", style: "font-size:18px", text: l }); }))));
+    app.appendChild(el("button", { class: "primary", text: "Rejouer", onclick: function () {
+      sb.rpc("zt_replay", { p_code: session.code, p_token: session.token }).then(function (r) { if (r.error) return fail(r.error); view = r.data; resetGameFlags(); selectedWire = null; activePanel = 0; render(); });
+    } }));
+    app.appendChild(el("button", { text: "Quitter", onclick: function () { forget(); render(); } }));
+  }
+
   function render() {
     if (!session || !view) { stopTimer(); return renderHome(); }
-    if (view.status === "lobby") { stopTimer(); return renderLobby(); }
+    if (view.status === "lobby") { stopTimer(); resetGameFlags(); return renderLobby(); }
+    if (view.status === "ended") return renderEnded();
     return renderPlaying();
   }
 

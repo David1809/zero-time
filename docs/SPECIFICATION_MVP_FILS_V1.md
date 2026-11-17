@@ -75,6 +75,8 @@ Le technicien ne voit pas les fils. Il ne voit **que le manuel Fils**. Il ne voi
 1. **Comment lire un panneau** : compter les fils de haut en bas ; repérer le dernier chiffre du numéro de série (pair ou impair) ; demander à l'opérateur la liste des couleurs dans l'ordre.
 2. **Panneau à 4 fils** et **panneau à 5 fils** : deux onglets. Chaque onglet est une **liste de règles à appliquer dans l'ordre : on s'arrête à la première qui s'applique.**
 3. **Lexique** : `dernier fil` = le plus bas ; `1er fil` = le plus haut ; `exactement un` = ni zéro ni deux.
+   Précision ajoutée au manuel : un chiffre pair est 0, 2, 4, 6 ou 8 (le 0 est pair) ; impair : 1, 3, 5, 7 ou 9.
+   Piste pour plus tard (David) : le numéro de série pourra servir à d'autres conditions que pair/impair ; à définir avant le générateur, rien n'est inventé pour le prototype.
 4. **Rappel des erreurs et des pénalités.**
 
 ---
