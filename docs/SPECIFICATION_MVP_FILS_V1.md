@@ -2,7 +2,7 @@
 
 **Version :** V1.1 — décisions de David du 17 novembre 2026 intégrées
 **Référence :** cahier des charges maître (§5, §11, §12, §18) et procédure, phase 2
-**Statut :** les points 1 à 11 sont décidés par David (voir le récapitulatif §10). Le point **12** (un manuel par module) est décidé dans son principe par David ; son contenu reste **À DÉFINIR** (§8 bis).
+**Statut :** les points 1 à 11 sont décidés par David (voir le récapitulatif §10). Le point **12** (un manuel par module) est décidé par David, y compris les règles 3 fils (§8 bis). Il ne reste aucun point À DÉFINIR.
 
 ---
 
@@ -183,16 +183,16 @@ Principe du cahier (§14.6) : une reconnexion ne réinitialise pas la partie et 
 
 ---
 
-## 8 bis. Un manuel par module (principe décidé, contenu À DÉFINIR)
+## 8 bis. Un manuel par module (décidé)
 
 **Décidé 12 — Principe.** Le jeu ne doit pas être répétitif : chaque panneau a son propre manuel. L'opérateur annonce à voix haute le module qu'il a sous les yeux ; le technicien ouvre le manuel du module correspondant.
 
-**À DÉFINIR 12 — Proposition de Claude, à valider ou corriger par David.**
+**Décidé 12 bis — Contenu validé par David le 18 novembre 2026** (noms de module « 3 fils », « 4 fils », « 5 fils », tirage d'un panneau de chaque module, règles 3.1 à 3.4 et configurations P9 à P12 ci-dessous).
 
 1. **Identification du module :** chaque panneau affiche en texte son module, par le nombre de fils : « Module 3 fils », « Module 4 fils », « Module 5 fils ». C'est du texte, donc pas de problème de couleur seule.
 2. **Tirage :** une bombe contient **un panneau de chaque module** (un à 3 fils, un à 4 fils, un à 5 fils), dans un ordre aléatoire. Les trois manuels servent donc dans chaque partie.
 3. **Manuel du technicien :** trois onglets « 3 fils », « 4 fils », « 5 fils » ; les règles 4 fils et 5 fils sont celles du §5 (5.4 = dernier fil). Le technicien ne voit pas quel module est à l'écran de l'opérateur : il ouvre l'onglet annoncé.
-4. **Nouveau manuel 3 fils (proposition, à valider).** Première règle qui s'applique :
+4. **Manuel 3 fils (validé).** Première règle qui s'applique :
 
 | N° | Condition | Action |
 | --- | --- | --- |
@@ -201,7 +201,7 @@ Principe du cahier (§14.6) : une reconnexion ne réinitialise pas la partie et 
 | 3.3 | Sinon, le chiffre de série est pair **et** plus d'un fil blanc | Couper le **1er** fil |
 | 3.4 | Sinon | Couper le **dernier fil rouge** |
 
-5. **Quatre configurations fixes 3 fils (proposition) :**
+5. **Quatre configurations fixes 3 fils (validées) :**
 
 | Panneau | Série | Fils (haut → bas) | Série | Règle | Bonne réponse |
 | --- | --- | --- | --- | --- | --- |
@@ -239,4 +239,4 @@ Télévision, générateur, Code PIN, Symboles, 3 bombes, rotation des rôles, s
 | 9 | Connexion perdue | Pause de la partie |
 | 10 | Départ définitif | Le créateur peut abandonner ; le bouton n'apparaît que si un membre a disparu |
 | 11 | Créateur disparu | L'autre joueur reçoit le bouton Abandonner (même règle d'apparition) |
-| 12 | Manuel par module | Principe décidé ; contenu **À DÉFINIR** (§8 bis) |
+| 12 | Manuel par module | Un manuel par module (3, 4, 5 fils), un panneau de chaque par partie ; règles 3 fils validées (§8 bis) |

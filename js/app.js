@@ -207,13 +207,14 @@
     g.panels.forEach(function (p, idx) {
       tabs.appendChild(el("button", {
         class: idx === activePanel ? "on" : "",
-        text: "Panneau " + p.pos + (p.state === "solved" ? " ✓" : ""),
+        text: p.wires.length + " fils" + (p.state === "solved" ? " ✓" : ""),
         onclick: function () { activePanel = idx; selectedWire = null; render(); }
       }));
     });
     app.appendChild(tabs);
 
     var card = el("div", { class: "card" }, [
+      el("div", { class: "modname", text: "Module " + panel.wires.length + " fils" }),
       el("div", { class: "muted", text: "N° de série" }),
       el("div", { class: "serial", text: panel.serial }),
       el("div", { class: "muted", text: panel.state === "solved" ? "Résolu ✓" : "À faire" })
@@ -254,11 +255,10 @@
     }
     app.appendChild(el("div", { class: "card" }, [el("h2", { text: "Manuel Fils" }), el("div", { class: "muted", text: m.rule_order })]));
     app.appendChild(el("div", { class: "card" }, [el("h3", { text: "1. Lire un panneau" }), list(m.read)]));
-    app.appendChild(el("div", { class: "row" }, [
-      el("button", { class: manualTab === "w4" ? "on" : "", text: "4 fils", onclick: function () { manualTab = "w4"; render(); } }),
-      el("button", { class: manualTab === "w5" ? "on" : "", text: "5 fils", onclick: function () { manualTab = "w5"; render(); } })
-    ]));
-    app.appendChild(el("div", { class: "card" }, [el("h3", { text: manualTab === "w4" ? "2. Panneau à 4 fils" : "2. Panneau à 5 fils" }), list(m[manualTab])]));
+    app.appendChild(el("div", { class: "row" }, ["w3", "w4", "w5"].map(function (k) {
+      return el("button", { class: manualTab === k ? "on" : "", text: k.slice(1) + " fils", onclick: function () { manualTab = k; render(); } });
+    })));
+    app.appendChild(el("div", { class: "card" }, [el("h3", { text: "2. Module " + manualTab.slice(1) + " fils" }), list(m[manualTab])]));
     app.appendChild(el("div", { class: "card" }, [el("h3", { text: "3. Lexique" }), list(m.lexicon, "lex")]));
     app.appendChild(el("div", { class: "card" }, [el("h3", { text: "4. Erreurs" }), el("div", { text: m.penalties })]));
   }

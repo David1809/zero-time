@@ -40,3 +40,5 @@ h2,h3{margin:0}h3{font-size:16px;color:var(--orange)}
 @keyframes flash{0%{background:#7a1c1c}100%{background:var(--bg)}}
 body.flash{animation:flash .7s ease-out}
 .rules{list-style:none;padding-left:0}
+
+.modname{font-size:20px;font-weight:700;color:var(--orange);text-align:center}
