@@ -195,29 +195,44 @@
     return el("div", { class: "card pause" }, kids);
   }
 
+  function fmtH(ms) {
+    ms = Math.max(0, ms);
+    var s = Math.floor(ms / 1000), c = Math.floor((ms % 1000) / 10);
+    return [Math.floor(s / 60) + ":" + (s % 60 < 10 ? "0" : "") + (s % 60), (c < 10 ? ".0" : ".") + c];
+  }
+
   function renderOperator() {
     var g = view.game;
     offsetMs = new Date(g.server_now).getTime() - Date.now();
     var endsAt = new Date(g.ends_at).getTime();
     var solved = g.panels.filter(function (p) { return p.state === "solved"; }).length;
     var panel = g.panels[activePanel] || g.panels[0];
-
     var paused = view.paused;
-    var timer = el("div", { class: "timer", text: paused ? fmt(paused.remaining_ms) : fmt(endsAt - (Date.now() + offsetMs)) });
+
+    var tMain = el("span", { class: "t-main" }), tHund = el("span", { class: "t-hund" });
+    var timer = el("div", { class: "optimer" }, [tMain, tHund]);
+    function paint(ms) {
+      var f = fmtH(ms); tMain.textContent = f[0]; tHund.textContent = f[1];
+      var crit = ms <= 30000 && !paused;
+      timer.classList.toggle("crit", crit);
+      timer.classList.toggle("paused", !!paused);
+    }
     stopTimer();
     var remInit = (endsAt - (Date.now() + offsetMs)) / 1000;
+    if (paused) paint(paused.remaining_ms); else paint(endsAt - (Date.now() + offsetMs));
     if (!alertInit) { alertInit = true; ALERTS.forEach(function (T) { if (remInit <= T) alerted[T] = true; }); }
     if (!paused) timerId = setInterval(function () {
       var ms = endsAt - (Date.now() + offsetMs), rem = ms / 1000;
-      timer.textContent = fmt(ms);
+      paint(ms);
       var fire = null;
       ALERTS.forEach(function (T) { if (rem <= T && rem > 0 && !alerted[T]) { alerted[T] = true; fire = T; } });
-      if (fire !== null) { toast("Il reste " + fmt(ms), false); buzz([150, 80, 150]); }
+      if (fire !== null) { toast("Il reste " + fmt(ms), false); buzz([150, 80, 150]); window.ZT_FX.beep(fire <= 10 ? 1200 : 880); }
       if (rem <= 0 && !tickSent) {
         tickSent = true;
         sb.rpc("zt_tick", { p_code: session.code, p_token: session.token }).then(function (r) { if (!r.error) { view = r.data; render(); } });
       }
-    }, 250);
+    }, 50);
+
     // Retour de la dernière coupe : flash et vibration, une seule fois par événement.
     var ev = g.event;
     if (seenEvent === undefined) { seenEvent = ev ? ev.id : null; }
@@ -231,15 +246,29 @@
 
     var dots = el("div", { class: "dots" });
     for (var i = 0; i < 3; i++) dots.appendChild(el("span", { class: "dot" + (i < g.errors ? " full" : "") }));
+    var gauge = el("div", { class: "gauge" });
+    for (var k = 0; k < 3; k++) gauge.appendChild(el("span", { class: k < solved ? "on" : "" }));
 
-    app.appendChild(el("div", { class: "hud" }, [
+    app.appendChild(el("div", { class: "opbar" }, [
+      el("span", { class: "opbar-t", text: "UNITÉ OPÉRATEUR" }),
+      el("span", { class: "opbar-s", text: paused ? "PAUSE" : "ACTIF" })
+    ]));
+
+    app.appendChild(el("div", { class: "chassis telemetry" }, [
+      el("div", { class: "tele-top" }, [
+        el("span", { class: "tele-state" + (paused ? "" : " live"), text: paused ? "EN PAUSE" : (solved === 3 ? "SÉCURISÉ" : "DÉTONATION IMMINENTE") }),
+        el("span", { class: "tele-ch", text: "CANAL // LIVE" })
+      ]),
       timer,
-      el("div", { class: "row2" }, [dots, el("span", { text: "Erreurs " + g.errors + "/3" })]),
-      el("div", { class: "muted", text: "Panneaux " + solved + "/3" })
+      el("div", { class: "tele-row" }, [
+        el("div", {}, [el("div", { class: "lbl", text: "ERREURS " + g.errors + "/3" }), dots]),
+        el("div", {}, [el("div", { class: "lbl", text: "PANNEAUX " + solved + "/3" }), gauge])
+      ])
     ]));
 
     if (paused) app.appendChild(pauseCard());
-    var tabs = el("div", { class: "row" });
+
+    var tabs = el("div", { class: "row optabs" });
     g.panels.forEach(function (p, idx) {
       tabs.appendChild(el("button", {
         class: idx === activePanel ? "on" : "",
@@ -249,30 +278,46 @@
     });
     app.appendChild(tabs);
 
-    var card = el("div", { class: "card" }, [
-      el("div", { class: "modname", text: "Module " + panel.wires.length + " fils" }),
-      el("div", { class: "muted", text: "N° de série" }),
-      el("div", { class: "serial", text: panel.serial }),
-      el("div", { class: "muted", text: panel.state === "solved" ? "Résolu ✓" : "À faire" })
+    var chassis = el("div", { class: "chassis wires" }, [
+      el("div", { class: "plate" }, [
+        el("div", {}, [el("div", { class: "lbl", text: "MODULE" }), el("div", { class: "plate-v", text: panel.wires.length + " FILS" })]),
+        el("div", { class: "plate-r" }, [el("div", { class: "lbl", text: "N° DE SÉRIE" }), el("div", { class: "plate-serial", text: panel.serial })])
+      ])
     ]);
+    var rows = {};
     panel.wires.forEach(function (color, idx) {
       var n = idx + 1, isCut = panel.cut.indexOf(n) !== -1;
-      var wire = el("button", {
-        class: "wire w-" + color + (isCut ? " cut" : "") + (selectedWire === n ? " sel" : ""),
+      var conduit = el("div", { class: "conduit" });
+      if (isCut) {
+        conduit.appendChild(el("span", { class: "cable c-" + color + " stump l" }));
+        conduit.appendChild(el("span", { class: "cut-lbl", text: "SECTIONNÉ" }));
+        conduit.appendChild(el("span", { class: "cable c-" + color + " stump r" }));
+      } else {
+        conduit.appendChild(el("span", { class: "cable c-" + color }));
+      }
+      var row = el("button", {
+        class: "oprow" + (isCut ? " is-cut" : "") + (selectedWire === n ? " sel" : ""),
         "aria-label": "Fil " + n + (isCut ? " coupé" : ""),
         onclick: function () { if (!isCut && panel.state !== "solved") { selectedWire = n; render(); } }
-      }, [el("span", { class: "num", text: String(n) }), el("span", { class: "bar" }), el("span", { class: "state", text: isCut ? "✂" : (selectedWire === n ? "●" : "") })]);
-      card.appendChild(wire);
+      }, [el("span", { class: "badge", text: String(n) }), el("span", { class: "pin" }), conduit, el("span", { class: "pin" })]);
+      rows[n] = row;
+      chassis.appendChild(row);
     });
-    app.appendChild(card);
+    app.appendChild(chassis);
 
-    app.appendChild(el("button", { class: "primary", text: "Couper ce fil", disabled: (selectedWire && !paused) ? null : "disabled",
+    app.appendChild(el("div", { class: "target", text: selectedWire ? "CIBLE ENGAGÉE : FIL #" + selectedWire : "AUCUNE CIBLE" }));
+    app.appendChild(el("button", { class: "trigger", text: "COUPER CE FIL", disabled: (selectedWire && !paused) ? null : "disabled",
       onclick: function () {
         if (cutting || !selectedWire || view.paused) return;
         cutting = true;
-        sb.rpc("zt_cut", { p_code: session.code, p_token: session.token, p_action: uuid(), p_pos: panel.pos, p_wire: selectedWire }).then(function (r) {
+        var n = selectedWire, row = rows[n];
+        // Effets immédiats : le serveur reste l'autorité, l'écran se met à jour juste après.
+        window.ZT_FX.cutSound(); buzz([22, 12, 45]);
+        if (row) { row.classList.add("snip"); window.ZT_FX.sparks(row); }
+        hold(450);
+        sb.rpc("zt_cut", { p_code: session.code, p_token: session.token, p_action: uuid(), p_pos: panel.pos, p_wire: n }).then(function (r) {
           cutting = false;
-          if (r.error) return fail(r.error);
+          if (r.error) { holdUntil = 0; fail(r.error); return render(); }
           selectedWire = null; view = r.data; render();
         });
       } }));
@@ -337,7 +382,19 @@
     app.appendChild(el("button", { text: "Quitter", onclick: function () { forget(); render(); } }));
   }
 
+  var holdUntil = 0, holdTimer = null;
+  function hold(ms) { holdUntil = Date.now() + ms; }
   function render() {
+    var wait = holdUntil - Date.now();
+    if (wait > 0) {
+      if (!holdTimer) holdTimer = setTimeout(function () { holdTimer = null; render(); }, wait + 10);
+      return;
+    }
+    doRender();
+  }
+  function doRender() {
+    var isOp = !!(session && view && view.status === "playing" && view.me && view.me.role === "operator" && view.game);
+    document.body.classList.toggle("op", isOp);
     if (!session || !view) { stopTimer(); return renderHome(); }
     if (view.status === "lobby") { stopTimer(); resetGameFlags(); return renderLobby(); }
     if (view.status === "ended" || view.status === "abandoned") return renderEnded();

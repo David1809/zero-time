@@ -44,3 +44,49 @@ body.flash{animation:flash .7s ease-out}
 .modname{font-size:20px;font-weight:700;color:var(--orange);text-align:center}
 
 .pause{border:2px solid var(--orange);text-align:center}
+
+/* ===== Écran opérateur (maquette OP03 Stitch) ===== */
+body.op{background:#06090e;font-family:"Space Grotesk",system-ui,sans-serif}
+.opbar{display:flex;justify-content:space-between;align-items:center;padding:6px 4px;font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.15em;color:var(--orange)}
+.opbar-s{color:#4ade80}
+.chassis{background:linear-gradient(160deg,#111923,#0c1219);border:1px solid #223242;border-radius:10px;padding:12px;box-shadow:inset 0 1px 0 #ffffff0d,0 6px 16px #0008}
+.lbl{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.14em;color:var(--txt2);margin-bottom:4px}
+.telemetry{display:flex;flex-direction:column;gap:8px}
+.tele-top{display:flex;justify-content:space-between;font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.12em}
+.tele-state{color:var(--txt2)}.tele-state.live{color:var(--red);animation:blink 1s steps(2) infinite}
+.tele-ch{color:var(--txt2)}
+@keyframes blink{50%{opacity:.35}}
+.optimer{font-family:"JetBrains Mono",monospace;font-weight:700;text-align:center;color:#4ade80;line-height:1;text-shadow:0 0 14px currentColor;font-variant-numeric:tabular-nums}
+.t-main{font-size:76px}.t-hund{font-size:34px;opacity:.8}
+.optimer.crit{color:var(--red);animation:pulse .5s ease-in-out infinite alternate}
+.optimer.paused{opacity:.4;color:var(--txt2);text-shadow:none}
+@keyframes pulse{to{text-shadow:0 0 28px var(--red);opacity:.8}}
+.tele-row{display:flex;justify-content:space-between;align-items:flex-end}
+.gauge{display:flex;gap:4px}.gauge span{width:28px;height:10px;border-radius:2px;background:#223242}.gauge span.on{background:#4ade80;box-shadow:0 0 8px #4ade80}
+.optabs button{font-family:"JetBrains Mono",monospace}
+.plate{display:flex;justify-content:space-between;align-items:flex-end;padding:6px 8px 10px;border-bottom:1px solid #223242;margin-bottom:8px}
+.plate-v{font-family:Chivo,sans-serif;font-weight:900;font-size:20px;color:var(--orange)}
+.plate-r{text-align:right}
+.plate-serial{font-family:"JetBrains Mono",monospace;font-size:22px;font-weight:700;letter-spacing:.12em}
+.oprow{display:flex;align-items:center;gap:6px;width:100%;min-height:58px;padding:0 6px;margin:4px 0;background:#0a1017;border:1px solid #1b2836;border-radius:8px;color:var(--txt)}
+.oprow.sel{border-color:var(--orange);box-shadow:0 0 0 2px #ff9f3266,inset 0 0 14px #ff9f3222;background:#10171f}
+.badge{width:28px;height:28px;border-radius:6px;background:#1b2836;display:flex;align-items:center;justify-content:center;font-family:"JetBrains Mono",monospace;font-weight:700}
+.oprow.sel .badge{background:var(--orange);color:#1a1000}
+.pin{width:10px;height:22px;border-radius:2px;background:linear-gradient(#5a6b7a,#2a3642);flex:none}
+.conduit{position:relative;flex:1;height:30px;display:flex;align-items:center;justify-content:center}
+.cable{display:block;width:100%;height:12px;border-radius:6px;box-shadow:inset 0 3px 3px #fff4,inset 0 -3px 3px #0006,0 1px 3px #000a}
+.c-red{background:linear-gradient(#ff7b7b,#c01f1f)}.c-blue{background:linear-gradient(#7fb0ff,#1f4fc0)}.c-yellow{background:linear-gradient(#fff08a,#c9a800)}
+.c-white{background:linear-gradient(#fff,#b8c0c6)}.c-black{background:linear-gradient(#4a525a,#0a0d10);outline:1px solid #3a444d}
+.cable.stump{width:34%;flex:none;border-radius:6px;opacity:.85}.cable.stump.l{margin-right:auto;border-top-right-radius:2px;border-bottom-right-radius:2px}.cable.stump.r{margin-left:auto;border-top-left-radius:2px;border-bottom-left-radius:2px}
+.cut-lbl{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.15em;color:var(--red)}
+.oprow.is-cut{opacity:.7}
+.oprow.snip .cable{animation:snip .3s ease-out forwards}
+@keyframes snip{50%{transform:scaleY(.2)}to{opacity:.2;transform:scaleX(.9)}}
+.target{text-align:center;font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.15em;color:var(--orange);margin:10px 0 6px}
+.trigger{width:100%;min-height:64px;border-radius:8px;border:2px solid #ff9f32;background:linear-gradient(#ffb25a,#d9780c);color:#1a1000;font-family:Chivo,sans-serif;font-weight:900;font-size:20px;letter-spacing:.1em;box-shadow:0 6px 0 #8a4a05,0 10px 20px #0008}
+.trigger:active:not(:disabled){transform:translateY(4px);box-shadow:0 2px 0 #8a4a05}
+.trigger:disabled{background:#1b2836;border-color:#223242;color:#5b6b78;box-shadow:none}
+.arc-flash{position:absolute;left:50%;top:50%;width:90px;height:90px;margin:-45px 0 0 -45px;border-radius:50%;background:radial-gradient(#fff,#7dd3fc88 40%,transparent 70%);animation:arc .35s ease-out forwards;pointer-events:none}
+@keyframes arc{from{transform:scale(.3);opacity:1}to{transform:scale(1.6);opacity:0}}
+.spark-particle{position:absolute;left:50%;top:50%;border-radius:50%;pointer-events:none;animation:spark var(--dur) ease-out forwards}
+@keyframes spark{from{transform:translate(0,0);opacity:1}to{transform:translate(var(--tx),calc(var(--ty) + 24px));opacity:0}}
