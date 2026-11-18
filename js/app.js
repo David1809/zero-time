@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.18";
+  var APP_VERSION = "1.0.19";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -560,25 +560,107 @@
     };
   }
 
+  // ===== Carnet du technicien (design TE04 Stitch : papier recyclé manuscrit) =====
+  function escH(t) { return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  var WCOL = { rouge: "red", blanc: "white", bleu: "blue", jaune: "yellow", noir: "black" };
+  function inkText(t) {
+    return escH(t).replace(/\b(rouge|blanc|bleu|jaune|noir)\b/g, function (w) { return '<span class="wire-sketch wire-' + WCOL[w] + ' w-7 mx-1"></span>'; })
+      .replace(/(\d)(er|e)\b/g, "$1<sup>$2</sup>");
+  }
+  function ruleParts(r) {
+    var k = r.t.indexOf(" : "), cond = k < 0 ? r.t : r.t.slice(0, k), act = k < 0 ? "" : r.t.slice(k + 3);
+    act = act.replace(/^coupe /, "couper "); act = act.charAt(0).toUpperCase() + act.slice(1);
+    return { cond: cond, act: act, dflt: /^Sinon$/.test(cond) };
+  }
+  function ruleLi(r, idx, circle) {
+    var p = ruleParts(r), n = String(r.n).split(".").pop();
+    var bg = p.dflt ? "bg-slate-200/40 p-1.5 rounded border border-slate-400/30" : (idx % 2 === 0 ? "bg-amber-50/40 p-1.5 rounded border border-dashed border-amber-900/20" : "p-1.5 rounded");
+    var cond = p.dflt ? '<span class="font-bold underline">Sinon</span> :' : inkText(p.cond) + " :";
+    var act = '<div class="font-notes text-sm text-inkRed font-bold ' + (circle ? "pl-2" : "pl-3") + ' pt-0.5">➔ ' + inkText(p.act) + "</div>";
+    if (circle) return '<li class="flex items-start gap-2.5 ' + bg + '"><span class="font-notes font-bold text-inkBlue text-base bg-amber-200/60 w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5">' + n + '</span><div class="leading-snug"><span>' + cond + "</span>" + act + "</div></li>";
+    return '<li class="' + bg + '"><span class="font-notes font-bold text-inkBlue text-base bg-amber-200/60 px-1.5 rounded">' + n + "</span> <span>" + cond + "</span>" + act + "</li>";
+  }
+  var TECH_ORDER = ["lecture", "w3", "w4", "w5"];
+  var TECH_META = {
+    lecture: { tab: "📌 Lire un panneau", title: "Section 02 — Lire un Panneau", sub: "Protocole de communication avec l'opérateur", pg: "p. 02", ind: "Page 2 / 5 — Lire un panneau" },
+    w3: { tab: "3 fils", title: "Section 03 — Module 3 fils", sub: "Configuration compacte à 3 connexions", pg: "p. 03", ind: "Page 3 / 5 — Module 3 fils" },
+    w4: { tab: "4 fils", title: "Section 04 — Module 4 fils", sub: "Règles de désamorçage de la baie câblée à 4 connexions", pg: "p. 04", ind: "Page 4 / 5 — Module 4 fils" },
+    w5: { tab: "5 fils", title: "Section 05 — Module 5 fils", sub: "Harnais principal lourd à 5 connexions", pg: "p. 05", ind: "Page 5 / 5 — Module 5 fils" },
+    index: { tab: "", title: "Sommaire du Manuel", sub: "Index rapide des modules de déminage", pg: "INDEX", ind: "Sommaire général" }
+  };
+  var techQuery = "";
+  function techHead(k, extra) {
+    var m = TECH_META[k];
+    return '<div class="border-b-2 border-inkBlue/30 pb-2 mb-3 flex items-baseline justify-between"><div><div class="font-hand text-3xl font-bold text-inkBlue tracking-wide flex items-center gap-2"><span>' + m.title + "</span>" + (extra || "") + '</div><p class="font-notes text-xs text-slate-600 italic">' + m.sub + '</p></div><div class="font-typewriter text-xs text-slate-500 font-bold">' + m.pg + "</div></div>";
+  }
+  function techPageHtml(k, m) {
+    if (k === "w4") {
+      return techHead(k, '<span class="inline-block px-1.5 py-0.5 rounded text-[11px] font-notes text-inkRed border border-inkRed/40 bg-red-50/50 rotate-[-2deg]">URGENT</span>') +
+        '<div class="bg-red-100/50 border-l-2 border-inkRed pl-2 py-1 mb-3.5 rounded-r"><p class="font-notes text-xs text-inkRed font-semibold leading-tight">✍️ ' + escH(m.rule_order) + "</p></div>" +
+        '<ol class="space-y-3 font-hand text-lg text-inkBlue">' + m.w4.map(function (r, i) { return ruleLi(r, i, true); }).join("") + "</ol>" +
+        '<div class="mt-4 pt-2 border-t border-inkBlue/20 flex items-center justify-end"><div class="font-notes text-[11px] text-inkRed font-bold">✓ Révision atelier 03/A</div></div>';
+    }
+    if (k === "w3" || k === "w5") {
+      return techHead(k) + '<ol class="space-y-' + (k === "w5" ? "2.5" : "3") + ' font-hand text-lg text-inkBlue">' + m[k].map(function (r, i) { return ruleLi(r, i, false); }).join("") + "</ol>";
+    }
+    if (k === "lecture") {
+      var L = ["Étape A : Annoncer le module", "Étape B : Relever le numéro de série", "Étape C : Lister les couleurs"];
+      return techHead(k) + '<div class="space-y-3 font-hand text-lg text-inkBlue leading-snug">' + m.read.map(function (t, i) {
+        return '<div class="bg-amber-100/40 p-2.5 rounded border border-amber-800/30"><span class="font-notes text-xs font-bold text-inkRed uppercase tracking-wider block">' + L[i % 3] + '</span><p class="mt-1">' + escH(t) + "</p></div>";
+      }).join("") + "</div>";
+    }
+    var items = [["lecture", "📌", "Lire un panneau", "(protocole série, comptage)", "p. 02"], ["w3", "⚡", "Module 3 fils", "(combinaisons de base)", "p. 03"], ["w4", "⚡", "Module 4 fils", "(série pair/impair & règles)", "p. 04"], ["w5", "⚡", "Module 5 fils", "(harnais complexe à 5 brins)", "p. 05"]];
+    return techHead("index") +
+      '<div class="mb-4 bg-amber-50/70 p-2.5 rounded border border-amber-900/30 shadow-inner"><label class="block font-notes text-xs text-slate-700 font-bold mb-1">🔍 Recherche de mot-clé ou module :</label><div class="relative"><input type="text" id="indexSearchInput" placeholder="Ex: 4 fils, série, pair..." class="w-full bg-transparent border-b-2 border-inkBlue text-inkBlue font-hand text-xl px-1 py-0.5 focus:outline-none focus:border-inkRed placeholder-slate-400"/><span class="absolute right-1 top-1 text-xs text-slate-400 font-notes italic">écrire ici</span></div></div>' +
+      '<ul id="indexList" class="space-y-2.5 font-hand text-lg text-inkBlue">' + items.map(function (x) {
+        return '<li class="index-item flex items-center justify-between border-b border-dotted border-inkBlue/40 pb-1 cursor-pointer" data-go="' + x[0] + '"><span class="flex items-center gap-2"><span>' + x[1] + "</span> <b>" + x[2] + '</b> <span class="font-notes text-xs text-slate-500">' + x[3] + '</span></span><span class="font-typewriter text-sm font-bold text-inkBlue">' + x[4] + "</span></li>";
+      }).join("") + '<li class="index-item flex items-center justify-between border-b border-dotted border-inkBlue/40 pb-1 opacity-50"><span class="flex items-center gap-2"><span>🔒</span> Module Clavier & Symboles</span><span class="font-typewriter text-sm text-slate-400">p. 06</span></li></ul>';
+  }
+
   function renderTechnician() {
     stopTimer();
-    var m = view.manual;
-    if (view.paused) app.appendChild(pauseCard());
-    function list(items, cls) {
-      var ol = el("ol", { class: cls || "rules" });
-      items.forEach(function (x) {
-        ol.appendChild(typeof x === "string" ? el("li", { text: x }) : el("li", {}, [el("b", { text: x.n + "  " }), document.createTextNode(x.t)]));
-      });
-      return ol;
+    var m = view.manual, k = TECH_META[manualTab] ? manualTab : "w4", meta = TECH_META[k], paused = view.paused;
+    var tabs = TECH_ORDER.map(function (t) {
+      return t === k
+        ? '<button data-tab="' + t + '" class="tab-btn tab-active px-3 py-1.5 text-sm font-hand text-inkBlue bg-[#f4ecdf] border-t-2 border-x-2 border-amber-800/40 rounded-t-lg shadow-sm whitespace-nowrap">' + TECH_META[t].tab + "</button>"
+        : '<button data-tab="' + t + '" class="tab-btn px-2.5 py-1 text-xs font-hand text-slate-400 bg-[#352d24] border-t border-x border-[#524436] rounded-t-md whitespace-nowrap">' + TECH_META[t].tab + "</button>";
+    }).join("") + '<button class="px-2 py-1 text-[11px] font-hand text-slate-600 bg-[#251f19] border-t border-slate-700 rounded-t-md whitespace-nowrap opacity-60 cursor-not-allowed" disabled>6+ fils...</button>';
+    var lex = m.lexicon.concat([m.penalties]).map(function (t) { return "<div>• " + escH(t) + "</div>"; }).join("");
+    var pauseBox = paused ? '<div class="absolute inset-x-3 top-3 z-40 bg-amber-100 border-2 border-inkRed rounded p-2.5 text-center shadow-lg"><div class="font-hand text-2xl font-bold text-inkRed">⏸ En attente de ' + escH(paused.pseudo) + '</div><div class="font-notes text-xs text-slate-700">La partie est en pause. Le temps ne s\'écoule plus.</div>' + (paused.can_abandon ? '<button id="zt-t-abort" class="mt-2 px-3 py-1 rounded border-2 border-inkRed text-inkRed font-notes text-xs font-bold">Abandonner la partie</button>' : "") + "</div>" : "";
+    app.innerHTML =
+      '<header class="flex items-center justify-between px-2 pt-1 pb-1 z-20"><div class="flex items-center space-x-2"><span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.8)]"></span><span class="font-tech text-xs tracking-wider text-slate-400 font-bold uppercase">UNITÉ SUPPORT // TECHNICIEN</span><span class="font-tech text-[10px] text-slate-500 border border-slate-700/80 px-1 rounded">MANUEL TE04</span></div>' +
+      '<button data-tab="index" class="relative ribbon-bookmark px-3 py-1.5 rounded-t-sm text-amber-100 font-tech text-xs tracking-widest font-bold uppercase flex items-center gap-1 active:translate-y-0.5 transition-transform" title="Ouvrir le Sommaire"><svg class="w-3.5 h-3.5 fill-amber-200" viewBox="0 0 20 20"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z"/></svg><span>INDEX</span></button></header>' +
+      '<nav class="flex items-end space-x-1 px-3 z-10 overflow-x-auto pt-1" id="tabBar">' + tabs + "</nav>" +
+      '<div class="relative flex-1 paper-sheet paper-edge mx-1.5 mb-1.5 p-0 overflow-hidden flex flex-col z-20" id="tech-sheet" style="min-height:0"><div class="paperclip"></div><div class="coffee-stain top-4 right-10"></div><div class="tape-strip absolute -top-1 -left-2 w-14 h-5 rotate-[-25deg] z-10 pointer-events-none"></div>' + pauseBox +
+      '<div class="paper-content-scroll ruled-lines p-4 sm:p-5 flex flex-col justify-between" id="pageContainer"><div class="page-view flex-1 flex flex-col">' + techPageHtml(k, m) + "</div>" +
+      '<footer class="mt-4 pt-3 border-t-2 border-dashed border-amber-900/30 bg-amber-100/30 p-2 rounded"><div class="flex items-center gap-1.5 mb-1"><span class="font-notes text-xs font-bold text-inkRed">📖 RAPPEL LEXIQUE & CONVENTIONS :</span></div><div class="grid grid-cols-2 gap-2 font-hand text-sm text-slate-700">' + lex + "</div></footer></div>" +
+      '<div class="border-t border-amber-900/20 bg-[#ede4d4] px-4 py-2 flex items-center justify-between text-xs font-notes text-inkBlue"><button id="btnPrev" class="flex items-center gap-1 font-bold text-inkBlue active:scale-95 transition-transform"><span>⟵</span> <span>Précédent</span></button><div class="flex items-center gap-1 font-typewriter text-[11px] text-slate-600 bg-amber-200/50 px-2 py-0.5 rounded border border-amber-800/30"><span>' + meta.ind + '</span></div><button id="btnNext" class="flex items-center gap-1 font-bold text-inkBlue active:scale-95 transition-transform"><span>Suivant</span> <span>⟶</span></button></div></div>';
+
+    function go(t) { manualTab = t; render(); }
+    function step(d) { var i = TECH_ORDER.indexOf(manualTab); if (i < 0) i = TECH_ORDER.indexOf("w4"); go(TECH_ORDER[(i + d + TECH_ORDER.length) % TECH_ORDER.length]); }
+    Array.prototype.forEach.call(app.querySelectorAll("[data-tab]"), function (b) { b.onclick = function () { go(b.getAttribute("data-tab")); }; });
+    Array.prototype.forEach.call(app.querySelectorAll("[data-go]"), function (b) { b.onclick = function () { go(b.getAttribute("data-go")); }; });
+    document.getElementById("btnPrev").onclick = function () { step(-1); };
+    document.getElementById("btnNext").onclick = function () { step(1); };
+    var ab = document.getElementById("zt-t-abort");
+    if (ab) ab.onclick = function () {
+      if (!window.confirm("Abandonner la partie ?")) return;
+      sb.rpc("zt_abandon", { p_code: session.code, p_token: session.token }).then(function (r) { if (r.error) return fail(r.error); view = r.data; render(); });
+    };
+    var inp = document.getElementById("indexSearchInput");
+    if (inp) {
+      var filt = function () {
+        techQuery = inp.value;
+        Array.prototype.forEach.call(app.querySelectorAll("#indexList .index-item"), function (it) { it.style.display = it.textContent.toLowerCase().indexOf(techQuery.toLowerCase()) >= 0 ? "flex" : "none"; });
+      };
+      inp.value = techQuery; filt(); inp.oninput = filt;
     }
-    app.appendChild(el("div", { class: "card" }, [el("h2", { text: "Manuel Fils" }), el("div", { class: "muted", text: m.rule_order })]));
-    app.appendChild(el("div", { class: "card" }, [el("h3", { text: "1. Lire un panneau" }), list(m.read)]));
-    app.appendChild(el("div", { class: "row" }, ["w3", "w4", "w5"].map(function (k) {
-      return el("button", { class: manualTab === k ? "on" : "", text: k.slice(1) + " fils", onclick: function () { manualTab = k; render(); } });
-    })));
-    app.appendChild(el("div", { class: "card" }, [el("h3", { text: "2. Module " + manualTab.slice(1) + " fils" }), list(m[manualTab])]));
-    app.appendChild(el("div", { class: "card" }, [el("h3", { text: "3. Lexique" }), list(m.lexicon, "lex")]));
-    app.appendChild(el("div", { class: "card" }, [el("h3", { text: "4. Erreurs" }), el("div", { text: m.penalties })]));
+    var sx = 0, sy = 0, pc = document.getElementById("pageContainer");
+    pc.addEventListener("touchstart", function (e) { sx = e.changedTouches[0].screenX; sy = e.changedTouches[0].screenY; }, { passive: true });
+    pc.addEventListener("touchend", function (e) {
+      var dx = e.changedTouches[0].screenX - sx, dy = e.changedTouches[0].screenY - sy;
+      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) step(dx < 0 ? 1 : -1);
+    }, { passive: true });
   }
 
   function renderPlaying() {
@@ -635,7 +717,7 @@
     var b = document.createElement("button");
     b.id = "zt-solo"; b.type = "button";
     b.textContent = "TEST ⇄ " + (other === "operator" ? "voir opérateur" : "voir technicien");
-    b.style.cssText = "position:fixed;right:8px;top:calc(60px + env(safe-area-inset-top,0px));z-index:90;min-height:0;padding:5px 9px;border-radius:6px;border:1px solid #ff9f32;background:#1a1e23ee;color:#ff9f32;font:700 10px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase";
+    b.style.cssText = "position:fixed;right:14px;" + (document.body.classList.contains("tech") ? "bottom:calc(64px + env(safe-area-inset-bottom,0px));" : "top:calc(60px + env(safe-area-inset-top,0px));") + "z-index:90;min-height:0;padding:5px 9px;border-radius:6px;border:1px solid #ff9f32;background:#1a1e23ee;color:#ff9f32;font:700 10px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase";
     b.onclick = function () {
       sb.rpc("zt_solo_role", { p_code: session.code, p_token: session.token, p_role: other }).then(function (r) { if (r.error) return fail(r.error); view = r.data; render(); });
     };
@@ -643,10 +725,13 @@
   }
   document.addEventListener("touchmove", function (e) { if (document.body.classList.contains("op")) e.preventDefault(); }, { passive: false });
   function doRender() {
-    soloChip();
     var isOp = !!(session && view && view.status === "playing" && view.me && view.me.role === "operator" && view.game);
     document.body.classList.toggle("op", isOp);
     document.body.classList.toggle("bg-industrial-bay", isOp);
+    var isTech = !!(session && view && view.status === "playing" && view.me && view.me.role === "technician" && view.manual);
+    document.body.classList.toggle("tech", isTech);
+    document.body.classList.toggle("workbench-bg", isTech);
+    soloChip();
     if (!session || !view) { stopTimer(); return renderHome(); }
     if (view.status === "lobby") { stopTimer(); resetGameFlags(); return renderLobby(); }
     if (view.status === "ended" || view.status === "abandoned") return renderEnded();
