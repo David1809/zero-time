@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.19";
+  var APP_VERSION = "1.0.20";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -417,9 +417,8 @@
       '<div class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#101419] border border-[#2e3742] shadow-inner"><span class="w-1.5 h-1.5 rounded-full bg-[#00ffaa] shadow-[0_0_5px_#00ffaa]"></span><span class="font-code-serial text-[8px] font-bold text-[#a7f3d0] tracking-wider uppercase">' + solved + '/3 VALIDÉ</span></div></div>' +
       '<div class="grid grid-cols-3 gap-1.5 pt-1.5 mx-2">' + cells + '</div></section>';
 
-    var errBanner = showErr
-      ? '<aside style="position:fixed;left:10px;right:10px;top:calc(max(env(safe-area-inset-top,0px),6px) + 50px);z-index:45" class="flex items-center justify-between px-3 py-1.5 rounded-lg bg-gradient-to-r from-[#3e0b0b] via-[#521010] to-[#3e0b0b] border border-[#ff3333]/80 shadow-[0_0_18px_rgba(255,51,51,0.45)]"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-[#ff4d4d] text-[20px] animate-bounce">warning</span><div class="flex flex-col"><span class="font-label-sm text-[11px] font-black text-white tracking-widest uppercase flex items-center gap-1.5">ERREUR ' + errFlash.n + '/3' + (errFlash.penalty ? ' <span class="text-[#ffb3ad] font-code-serial font-bold">— PÉNALITÉ APPLIQUÉE</span>' : "") + '</span><span class="font-code-serial text-[8.5px] text-[#ffc2bd] tracking-wider uppercase">CIRCUIT COURT-CIRCUIT DÉTECTÉ</span></div></div>' + (errFlash.penalty ? '<div class="px-2 py-0.5 rounded bg-[#1f0505] border border-[#ff4d4d] text-right"><span class="font-code-serial text-[13px] font-black text-[#ff3333] tracking-wider drop-shadow-[0_0_8px_rgba(255,51,51,0.8)]">−' + errFlash.penalty + ' s</span></div>' : "") + '</aside>'
-      : "";
+    var errBanner = "";
+
     // --- module de câblage
     var locked = paused || isSolved;
     var order = ORDER[n] || ORDER[5], cutNow = (lastCut && lastCut.pos === panel.pos) ? lastCut.wire : 0;
