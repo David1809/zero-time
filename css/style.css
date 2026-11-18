@@ -1008,9 +1008,8 @@ body.tech #tabBar::-webkit-scrollbar{display:none}
 /* ===== Écrans salle d'attente / victoire / explosion : maquettes Stitch ===== */
 body.scr{position:fixed;inset:0;width:100%;margin:0;padding:0;overflow-x:hidden;overflow-y:auto;background-color:#0c141c;color:#dbe3ef;font-family:Chivo,sans-serif;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
 html:has(body.scr){overscroll-behavior:none;height:100%}
-body.scr{--zt-h:calc(100dvh - 44px)}
 body.scr input{border:0;min-height:0;padding:0;border-radius:0;box-shadow:none;outline:none}
-body.scr #app{max-width:none;padding:0;gap:0;display:block;min-height:0}
+body.scr #app{max-width:none;padding:0;gap:0;display:block;min-height:0;height:100%}
 body.scr #toast{bottom:auto;top:60px}
 body.scr ::-webkit-scrollbar{display:none}
 :where(body.scr) *,:where(body.scr) ::before,:where(body.scr) ::after{border:0 solid #e5e7eb;box-sizing:border-box}
