@@ -28,12 +28,36 @@ Livre-moi l'écran principal (chapitre « 4 fils » ouvert) puis les variantes :
 
 « Crée quatre écrans simples, cohérents avec OP03 et TE04 : (1) accueil : symbole ZERO TIME, boutons « Créer une salle » et « Rejoindre » ; (2) salle d'attente : code de 4 lettres très visible, liste des deux joueurs avec leur pseudo et leur état de connexion, choix du créateur « Je choisis mon rôle » ou « Tirage au sort », bouton « Lancer » ; (3) victoire : « BOMBE DÉSAMORCÉE », temps restant, nombre d'erreurs, bouton « Rejouer » ; (4) explosion : « EXPLOSION », cause (temps écoulé ou 3 erreurs), panneaux résolus x/3, bouton « Rejouer ». Version technicien des écrans de fin : sans le temps restant. »
 
+## Prompt 5 — OP-PIN : opérateur, module « Digicode » (direction artistique distincte)
+
+**Intention :** le module Fils est organique (câbles, cuivre, lumière chaude). Le Digicode est le contraire : un objet rigide, de précision, un boîtier de sécurité militaire. Même palette, même identité, même tension, mais une matière différente, pour que chaque module de la bombe ait sa personnalité en restant de la même famille.
+
+« Crée l'écran du module « Digicode » côté opérateur, smartphone en portrait, même univers que OP03 (fond #101820, mêmes couleurs, même compte à rebours en haut avec les trois pastilles d'erreur), mais avec une direction artistique propre au module : un BOÎTIER DE SÉCURITÉ MÉTALLIQUE posé sur la bombe. Plaque d'acier brossé gris-bleu sombre, rivets, vis cruciformes dans les angles, léger chanfrein et ombres nettes, quelques rayures d'usage, pas de papier ni de câbles. Éclairage froid et précis, avec des rétroéclairages ambrés (#FF9F32) sur les touches et l'afficheur. Typographie technique (type Share Tech Mono, Orbitron ou Rajdhani), chiffres de type afficheur sept segments.
+
+Structure de haut en bas :
+1) Sous le compte à rebours : le nom du module « Digicode » en petites capitales gravées sur la plaque, et un petit voyant d'état dans l'angle (rouge = à faire, vert = résolu, avec le texte « À faire » ou « Résolu ✓ » à côté, jamais la couleur seule).
+2) Un afficheur : 4 cases de chiffres en sept segments ambrés, avec un curseur clignotant sur la case en cours de saisie. Cases vides affichées par un tiret éteint.
+3) Une rangée de voyants physiques sur le boîtier : une série de petites lampes rouges et une série de petites lampes bleues, allumées ou éteintes, comme des LED encastrées (nombre variable de 0 à 4 allumées pour chaque couleur). Chaque lampe allumée est aussi marquée d'un petit repère de forme (rond pour rouge, carré pour bleu) pour ne pas dépendre de la couleur seule. Aucune étiquette ne dit à quoi elles servent.
+4) Un clavier de 10 touches (1 à 9 en grille de 3 sur 3, puis 0 en bas), grosses touches en caoutchouc noir mat à bord métallique, chiffre gravé et rétroéclairé, zone tactile d'au moins 56 px, bon espacement. À côté du 0 : une touche « Effacer » (flèche arrière) et une touche « Valider » orange pleine, plus grande, bien séparée des chiffres pour éviter l'erreur de pression.
+5) Un historique des essais, sous le clavier : une pile des essais déjà faits, du plus récent au plus ancien, chacun montrant les 4 chiffres tentés et, sous chaque chiffre, un petit verdict à forme distincte : coche pour « bon chiffre, bonne place », losange pour « bon chiffre, mauvaise place », croix pour « absent du code ». Les formes se lisent sans couleur ; une teinte vert, orange ou gris sombre s'y ajoute seulement en renfort.
+
+Montre l'état d'une saisie en cours (2 chiffres tapés sur 4) avec un historique de 1 essai. N'ajoute aucune règle, aucun indice, aucun score. Les règles restent dans le manuel du technicien. Ne conçois que cet écran pour le moment. »
+
+## Prompt 6 — Variantes d'état du Digicode (après validation du Prompt 5)
+
+« À partir du Digicode validé, crée ces variantes sans rien changer d'autre : (a) mauvais code : l'afficheur clignote rouge, secousse brève du boîtier, bandeau « ERREUR 1/3 — −20 s » (puis « ERREUR 2/3 — −30 s ») ; l'essai est ajouté à l'historique avec ses verdicts ; (b) code juste : les quatre chiffres passent au vert avec coches, le voyant d'angle devient vert, texte « Résolu ✓ », le clavier est verrouillé et grisé ; (c) module résolu consulté plus tard : même écran verrouillé, historique conservé ; (d) pause : compte à rebours figé et texte « En attente de <pseudo> », avec le bouton « Abandonner » visible uniquement dans cet état. »
+
+## Prompt 7 — TE05 : technicien, chapitre « Digicode » du carnet
+
+« Ajoute au carnet de manuels papier de TE04 un chapitre « Digicode », en gardant exactement le même carnet, le même papier et la même écriture manuscrite (le technicien reste sur du papier ; la direction métal est réservée à l'écran de l'opérateur). Ajoute un onglet « Digicode » à la rangée d'intercalaires et une entrée dans l'index. Contenu de la page, tout en manuscrit avec petits croquis au crayon de couleur : 1) comment lire le boîtier que décrit l'opérateur (lampes rouges et bleues, nombre de piles, numéro de série) ; 2) un tableau de règles courtes à remplir comme une grille manuscrite : indice → effet sur le code ; 3) comment lire le verdict d'un essai, avec les trois dessins : coche, losange, croix ; 4) un rappel : le code a 4 chiffres tous différents, et trois erreurs font exploser la bombe. Livre l'écran avec le chapitre « Digicode » ouvert, puis la variante de l'index avec recherche sur le mot « code ». N'invente aucune règle absente de la spécification. »
+
 ## Points à vérifier à chaque retour de Stitch
 
 - Aucun nom de couleur écrit sur les fils (décision de David) et aucun fil identifiable par une couleur seule hors de cette dérogation.
 - Le technicien ne voit jamais le temps.
 - Boutons d'au moins 48 px ; bouton « Couper ce fil » séparé des fils.
 - Rien d'inventé : pas de score, pas d'indice, pas de fonction hors spécification.
+- Digicode : verdicts et lampes lisibles sans la couleur (formes), touche Valider séparée des chiffres, direction métal cohérente avec la palette mais différente des Fils.
 
 ## À corriger dans le cahier
 
