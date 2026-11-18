@@ -5,6 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
+  var APP_VERSION = "1.0.15";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -123,6 +124,16 @@
       el("label", { for: "pseudo", text: "Pseudo" }), pseudo, create,
       el("label", { for: "code", text: "Code de la salle" }), code, join
     ]));
+    var ver = el("button", { id: "zt-version", text: "v" + APP_VERSION + " · toucher pour mettre à jour", onclick: function () {
+      ver.textContent = "Mise à jour…";
+      var done = function () { location.replace(location.pathname + "?u=" + Date.now()); };
+      Promise.all([
+        (navigator.serviceWorker ? navigator.serviceWorker.getRegistrations().then(function (rs) { return Promise.all(rs.map(function (x) { return x.unregister(); })); }) : null),
+        (window.caches ? caches.keys().then(function (ks) { return Promise.all(ks.map(function (k) { return caches.delete(k); })); }) : null)
+      ]).then(done, done);
+    } });
+    ver.style.cssText = "display:block;margin:18px auto 0;background:none;border:0;color:#6b7684;font:11px 'JetBrains Mono',monospace;min-height:0;padding:6px;width:auto";
+    app.appendChild(ver);
   }
 
   function roleLabel(r) { return r === "operator" ? "Opérateur" : r === "technician" ? "Technicien" : "—"; }
@@ -371,6 +382,7 @@
       waiting +
       '<div class="flex items-baseline justify-center relative z-15 py-0.5"><div class="font-display-timer text-[46px] leading-none font-bold tracking-wider transition-colors duration-300" id="chrono-display">00:00</div><span class="ml-2 font-code-serial text-[16px] font-bold tracking-widest transition-colors duration-300" id="chrono-ms">.00</span>' +
       (paused ? '<span class="ml-2.5 px-1.5 py-0.5 rounded bg-black/60 border border-slate-700 text-[8px] font-code-serial text-slate-400 uppercase tracking-widest">FIGÉ</span>' : "") + '</div>' +
+      '<div class="flex items-center justify-center gap-1.5 relative z-15 pb-1">' + chips + '</div>' +
       '<div class="mt-1 pt-1 border-t border-[#182029] grid grid-cols-2 gap-2 items-center relative z-15">' +
       '<div class="flex flex-col gap-0.5"><div class="flex items-center gap-1"><span class="material-symbols-outlined text-error text-[12px]' + (mode === "err" ? " animate-pulse" : "") + '">warning</span><span class="font-label-sm text-[8px] font-bold tracking-wider text-error uppercase">ERREURS ' + g.errors + '/3</span></div><div class="flex items-center gap-1.5">' + diodes + '</div></div>' +
       '<div class="flex flex-col items-end gap-0.5"><div class="flex items-center gap-1 ' + (mode === "ok" ? "text-[#00ffaa]" : "text-secondary") + '"><span class="font-label-sm text-[8px] font-bold tracking-wider uppercase">MODULES VALIDES ' + solved + '/3</span><span class="material-symbols-outlined text-[12px]">' + (mode === "ok" ? "check_circle" : "grid_view") + '</span></div><div class="flex items-center gap-1.5 w-24 h-3.5 bg-[#0e1216] p-0.5 rounded border border-[#28323d] shadow-inner">' + crans + '</div></div>' +
@@ -451,11 +463,11 @@
     }
 
     app.innerHTML =
-      (mode === "err" ? '<div class="alarm-vignette-overlay fixed inset-0 pointer-events-none z-40"></div>' : "") +
+      ((mode === "err" || (!paused && remNow <= 30000)) ? '<div class="alarm-vignette-overlay fixed inset-0 pointer-events-none z-40"' + (remNow <= 30000 && !showErr ? ' style="animation-duration:.6s"' : "") + '></div>' : "") +
       '<header class="fixed top-0 left-0 right-0 z-50 pt-safe bg-[#242930]/95 border-b border-[#3b434e] backdrop-blur-md shadow-[0_4px_16px_rgba(0,0,0,0.6)]"><div class="h-12 px-3 flex items-center justify-between max-w-md mx-auto">' +
       '<div class="flex items-center gap-2"><div class="flex flex-col"><div class="flex items-center gap-1.5">' + topLed + '</div><span class="font-headline-sm text-[14px] font-bold tracking-tight text-white flex items-center gap-1.5">BAIE CÂBLAGE <span class="text-[10px] text-secondary font-code-serial font-normal">[MOD-0' + (activePanel + 1) + ']</span></span></div></div>' +
-      '<div class="flex items-center gap-2"><div class="flex items-center p-0.5 rounded bg-[#161a20] border border-[#333a44]">' + chips + '</div>' + badge + '</div></div></header>' +
-      '<main class="w-full max-w-md mx-auto px-2.5 pb-safe flex flex-col justify-between gap-1 overflow-hidden relative z-30" id="tactical-rack">' + errBanner + tele + alertStrip + module + cmd + '</main>';
+      '<div class="flex items-center gap-2">' + badge + '</div></div></header>' +
+      '<main class="w-full max-w-md mx-auto px-2.5 pb-safe flex flex-col justify-between gap-1 overflow-hidden relative z-30" id="tactical-rack">' + errBanner + tele + module + cmd + '</main>';
 
     // Valeurs dynamiques (texte pur)
     var se = document.getElementById("zt-serial"); if (se) se.textContent = panel.serial;
@@ -495,7 +507,7 @@
       paint(ms);
       var fire = null;
       ALERTS.forEach(function (T) { if (rem <= T && rem > 0 && !alerted[T]) { alerted[T] = true; fire = T; } });
-      if (fire !== null) { alertFlash = { T: fire, until: Date.now() + 4000 }; buzz([150, 80, 150]); window.ZT_FX.beep(fire <= 10 ? 1200 : 880); render(); }
+      if (fire !== null) { buzz([150, 80, 150]); window.ZT_FX.beep(fire <= 10 ? 1200 : 880); render(); }
       if (rem <= 0 && !tickSent) {
         tickSent = true;
         sb.rpc("zt_tick", { p_code: session.code, p_token: session.token }).then(function (r) { if (!r.error) { view = r.data; render(); } });
@@ -601,6 +613,7 @@
     };
     document.body.appendChild(b);
   }
+  document.addEventListener("touchmove", function (e) { if (document.body.classList.contains("op")) e.preventDefault(); }, { passive: false });
   function doRender() {
     soloChip();
     var isOp = !!(session && view && view.status === "playing" && view.me && view.me.role === "operator" && view.game);

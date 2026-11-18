@@ -477,3 +477,6 @@ body.op #app{max-width:none;padding:0;gap:0;display:block;min-height:0}
 body.op #tactical-rack{height:100dvh;padding-top:calc(52px + env(safe-area-inset-top,0px))}
 body.op #harness-chamber{flex:1 1 0;min-height:130px;max-height:256px}
 body.op #toast{bottom:auto;top:60px}
+
+html:has(body.op){overflow:hidden;overscroll-behavior:none;height:100%}
+body.op{position:fixed;inset:0;width:100%;touch-action:manipulation}
