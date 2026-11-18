@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.38";
+  var APP_VERSION = "1.0.39";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -502,7 +502,7 @@ ${solo}
         ico = '<span class="material-symbols-outlined text-[13px] text-slate-500 font-light">lock_open</span>';
         wCls = "font-bold text-slate-400"; bar = '<div class="w-full h-1 rounded-full bg-[#161c24] border border-[#252f3b] mt-1"></div>';
       }
-      return '<button class="' + cls + '" type="button" data-panel="' + idx + '"><div class="w-full flex items-center justify-between mb-0.5"><div class="flex items-center gap-1">' + led + '<span class="font-label-sm text-[8px] ' + nameCls + ' tracking-wider uppercase">MODULE ' + (idx + 1) + '</span></div>' + ico + '</div><span class="font-code-serial text-[11px] ' + wCls + ' tracking-tight leading-none my-0.5">' + MOD_NAME[w].toUpperCase() + '</span>' + bar + '</button>';
+      return '<button class="' + cls + '" type="button" data-panel="' + idx + '"><div class="w-full flex items-center justify-between mb-0.5"><div class="flex items-center gap-1">' + led + '<span class="font-label-sm text-[10px] ' + nameCls + ' tracking-wider uppercase">' + MOD_NAME[w].toUpperCase() + '</span></div>' + ico + '</div>' + bar + '</button>';
     }).join("");
     var select =
       '<section class="rugged-chassis rounded-xl p-2.5 relative shrink-0">' + SCR_SEL + screws("screw-rot-3", "screw-rot-1", "screw-rot-4", "screw-rot-2") +
@@ -552,9 +552,9 @@ ${solo}
     });
 
     var modHead = isSolved
-      ? '<div class="px-4 flex items-center justify-between"><div class="flex items-center gap-2"><div class="w-7 h-7 rounded bg-[#10291f] border border-[#00ffaa]/60 flex items-center justify-center text-[#00ffaa] shadow-[0_0_8px_rgba(0,255,170,0.35)]"><span class="material-symbols-outlined text-[17px] font-bold">check</span></div><div class="flex flex-col"><span class="font-label-sm text-[7.5px] tracking-widest text-[#00ffaa] uppercase font-bold">MODULE ' + (activePanel + 1) + ' // RÉSOLU ✓</span><span class="font-headline-sm text-[12px] font-bold text-white tracking-wide">' + MOD_NAME[n].toUpperCase() + '</span></div></div>' +
+      ? '<div class="px-4 flex items-center justify-between"><div class="flex items-center gap-2"><div class="w-7 h-7 rounded bg-[#10291f] border border-[#00ffaa]/60 flex items-center justify-center text-[#00ffaa] shadow-[0_0_8px_rgba(0,255,170,0.35)]"><span class="material-symbols-outlined text-[17px] font-bold">check</span></div><div class="flex flex-col"><span class="font-label-sm text-[7.5px] tracking-widest text-[#00ffaa] uppercase font-bold">RÉSOLU ✓</span><span class="font-headline-sm text-[12px] font-bold text-white tracking-wide">' + MOD_NAME[n].toUpperCase() + '</span></div></div>' +
         '<div class="px-2.5 py-1 rounded-md bg-gradient-to-r from-[#122e22] via-[#1a3d2e] to-[#122e22] border border-[#00ffaa]/70 shadow-[0_0_12px_rgba(0,255,170,0.35)] flex items-center gap-1.5"><span class="material-symbols-outlined text-[#00ffaa] text-[14px] font-bold">verified</span><div class="flex flex-col items-end"><span class="font-code-serial text-[9.5px] font-black tracking-wider text-[#00ffaa] leading-tight">RÉSOLU ✓</span><span class="font-code-serial text-[7px] text-[#71cf9e] tracking-widest uppercase" id="zt-serial"></span></div></div></div>'
-      : '<div class="px-6 flex items-center justify-between"><div class="flex items-center gap-1.5"><div class="w-6 h-6 rounded bg-[#20262e] border border-[#3b4552] flex items-center justify-center ' + (paused ? "text-secondary" : "text-primary") + ' shadow-inner"><span class="material-symbols-outlined text-[15px]">cable</span></div><div class="flex flex-col"><span class="font-label-sm text-[7px] tracking-widest text-slate-300 uppercase">MODULE ' + (activePanel + 1) + ' // HARNESS</span><span class="font-headline-sm text-[11px] font-bold text-white tracking-wide">' + MOD_NAME[n].toUpperCase() + '</span></div></div>' +
+      : '<div class="px-6 flex items-center justify-between"><div class="flex items-center gap-1.5"><div class="w-6 h-6 rounded bg-[#20262e] border border-[#3b4552] flex items-center justify-center ' + (paused ? "text-secondary" : "text-primary") + ' shadow-inner"><span class="material-symbols-outlined text-[15px]">cable</span></div><div class="flex flex-col"><span class="font-label-sm text-[7px] tracking-widest text-slate-300 uppercase">HARNESS</span><span class="font-headline-sm text-[11px] font-bold text-white tracking-wide">' + MOD_NAME[n].toUpperCase() + '</span></div></div>' +
         '<div class="px-2 py-0.5 rounded bg-gradient-to-r from-[#232931] via-[#2f3742] to-[#232931] border border-[#444f5c] shadow-sm flex items-center gap-1.5"><div class="flex flex-col items-end"><span class="font-label-sm text-[6px] text-slate-400 uppercase tracking-widest leading-none">SÉRIE / LOT</span><span class="font-code-serial text-[10px] font-black tracking-widest text-[#ffdcbf] leading-tight" id="zt-serial"></span></div></div></div>';
     var resolvedBar = isSolved ? '<div class="absolute top-2 inset-x-12 z-40 resolved-badge-bar rounded-md px-3 py-1 flex items-center justify-between pointer-events-none"><div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-[#00ffaa] shadow-[0_0_6px_#00ffaa] animate-ping"></span><span class="font-code-serial text-[9px] font-bold text-[#00ffaa] tracking-widest uppercase">CIRCUIT DÉSAMORCÉ AVEC SUCCÈS</span></div><span class="font-code-serial text-[8.5px] text-[#a4e6c3] tracking-widest font-semibold">STATUS: SECURE</span></div>' : "";
     var veil = paused ? '<div class="absolute inset-0 pointer-events-none z-25 bg-[#090d12]/30 backdrop-contrast-90"></div>' : "";
@@ -583,8 +583,8 @@ ${solo}
     }
 
     var hsel = g.panels.map(function (p, idx) { return idx === activePanel
-      ? '<span class="px-2 py-0.5 rounded bg-[#272e37] text-[8px] font-code-serial font-bold text-primary border border-primary/40 shadow-sm">MODULE ' + (idx + 1) + '</span>'
-      : '<span class="px-1.5 py-0.5 rounded text-[8px] font-code-serial font-semibold text-slate-400">M' + (idx + 1) + '</span>'; }).join("");
+      ? '<span class="px-2 py-0.5 rounded bg-[#272e37] text-[8px] font-code-serial font-bold text-primary border border-primary/40 shadow-sm">' + MOD_NAME[p.wires.length].toUpperCase() + '</span>'
+      : '<span class="px-1.5 py-0.5 rounded text-[8px] font-code-serial font-semibold text-slate-400">' + MOD_NAME[p.wires.length].slice(0, 3).toUpperCase() + '</span>'; }).join("");
     app.innerHTML =
       ((mode === "err" || (!paused && remNow <= 30000)) ? '<div class="alarm-vignette-overlay fixed inset-0 pointer-events-none z-40"' + (remNow <= 30000 && !showErr ? ' style="animation-duration:.6s"' : "") + '></div>' : "") +
       '<header class="fixed top-0 left-0 right-0 z-50 pt-safe bg-[#20252c]/95 border-b border-[#353d47] backdrop-blur-md shadow-[0_4px_16px_rgba(0,0,0,0.6)]"><div class="h-11 px-3 flex items-center justify-between max-w-md mx-auto">' +
