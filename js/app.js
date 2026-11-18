@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.27";
+  var APP_VERSION = "1.0.28";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -317,6 +317,17 @@ ${solo}
     x1: "M 125,86 C 145,98 172,106 190,118",
     x2: "M 120,186 C 138,191 166,196 182,198"
   };
+  // Modules de 6, 7 et 8 fils : courbes générées sur le même principe (bosse douce, croisements).
+  function mkGeom(n) {
+    var ys = [], i; for (i = 0; i < n; i++) ys.push(22 + i * 212 / (n - 1));
+    var k = { 6: 5, 7: 3, 8: 3 }[n], c = { 6: 2, 7: 2, 8: 1 }[n], out = [];
+    for (i = 0; i < n; i++) {
+      var y0 = ys[i], m = y0 + (ys[(i * k + c) % n] - y0) * 0.55;
+      out.push({ s: [[0, y0, 70, y0, 90, m, 160, m].map(r1), [160, m, 230, m, 250, y0, 320, y0].map(r1)], cut: G2 });
+    }
+    return out;
+  }
+  [6, 7, 8].forEach(function (n) { GEOM[n] = mkGeom(n); ORDER[n] = []; for (var i = 1; i <= n; i++) ORDER[n].push(i); });
   var BASE = { red: "#250202", yellow: "#240c01", blue: "#040914", black: "#000000", white: "#475569" };
 
   function r1(v) { return Math.round(v * 10) / 10; }
@@ -348,11 +359,12 @@ ${solo}
       ex: le[6], ey: le[7], sx: rs[0], sy: rs[1], cx: (le[6] + rs[0]) / 2, cy: (le[7] + rs[1]) / 2 };
   }
 
-  var CL_BASE = "terminal-clamp-block w-[22px] h-[22px] rounded flex items-center justify-center font-code-serial font-bold text-[10px]";
+  var clampPx = 22;
+  function clBase() { return "terminal-clamp-block w-[" + clampPx + "px] h-[" + clampPx + "px] rounded flex items-center justify-center font-code-serial font-bold " + (clampPx < 22 ? "text-[9px]" : "text-[10px]"); }
   function clampCls(isCut, isSel, locked) {
-    if (isCut) return CL_BASE + " text-slate-500 line-through";
-    if (isSel) return "terminal-clamp-block active-clamp w-[22px] h-[22px] rounded flex items-center justify-center font-code-serial font-black text-[11px]";
-    return CL_BASE + (locked ? " text-slate-300" : " text-slate-200 group-hover:border-primary");
+    if (isCut) return clBase() + " text-slate-500 line-through";
+    if (isSel) return "terminal-clamp-block active-clamp w-[" + clampPx + "px] h-[" + clampPx + "px] rounded flex items-center justify-center font-code-serial font-black text-[" + (clampPx < 22 ? 10 : 11) + "px]";
+    return clBase() + (locked ? " text-slate-300" : " text-slate-200 group-hover:border-primary");
   }
   function lugsL(isCut) { return '<div class="flex flex-col items-center gap-0.5' + (isCut ? " opacity-40" : "") + '"><span class="w-1.5 h-1 rounded-xs terminal-lug"></span><span class="w-1.5 h-1 rounded-xs bg-[#111418]' + (isCut ? "" : " border border-[#3b434e]") + '"></span></div>'; }
   function lugsR(isCut) { return '<div class="flex flex-col items-center gap-0.5' + (isCut ? " opacity-40" : "") + '"><span class="w-1.5 h-1 rounded-xs bg-[#111418]' + (isCut ? "" : " border border-[#3b434e]") + '"></span><span class="w-1.5 h-1 rounded-xs terminal-lug"></span></div>'; }
@@ -386,6 +398,7 @@ ${solo}
     var panel = g.panels[activePanel] || g.panels[0];
     var paused = view.paused;
     var n = panel.wires.length;
+    clampPx = n >= 7 ? 18 : 22;
     var isSolved = panel.state === "solved";
     var geom = GEOM[n] || GEOM[5];
     var now = Date.now();
@@ -406,10 +419,6 @@ ${solo}
     var mode = paused ? "pause" : (isSolved ? "ok" : (showErr ? "err" : (critical ? "alert" : "live")));
 
     // --- éléments de l'en-tête
-    var chips = g.panels.map(function (p, idx) {
-      var on = idx === activePanel, w = p.wires.length;
-      return '<button type="button" data-panel="' + idx + '" class="zt-tab' + (on ? " on" : "") + (p.state === "solved" ? " done" : "") + (mode === "pause" ? " paused" : "") + '"><span class="zt-tab-n">MODULE ' + (idx + 1) + '</span><span class="zt-tab-w">' + w + ' FILS' + (p.state === "solved" ? " ✓" : "") + '</span></button>';
-    }).join("");
     var topLed = { live: '<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span><span class="font-label-sm text-[8px] font-bold text-primary tracking-widest uppercase">UNITÉ TACTIQUE // DÉMINEUR</span>',
       alert: '<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span><span class="font-label-sm text-[8px] font-bold text-primary tracking-widest uppercase">UNITÉ TACTIQUE // DÉMINEUR</span>',
       err: '<span class="w-1.5 h-1.5 rounded-full bg-error animate-ping"></span><span class="font-label-sm text-[8px] font-bold text-error tracking-widest uppercase">UNITÉ TACTIQUE // DÉMINEUR</span>',
@@ -654,12 +663,15 @@ ${solo}
     if (circle) return '<li class="flex items-start gap-2.5 ' + bg + '"><span class="font-notes font-bold text-inkBlue text-base bg-amber-200/60 w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5">' + n + '</span><div class="leading-snug"><span>' + cond + "</span>" + act + "</div></li>";
     return '<li class="' + bg + '"><span class="font-notes font-bold text-inkBlue text-base bg-amber-200/60 px-1.5 rounded">' + n + "</span> <span>" + cond + "</span>" + act + "</li>";
   }
-  var TECH_ORDER = ["lecture", "w3", "w4", "w5"];
+  var TECH_ORDER = ["lecture", "w3", "w4", "w5", "w6", "w7", "w8"];
   var TECH_META = {
-    lecture: { tab: "📌 Lire un panneau", title: "Section 02 — Lire un Panneau", sub: "Protocole de communication avec l'opérateur", pg: "p. 02", ind: "Page 2 / 5 — Lire un panneau" },
-    w3: { tab: "3 fils", title: "Section 03 — Module 3 fils", sub: "Configuration compacte à 3 connexions", pg: "p. 03", ind: "Page 3 / 5 — Module 3 fils" },
-    w4: { tab: "4 fils", title: "Section 04 — Module 4 fils", sub: "Règles de désamorçage de la baie câblée à 4 connexions", pg: "p. 04", ind: "Page 4 / 5 — Module 4 fils" },
-    w5: { tab: "5 fils", title: "Section 05 — Module 5 fils", sub: "Harnais principal lourd à 5 connexions", pg: "p. 05", ind: "Page 5 / 5 — Module 5 fils" },
+    lecture: { tab: "📌 Lire un panneau", title: "Section 02 — Lire un Panneau", sub: "Protocole de communication avec l'opérateur", pg: "p. 02", ind: "Page 2 / 8 — Lire un panneau" },
+    w3: { tab: "3 fils", title: "Section 03 — Module 3 fils", sub: "Configuration compacte à 3 connexions", pg: "p. 03", ind: "Page 3 / 8 — Module 3 fils" },
+    w4: { tab: "4 fils", title: "Section 04 — Module 4 fils", sub: "Règles de désamorçage de la baie câblée à 4 connexions", pg: "p. 04", ind: "Page 4 / 8 — Module 4 fils" },
+    w5: { tab: "5 fils", title: "Section 05 — Module 5 fils", sub: "Harnais principal lourd à 5 connexions", pg: "p. 05", ind: "Page 5 / 8 — Module 5 fils" },
+    w6: { tab: "6 fils", title: "Section 06 — Module 6 fils", sub: "Faisceau étendu à 6 connexions", pg: "p. 06", ind: "Page 6 / 8 — Module 6 fils" },
+    w7: { tab: "7 fils", title: "Section 07 — Module 7 fils", sub: "Faisceau dense à 7 connexions", pg: "p. 07", ind: "Page 7 / 8 — Module 7 fils" },
+    w8: { tab: "8 fils", title: "Section 08 — Module 8 fils", sub: "Harnais maximal à 8 connexions", pg: "p. 08", ind: "Page 8 / 8 — Module 8 fils" },
     index: { tab: "", title: "Sommaire du Manuel", sub: "Index rapide des modules de déminage", pg: "INDEX", ind: "Sommaire général" }
   };
   var techQuery = "";
@@ -673,7 +685,7 @@ ${solo}
         '<ol class="space-y-3 font-hand text-lg text-inkBlue">' + m.w4.map(function (r, i) { return ruleLi(r, i, true); }).join("") + "</ol>" +
         '<div class="mt-4 pt-2 border-t border-inkBlue/20 flex items-center justify-end"><div class="font-notes text-[11px] text-inkRed font-bold">✓ Révision atelier 03/A</div></div>';
     }
-    if (k === "w3" || k === "w5") {
+    if (k === "w3" || k === "w5" || k === "w6" || k === "w7" || k === "w8") {
       return techHead(k) + '<ol class="space-y-' + (k === "w5" ? "2.5" : "3") + ' font-hand text-lg text-inkBlue">' + m[k].map(function (r, i) { return ruleLi(r, i, false); }).join("") + "</ol>";
     }
     if (k === "lecture") {
@@ -682,12 +694,12 @@ ${solo}
         return '<div class="bg-amber-100/40 p-2.5 rounded border border-amber-800/30"><span class="font-notes text-xs font-bold text-inkRed uppercase tracking-wider block">' + L[i % 3] + '</span><p class="mt-1">' + escH(t) + "</p></div>";
       }).join("") + "</div>";
     }
-    var items = [["lecture", "📌", "Lire un panneau", "(protocole série, comptage)", "p. 02"], ["w3", "⚡", "Module 3 fils", "(combinaisons de base)", "p. 03"], ["w4", "⚡", "Module 4 fils", "(série pair/impair & règles)", "p. 04"], ["w5", "⚡", "Module 5 fils", "(harnais complexe à 5 brins)", "p. 05"]];
+    var items = [["lecture", "📌", "Lire un panneau", "(protocole série, comptage)", "p. 02"], ["w3", "⚡", "Module 3 fils", "(combinaisons de base)", "p. 03"], ["w4", "⚡", "Module 4 fils", "(série pair/impair & règles)", "p. 04"], ["w5", "⚡", "Module 5 fils", "(harnais complexe à 5 brins)", "p. 05"], ["w6", "⚡", "Module 6 fils", "(faisceau étendu)", "p. 06"], ["w7", "⚡", "Module 7 fils", "(faisceau dense)", "p. 07"], ["w8", "⚡", "Module 8 fils", "(harnais maximal)", "p. 08"]];
     return techHead("index") +
       '<div class="mb-4 bg-amber-50/70 p-2.5 rounded border border-amber-900/30 shadow-inner"><label class="block font-notes text-xs text-slate-700 font-bold mb-1">🔍 Recherche de mot-clé ou module :</label><div class="relative"><input type="text" id="indexSearchInput" placeholder="Ex: 4 fils, série, pair..." class="w-full bg-transparent border-b-2 border-inkBlue text-inkBlue font-hand text-xl px-1 py-0.5 focus:outline-none focus:border-inkRed placeholder-slate-400"/><span class="absolute right-1 top-1 text-xs text-slate-400 font-notes italic">écrire ici</span></div></div>' +
       '<ul id="indexList" class="space-y-2.5 font-hand text-lg text-inkBlue">' + items.map(function (x) {
         return '<li class="index-item flex items-center justify-between border-b border-dotted border-inkBlue/40 pb-1 cursor-pointer" data-go="' + x[0] + '"><span class="flex items-center gap-2"><span>' + x[1] + "</span> <b>" + x[2] + '</b> <span class="font-notes text-xs text-slate-500">' + x[3] + '</span></span><span class="font-typewriter text-sm font-bold text-inkBlue">' + x[4] + "</span></li>";
-      }).join("") + '<li class="index-item flex items-center justify-between border-b border-dotted border-inkBlue/40 pb-1 opacity-50"><span class="flex items-center gap-2"><span>🔒</span> Module Clavier & Symboles</span><span class="font-typewriter text-sm text-slate-400">p. 06</span></li></ul>';
+      }).join("") + '<li class="index-item flex items-center justify-between border-b border-dotted border-inkBlue/40 pb-1 opacity-50"><span class="flex items-center gap-2"><span>🔒</span> Module Clavier & Symboles</span><span class="font-typewriter text-sm text-slate-400">p. 09</span></li></ul>';
   }
 
   function renderTechnician() {
@@ -697,7 +709,7 @@ ${solo}
       return t === k
         ? '<button data-tab="' + t + '" class="tab-btn tab-active px-3 py-1.5 text-sm font-hand text-inkBlue bg-[#f4ecdf] border-t-2 border-x-2 border-amber-800/40 rounded-t-lg shadow-sm whitespace-nowrap">' + TECH_META[t].tab + "</button>"
         : '<button data-tab="' + t + '" class="tab-btn px-2.5 py-1 text-xs font-hand text-slate-400 bg-[#352d24] border-t border-x border-[#524436] rounded-t-md whitespace-nowrap">' + TECH_META[t].tab + "</button>";
-    }).join("") + '<button class="px-2 py-1 text-[11px] font-hand text-slate-600 bg-[#251f19] border-t border-slate-700 rounded-t-md whitespace-nowrap opacity-60 cursor-not-allowed" disabled>6+ fils...</button>';
+    }).join("");
     var lex = m.lexicon.concat([m.penalties]).map(function (t) { return "<div>• " + escH(t) + "</div>"; }).join("");
     var pauseBox = paused ? '<div class="absolute inset-x-3 top-3 z-40 bg-amber-100 border-2 border-inkRed rounded p-2.5 text-center shadow-lg"><div class="font-hand text-2xl font-bold text-inkRed">⏸ En attente de ' + escH(paused.pseudo) + '</div><div class="font-notes text-xs text-slate-700">La partie est en pause. Le temps ne s\'écoule plus.</div>' + (paused.can_abandon ? '<button id="zt-t-abort" class="mt-2 px-3 py-1 rounded border-2 border-inkRed text-inkRed font-notes text-xs font-bold">Abandonner la partie</button>' : "") + "</div>" : "";
     app.innerHTML =
