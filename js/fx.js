@@ -68,7 +68,7 @@ window.ZT_FX = (function () {
 
   // Flash d'arc + gerbe d'étincelles au centre du fil coupé.
   function sparks(row) {
-    var conduit = row && row.querySelector(".conduit");
+    var conduit = row && row.querySelector(".wire-conduit");
     if (!conduit) return;
     var flash = document.createElement("div");
     flash.className = "arc-flash"; conduit.appendChild(flash);

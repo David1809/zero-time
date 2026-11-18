@@ -8,15 +8,21 @@
 <title>ZERO TIME</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Chivo:wght@700;900&family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=9">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chivo:ital,wght@0,300..900;1,300..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+tailwind.config={darkMode:"class",corePlugins:{preflight:false},theme:{extend:{colors:{"surface":"#080d13","primary":"#ffc691","primary-container":"#ff9f32","secondary":"#9bb1c5","on-surface":"#dbe3ef","error":"#ff6b6b"},fontFamily:{"headline-sm":["Space Grotesk","sans-serif"],"body-md":["Chivo","sans-serif"],"label-sm":["JetBrains Mono","monospace"],"code-serial":["JetBrains Mono","monospace"],"display-timer":["JetBrains Mono","monospace"]}}}};
+</script>
+<link rel="stylesheet" href="css/style.css?v=10">
 </head>
 <body>
 <main id="app" aria-live="polite"></main>
 <div id="toast" role="status"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=9"></script>
-<script src="js/fx.js?v=9"></script>
-<script src="js/app.js?v=9"></script>
+<script src="js/config.js?v=10"></script>
+<script src="js/fx.js?v=10"></script>
+<script src="js/app.js?v=10"></script>
 </body>
 </html>
