@@ -226,3 +226,22 @@ body.op #app{max-width:none;padding:0}
 :where(body.op) svg{display:block}
 :where(body.op) button{background:transparent;font:inherit;color:inherit}
 body.op #app{gap:0;max-width:none}
+/* Tout tient dans l'écran, quel que soit le nombre de fils (3, 4 ou 5) */
+body.op,html:has(body.op){overflow:hidden;height:100dvh}
+body.op main{height:100dvh;padding-top:calc(60px + env(safe-area-inset-top,0px));padding-bottom:max(env(safe-area-inset-bottom,0px),10px);gap:6px;overflow:hidden}
+body.op main>section:nth-of-type(2){flex:1 1 0;min-height:0;display:flex;flex-direction:column;padding-top:10px;padding-bottom:10px}
+body.op #wire-loom-container{flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:6px;padding-top:2px}
+body.op #wire-loom-container>*{flex:1 1 0;min-height:0!important;max-height:56px;padding-top:3px;padding-bottom:3px;align-items:stretch}
+body.op #wire-loom-container>*>div{align-items:center}
+body.op #wire-loom-container .wire-badge,body.op #wire-loom-container>*>div>.w-8{height:100%;max-height:32px;width:auto;aspect-ratio:1/1}
+body.op #wire-loom-container .wire-conduit{height:auto;align-self:center;min-height:18px;max-height:32px;flex:1 1 0}
+body.op #chrono-display{font-size:clamp(34px,7vh,52px)}
+body.op main>section:first-of-type{margin-top:0;padding:8px 10px}
+body.op main>section:first-of-type .bezel-screen{margin-top:6px;padding:6px 10px}
+body.op main>section:last-of-type{margin:0}
+body.op .screw-torx{display:none}
+body.op #zt-tabs button{min-height:34px}
+body.op .industrial-trigger{min-height:48px}
+/* Pause : carte au premier plan, sans pousser le contenu */
+#zt-pause:not(:empty){position:fixed;inset:0;z-index:60;background:#06090ed9;display:flex;align-items:center;justify-content:center;padding:20px}
+#zt-pause:not(:empty) .card{width:100%;max-width:420px}

@@ -349,7 +349,7 @@
       if (ev.type === "error") {
         document.body.classList.add("flash"); setTimeout(function () { document.body.classList.remove("flash"); }, 700);
         buzz([250]); toast("ERREUR " + ev.n + "/3" + (ev.penalty ? " — −" + ev.penalty + " s" : ""), false);
-      } else { buzz([80]); toast("Panneau résolu ✓", true); }
+      } else { buzz([80]); }
     }
 
     var btn = document.getElementById("cut-wire-button");
