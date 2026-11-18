@@ -1,0 +1,11 @@
+-- ZERO TIME — générateur de panneaux (remplace le tirage parmi les 12 panneaux fixes).
+-- Les règles des modules 3, 4 et 5 fils ne changent pas. Pour éviter qu'une règle domine, on tire
+-- d'abord la règle visée (chacune autant que les autres), puis un panneau (couleurs, série) qui la
+-- déclenche. Les 12 panneaux fixes P1 à P12 restent dans zt.configs (référence de test).
+-- Appliquée dans la base ; fonctions : zt.eval_panel(wires, impair), zt.gen_panel(nb_fils) et
+-- public.zt_start() (voir leur définition dans la base pour le texte complet).
+--
+-- zt.eval_panel : applique les règles de la spécification (§5 et §8 bis) et renvoie {rule, answer}.
+-- zt.gen_panel  : tire la règle visée, génère au hasard jusqu'à ce qu'elle s'applique (5000 essais max).
+-- public.zt_start : génère un panneau de chaque module (3, 4, 5 fils), enregistré dans zt.configs
+--                   sous un identifiant 'G…', puis les place dans un ordre aléatoire.

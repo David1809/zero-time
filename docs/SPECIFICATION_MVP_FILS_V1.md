@@ -218,7 +218,9 @@ Vérification faite par script : les 250 combinaisons possibles (3 fils, 5 coule
 
 ## 9. Hors prototype
 
-Télévision, générateur, Code PIN, Symboles, 3 bombes, rotation des rôles, sons élaborés, difficultés, statistiques.
+Télévision, Code PIN, Symboles, 3 bombes, rotation des rôles, sons élaborés, difficultés, statistiques.
+
+**Mise à jour du 18 novembre 2026 :** le **générateur de panneaux** est ajouté au prototype (migration 008). Les règles des modules 3, 4 et 5 fils sont inchangées. Le générateur tire d'abord la règle visée, chacune avec la même probabilité (environ 25 %), puis un panneau qui la déclenche : ce qui corrige le déséquilibre signalé au §5 sans modifier les règles. Les 12 panneaux fixes (§6 et §8 bis) restent la référence de test.
 
 ---
 

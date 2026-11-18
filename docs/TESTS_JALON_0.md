@@ -4,6 +4,10 @@
 
 **Lien du jeu :** https://david1809.github.io/zero-time/ — sur deux smartphones, de préférence des paires différentes à chaque partie.
 
+## Décision provisoire du 18 novembre 2026
+
+David a joué le prototype sur deux téléphones (salle, rôles, coupe, erreurs, fin de partie, pause et reprise) et le juge fonctionnel, **sans soirée de test formelle ni notation**. Il a décidé de passer aux étapes suivantes. La validation du plaisir de jeu (cahier §18.6) reste donc à confirmer lors d'une vraie soirée ; la fiche ci-dessous reste utilisable à tout moment.
+
 ## Avant la soirée (5 minutes)
 
 - Ouvrir le jeu sur les deux téléphones et jouer une partie complète seul(e) pour vérifier que tout marche : créer une salle, rejoindre, lancer, couper un fil, finir.
