@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.30";
+  var APP_VERSION = "1.0.31";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -359,7 +359,7 @@ ${solo}
       ex: le[6], ey: le[7], sx: rs[0], sy: rs[1], cx: (le[6] + rs[0]) / 2, cy: (le[7] + rs[1]) / 2 };
   }
 
-  var clampPx = 22;
+  var clampPx = 22, zW = 240, zH = 190;
   function clBase() { return "terminal-clamp-block w-[" + clampPx + "px] h-[" + clampPx + "px] rounded flex items-center justify-center font-code-serial font-bold " + (clampPx < 22 ? "text-[9px]" : "text-[10px]"); }
   function clampCls(isCut, isSel, locked) {
     if (isCut) return clBase() + " text-slate-500 line-through";
@@ -400,7 +400,15 @@ ${solo}
     var n = panel.wires.length;
     clampPx = n >= 7 ? 18 : 22;
     var isSolved = panel.state === "solved";
-    var geom = GEOM[n] || GEOM[5];
+    var geom0 = GEOM[n] || GEOM[5];
+    // Zone des fils mesurée en pixels : la géométrie suit la place disponible, l'épaisseur des fils reste fixe (en px).
+    var ZW = zW, ZH = zH, rowH = clampPx;
+    var sx = ZW / 320, Y0 = 2 + rowH / 2, sy = (ZH - 4 - rowH) / 212;
+    var spc = (ZH - 4 - 18) / 7;                       // pas entre 2 fils pour un module de 8 (le plus serré)
+    var F = Math.max(9, Math.min(17, spc * 0.8)) / 13.5; // facteur d'épaisseur identique pour tous les modules
+    var geom = geom0.map(function (gm) { return { cut: gm.cut, s: gm.s.map(function (q) { return q.map(function (v, i) { return i % 2 === 0 ? v * sx : Y0 + (v - 22) * sy; }); }) }; });
+    function fw(m) { return m.replace(/stroke-width="([\d.]+)"/g, function (_, w) { return 'stroke-width="' + r1(w * F) + '"'; }).replace(/translate\(0,(-[\d.]+)\)/g, function (_, d) { return "translate(0," + r1(d * F) + ")"; }); }
+    var DEFSF = DEFS.replace('stdDeviation="5"', 'stdDeviation="' + r1(5 * F) + '"').replace('dy="7"', 'dy="' + r1(7 * F) + '"').replace('stdDeviation="3"', 'stdDeviation="' + r1(3 * F) + '"').replace('dy="5"', 'dy="' + r1(5 * F) + '"');
     var now = Date.now();
 
     // Événement de la dernière coupe : bandeau d'erreur + vignette rouge quelques secondes.
@@ -516,7 +524,7 @@ ${solo}
       rightCol += '<' + tag + ' class="' + cls + '"' + btnAttrs + dis + '>' + lugsR(isCut) + '<div class="' + clampCls(isCut, isSel, locked) + '">' + num + '</div></' + tag + '>';
     });
     order.forEach(function (o, zi) {
-      if (typeof o === "string") { if (n === 5) wiresSvg += '<path d="' + XSHADOW[o] + '" fill="none" filter="url(#crossing-shadow)" opacity="0.8" pointer-events="none" stroke="#000" stroke-linecap="round" stroke-width="14"></path>'; return; }
+      if (typeof o === "string") { if (n === 5) wiresSvg += '<path d="' + XSHADOW[o].replace(/(-?[\d.]+),(-?[\d.]+)/g, function (_, a, b) { return r1(a * sx) + "," + r1(Y0 + (b - 22) * sy); }) + '" fill="none" filter="url(#crossing-shadow)" opacity="0.8" pointer-events="none" stroke="#000" stroke-linecap="round" stroke-width="14"></path>'; return; }
       var idx = o - 1, color = panel.wires[idx], P = parts[idx], isCut = panel.cut.indexOf(o) !== -1, isSel = selectedWire === o;
       var grad = "url(#grad-wire-" + color + ")", base = BASE[color] || "#10141a", spec = color === "black" ? "#cbd5e1" : "#ffffff";
       var cutBase = (color === "white" || color === "black") ? base : "#10141a";
@@ -524,7 +532,7 @@ ${solo}
       var top = zi === order.length - 1;
       if (isCut) {
         var anim = cutNow === o;
-        var cu = function (x, y, dir) { return "M " + r1(x) + "," + r1(y - 1) + " L " + r1(x + dir * 13) + "," + r1(y - 7) + " M " + r1(x + dir) + "," + r1(y) + " L " + r1(x + dir * 16) + "," + r1(y) + " M " + r1(x) + "," + r1(y + 1) + " L " + r1(x + dir * 12) + "," + r1(y + 7); };
+        var cu = function (x, y, dir) { var k = F; return "M " + r1(x) + "," + r1(y - k) + " L " + r1(x + dir * 13 * k) + "," + r1(y - 7 * k) + " M " + r1(x + dir * k) + "," + r1(y) + " L " + r1(x + dir * 16 * k) + "," + r1(y) + " M " + r1(x) + "," + r1(y + k) + " L " + r1(x + dir * 12 * k) + "," + r1(y + 7 * k); };
         wiresSvg += '<g class="opacity-80" data-wire-group="' + o + '" pointer-events="none">' +
           '<g' + (anim ? ' class="cut-recoil-left"' : "") + '><path d="' + P.left + '" fill="none" stroke="' + cutBase + '" stroke-linecap="round" stroke-width="14.5"></path><path d="' + P.left + '" fill="none" stroke="' + grad + '" stroke-linecap="round" stroke-width="13"></path><path transform="translate(0,-2.5)" d="' + P.left + '" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-width="' + cs.w + '" opacity="' + cs.o + '"></path><path d="' + cu(P.ex, P.ey, 1) + '" fill="none" stroke="url(#copper-wires)" stroke-linecap="round" stroke-width="2.2"></path></g>' +
           '<g' + (anim ? ' class="cut-recoil-right"' : "") + '><path d="' + cu(P.sx, P.sy, -1) + '" fill="none" stroke="url(#copper-wires)" stroke-linecap="round" stroke-width="2.2"></path><path d="' + P.right + '" fill="none" stroke="' + cutBase + '" stroke-linecap="round" stroke-width="14.5"></path><path d="' + P.right + '" fill="none" stroke="' + grad + '" stroke-linecap="round" stroke-width="13"></path><path transform="translate(0,-2.5)" d="' + P.right + '" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-width="' + cs.w + '" opacity="' + cs.o + '"></path></g></g>';
@@ -549,11 +557,11 @@ ${solo}
     var colCls = locked ? "flex flex-col justify-between py-0.5 z-30 pointer-events-none opacity-85" : "flex flex-col justify-between py-0.5 z-30 pointer-events-auto";
     var module =
       '<section class="rugged-chassis rounded-xl p-2.5 flex flex-col gap-1 relative min-h-0 flex-1">' + SCR_MOD + screws("screw-rot-4", "screw-rot-3", "screw-rot-2", "screw-rot-1") + modHead +
-      '<div class="relative bay-chassis-inner rounded-lg p-1 mx-2 flex items-stretch justify-between overflow-hidden" id="harness-chamber">' + veil +
+      '<div class="relative bay-chassis-inner rounded-lg p-1 mx-2 flex-1 min-h-0 flex items-stretch justify-between overflow-hidden" id="harness-chamber">' + veil +
       '<div class="absolute inset-0 pointer-events-none opacity-20 flex flex-col justify-between py-4 px-10"><div class="h-0.5 border-b border-dashed border-slate-400"></div><div class="h-0.5 border-b border-dashed border-slate-400"></div><div class="h-0.5 border-b border-dashed border-slate-400"></div><div class="h-0.5 border-b border-dashed border-slate-400"></div></div>' + resolvedBar +
       '<div class="' + colCls + '">' + leftCol + '</div>' +
-      '<div class="flex-1 mx-1 relative overflow-hidden" id="svg-wire-zone"><svg class="w-full h-full" id="wires-canvas" preserveAspectRatio="none" viewBox="0 0 320 256">' + DEFS +
-      '<g opacity="0.95" pointer-events="none">' + shadows + '</g>' + wiresSvg + '</svg></div>' +
+      '<div class="flex-1 mx-1 relative overflow-hidden" id="svg-wire-zone"><svg class="absolute inset-0 w-full h-full" id="wires-canvas" preserveAspectRatio="none" viewBox="0 0 ' + ZW + ' ' + ZH + '">' + DEFSF +
+      '<g opacity="0.95" pointer-events="none">' + fw(shadows) + '</g>' + fw(wiresSvg) + '</svg></div>' +
       '<div class="' + colCls + '">' + rightCol + '</div></div></section>';
 
     // --- commandes
@@ -609,6 +617,11 @@ ${solo}
         if (e.getAttribute("data-t") !== cls) { e.classList.remove("timer-neon-green", "timer-neon-warning", "timer-neon-alert", "timer-neon-paused"); e.classList.add(cls); e.setAttribute("data-t", cls); }
       });
     }
+    // Re-mesure la zone des fils : si sa taille réelle diffère de celle utilisée, on redessine une fois à la bonne taille.
+    var zEl = document.getElementById("svg-wire-zone");
+    if (zEl && zEl.clientWidth > 40 && zEl.clientHeight > 60 && (Math.abs(zEl.clientWidth - zW) > 1 || Math.abs(zEl.clientHeight - zH) > 1)) {
+      zW = zEl.clientWidth; zH = zEl.clientHeight; return renderOperator();
+    }
     stopTimer();
     var remInit = (endsAt - (now + offsetMs)) / 1000;
     paint(remNow);
@@ -633,7 +646,7 @@ ${solo}
       var w = selectedWire, P = parts[w - 1];
       var zone = document.getElementById("svg-wire-zone").getBoundingClientRect();
       window.ZT_FX.cutSound(); buzz([24, 15, 45]);
-      window.ZT_FX.sparksAt(zone.left + (P.cx / 320) * zone.width, zone.top + (P.cy / 256) * zone.height);
+      window.ZT_FX.sparksAt(zone.left + (P.cx / ZW) * zone.width, zone.top + (P.cy / ZH) * zone.height);
       lastCut = { pos: panel.pos, wire: w };
       sb.rpc("zt_cut", { p_code: session.code, p_token: session.token, p_action: uuid(), p_pos: panel.pos, p_wire: w }).then(function (r) {
         cutting = false;
