@@ -23,7 +23,8 @@
     reserve_operateur: "Action réservée à l'opérateur.",
     coupe_invalide: "Ce fil ne peut pas être coupé.",
     panneau_inconnu: "Panneau inconnu.",
-    abandon_indisponible: "Abandon impossible pour le moment."
+    abandon_indisponible: "Abandon impossible pour le moment.",
+    mode_solo_indisponible: "Mode solo indisponible : un autre joueur est dans la salle."
   };
 
   function toast(msg, ok) {
@@ -156,6 +157,18 @@
       app.appendChild(el("button", { class: "primary", text: "Lancer", disabled: ready ? null : "disabled", onclick: function () {
         sb.rpc("zt_start", { p_code: view.code, p_token: session.token }).then(function (r) { if (r.error) return fail(r.error); view = r.data; render(); });
       } }));
+      if (view.players.length === 1) {
+        function startSolo(role) {
+          sb.rpc("zt_start_solo", { p_code: view.code, p_token: session.token, p_role: role }).then(function (r) { if (r.error) return fail(r.error); view = r.data; resetGameFlags(); selectedWire = null; activePanel = 0; render(); });
+        }
+        app.appendChild(el("div", { class: "card" }, [
+          el("label", { text: "Mode test (seul, sans deuxième joueur)" }),
+          el("div", { class: "row" }, [
+            el("button", { text: "Tester en opérateur", onclick: function () { startSolo("operator"); } }),
+            el("button", { text: "Tester en technicien", onclick: function () { startSolo("technician"); } })
+          ])
+        ]));
+      }
     } else {
       app.appendChild(el("div", { class: "muted", text: "Le créateur choisit les rôles et lance la partie." }));
     }
@@ -575,7 +588,21 @@
     }
     doRender();
   }
+  function soloChip() {
+    var old = document.getElementById("zt-solo"); if (old) old.remove();
+    if (!(session && view && view.solo && view.status === "playing" && view.me)) return;
+    var other = view.me.role === "operator" ? "technician" : "operator";
+    var b = document.createElement("button");
+    b.id = "zt-solo"; b.type = "button";
+    b.textContent = "TEST ⇄ " + (other === "operator" ? "voir opérateur" : "voir technicien");
+    b.style.cssText = "position:fixed;right:8px;top:calc(60px + env(safe-area-inset-top,0px));z-index:90;min-height:0;padding:5px 9px;border-radius:6px;border:1px solid #ff9f32;background:#1a1e23ee;color:#ff9f32;font:700 10px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase";
+    b.onclick = function () {
+      sb.rpc("zt_solo_role", { p_code: session.code, p_token: session.token, p_role: other }).then(function (r) { if (r.error) return fail(r.error); view = r.data; render(); });
+    };
+    document.body.appendChild(b);
+  }
   function doRender() {
+    soloChip();
     var isOp = !!(session && view && view.status === "playing" && view.me && view.me.role === "operator" && view.game);
     document.body.classList.toggle("op", isOp);
     document.body.classList.toggle("bg-industrial-bay", isOp);
