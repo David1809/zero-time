@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.22";
+  var APP_VERSION = "1.0.23";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -422,7 +422,10 @@ ${solo}
     for (var k = 0; k < 3; k++) crans += k < solved
       ? '<div class="flex-1 h-full rounded-xs bg-[#00ffaa] shadow-[0_0_6px_#00ffaa]"></div>'
       : '<div class="flex-1 h-full rounded-xs bg-[#171d24]"></div>';
-    var screws = function (a, b, c, d) { return '<span class="screw-cross ' + a + ' top-2 left-2"></span><span class="screw-cross ' + b + ' top-2 right-2"></span><span class="screw-cross ' + c + ' bottom-2 left-2"></span><span class="screw-cross ' + d + ' bottom-2 right-2"></span>'; };
+    var screws = function (a, b, c, d) {
+      function w(pos, rot) { return '<div class="absolute pointer-events-none z-20" style="' + pos + ' width: 14px; height: 14px;"><span class="screw-cross ' + rot + '" style="top: 0; left: 0;"></span></div>'; }
+      return w("top: 5px; left: 5px;", a) + w("top: 5px; right: 5px;", b) + w("bottom: 5px; left: 5px;", c) + w("bottom: 5px; right: 5px;", d);
+    };
     var head = { live: '<span class="pilot-led-green"></span><span class="font-label-sm text-[8.5px] font-bold text-primary tracking-wider uppercase">ATTENTION : DÉTONATION IMMINENTE</span>',
       alert: '<span class="pilot-led-green"></span><span class="font-label-sm text-[8.5px] font-bold text-primary tracking-wider uppercase">ATTENTION : DÉTONATION IMMINENTE</span>',
       err: '<span class="pilot-led-red"></span><span class="font-label-sm text-[9px] font-bold text-[#ff6666] tracking-wider uppercase">ATTENTION : DÉTONATION IMMINENTE</span>',
