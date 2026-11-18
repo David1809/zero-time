@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.32";
+  var APP_VERSION = "1.0.33";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -469,7 +469,7 @@ ${solo}
       (paused ? '<div class="pause-scanline-veil absolute inset-0 pointer-events-none z-10"></div>' : "") +
       '<svg class="absolute inset-0 w-full h-full pointer-events-none opacity-25 z-10" preserveAspectRatio="none"><line stroke="#ffffff" stroke-width="0.75" x1="10%" x2="35%" y1="15%" y2="85%"></line><line stroke="#ffffff" stroke-width="0.5" x1="70%" x2="90%" y1="18%" y2="72%"></line><line opacity="0.3" stroke="#ff9f32" stroke-dasharray="2 4" stroke-width="0.5" x1="5%" x2="95%" y1="50%" y2="50%"></line></svg>' +
       waiting +
-      '<div class="flex items-baseline justify-center relative z-15 py-0"><div class="font-display-timer text-[38px] leading-tight font-bold tracking-wider transition-colors duration-300" id="chrono-display">00:00</div><span class="ml-1.5 font-code-serial text-[15px] font-bold tracking-widest transition-colors duration-300" id="chrono-ms">.00</span>' +
+      '<div class="flex items-baseline justify-center relative z-15 py-0"><div class="font-display-timer text-[38px] leading-tight font-bold tracking-wider" id="chrono-display">00:00</div><span class="ml-1.5 font-code-serial text-[15px] font-bold tracking-widest" id="chrono-ms">.00</span>' +
       (paused ? '<span class="ml-2.5 px-1.5 py-0.5 rounded bg-black/60 border border-slate-700 text-[8px] font-code-serial text-slate-400 uppercase tracking-widest">FIGÉ</span>' : "") + '</div>' +
       '<div class="mt-0.5 pt-1 border-t border-[#182029] grid grid-cols-2 gap-2 items-center relative z-15">' +
       '<div class="flex flex-col gap-0.5"><div class="flex items-center gap-1"><span class="material-symbols-outlined text-error text-[11px]">warning</span><span class="font-label-sm text-[7.5px] font-bold tracking-wider text-error uppercase">ERREURS ' + g.errors + '/3</span></div><div class="flex items-center gap-1.5">' + diodes + '</div></div>' +
