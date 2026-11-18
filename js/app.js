@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.26";
+  var APP_VERSION = "1.0.27";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -670,7 +670,6 @@ ${solo}
   function techPageHtml(k, m) {
     if (k === "w4") {
       return techHead(k, '<span class="inline-block px-1.5 py-0.5 rounded text-[11px] font-notes text-inkRed border border-inkRed/40 bg-red-50/50 rotate-[-2deg]">URGENT</span>') +
-        '<div class="bg-red-100/50 border-l-2 border-inkRed pl-2 py-1 mb-3.5 rounded-r"><p class="font-notes text-xs text-inkRed font-semibold leading-tight">✍️ ' + escH(m.rule_order) + "</p></div>" +
         '<ol class="space-y-3 font-hand text-lg text-inkBlue">' + m.w4.map(function (r, i) { return ruleLi(r, i, true); }).join("") + "</ol>" +
         '<div class="mt-4 pt-2 border-t border-inkBlue/20 flex items-center justify-end"><div class="font-notes text-[11px] text-inkRed font-bold">✓ Révision atelier 03/A</div></div>';
     }
