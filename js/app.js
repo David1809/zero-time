@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.31";
+  var APP_VERSION = "1.0.32";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -405,7 +405,7 @@ ${solo}
     var ZW = zW, ZH = zH, rowH = clampPx;
     var sx = ZW / 320, Y0 = 2 + rowH / 2, sy = (ZH - 4 - rowH) / 212;
     var spc = (ZH - 4 - 18) / 7;                       // pas entre 2 fils pour un module de 8 (le plus serré)
-    var F = Math.max(9, Math.min(17, spc * 0.8)) / 13.5; // facteur d'épaisseur identique pour tous les modules
+    var F = Math.max(9, Math.min(14, spc * 0.8)) / 13.5; // facteur d'épaisseur identique pour tous les modules
     var geom = geom0.map(function (gm) { return { cut: gm.cut, s: gm.s.map(function (q) { return q.map(function (v, i) { return i % 2 === 0 ? v * sx : Y0 + (v - 22) * sy; }); }) }; });
     function fw(m) { return m.replace(/stroke-width="([\d.]+)"/g, function (_, w) { return 'stroke-width="' + r1(w * F) + '"'; }).replace(/translate\(0,(-[\d.]+)\)/g, function (_, d) { return "translate(0," + r1(d * F) + ")"; }); }
     var DEFSF = DEFS.replace('stdDeviation="5"', 'stdDeviation="' + r1(5 * F) + '"').replace('dy="7"', 'dy="' + r1(7 * F) + '"').replace('stdDeviation="3"', 'stdDeviation="' + r1(3 * F) + '"').replace('dy="5"', 'dy="' + r1(5 * F) + '"');
