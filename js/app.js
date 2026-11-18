@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.33";
+  var APP_VERSION = "1.0.34";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -175,22 +175,24 @@
   function renderLobby() {
     clear();
     var players = view.players, n = players.length, mode = view.role_mode, cr = view.creator_role, isC = view.is_creator;
-    var ready = n === 2 && (mode === "random" || !!cr);
+    var ready = n >= 2 && (mode === "random" || !!cr);
     function roleOf(p) {
       if (mode === "random") return "RÔLE : TIRAGE AU SORT";
       if (!cr) return "RÔLE : À DÉFINIR";
+      if (!p.is_creator && cr === "technician" && n > 2) return "RÔLE : TIRAGE AU SORT";
       var r = p.is_creator ? cr : (cr === "operator" ? "technician" : "operator");
       return "RÔLE : " + ROLE_FULL[r];
     }
     function iconOf(p) {
       if (mode === "random" || !cr) return "person";
+      if (!p.is_creator && cr === "technician" && n > 2) return "person";
       return (p.is_creator ? cr : (cr === "operator" ? "technician" : "operator")) === "operator" ? "shield_person" : "menu_book";
     }
     function slot(p, i) {
       var host = !!p.is_creator;
       return `<div class="bg-surface-container-lowest rounded p-2 flex items-center justify-between shadow-inner"><div class="flex items-center gap-2.5 min-w-0"><div class="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center ${host ? "text-primary" : "text-secondary"} shrink-0"><span class="material-symbols-outlined text-lg">${iconOf(p)}</span></div><div class="flex flex-col min-w-0"><div class="flex items-center gap-1.5"><span class="font-label-md text-label-md text-on-surface font-bold truncate">${escS(p.pseudo)}</span><span class="font-label-sm text-label-sm ${host ? "bg-primary-container/20 text-primary" : "bg-surface-bright text-on-surface-variant"} px-1 rounded uppercase tracking-wider text-[9px]">${host ? "HÔTE" : "BINÔME"}</span></div><span class="font-label-sm text-label-sm ${host ? "text-primary" : "text-secondary"} tracking-wide uppercase truncate">${roleOf(p)}</span></div></div><div class="flex items-center gap-1.5 shrink-0 pl-1"><span class="w-2.5 h-2.5 rounded-full bg-secondary shadow-[0_0_8px_rgba(184,201,214,0.6)]"></span><span class="font-label-sm text-label-sm text-secondary font-bold">${host ? "PRÊT" : "SYNCHRO"}</span></div></div>`;
     }
-    var emptySlot = `<div class="bg-surface-container-lowest rounded p-2 flex items-center justify-between shadow-inner opacity-75"><div class="flex items-center gap-2.5 min-w-0"><div class="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center text-secondary shrink-0"><span class="material-symbols-outlined text-lg">person_search</span></div><div class="flex flex-col min-w-0"><span class="font-label-md text-label-md text-on-surface-variant font-bold truncate">EN ATTENTE DU BINÔME…</span><span class="font-label-sm text-label-sm text-secondary tracking-wide uppercase truncate">CANAL OUVERT</span></div></div><div class="flex items-center gap-1.5 shrink-0 pl-1"><span class="w-2.5 h-2.5 rounded-full bg-surface-bright animate-pulse"></span><span class="font-label-sm text-label-sm text-on-surface-variant font-bold">ATTENTE</span></div></div>`;
+    var emptySlot = `<div class="bg-surface-container-lowest rounded p-2 flex items-center justify-between shadow-inner opacity-75"><div class="flex items-center gap-2.5 min-w-0"><div class="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center text-secondary shrink-0"><span class="material-symbols-outlined text-lg">person_search</span></div><div class="flex flex-col min-w-0"><span class="font-label-md text-label-md text-on-surface-variant font-bold truncate">EN ATTENTE D'UN JOUEUR…</span><span class="font-label-sm text-label-sm text-secondary tracking-wide uppercase truncate">CANAL OUVERT</span></div></div><div class="flex items-center gap-1.5 shrink-0 pl-1"><span class="w-2.5 h-2.5 rounded-full bg-surface-bright animate-pulse"></span><span class="font-label-sm text-label-sm text-on-surface-variant font-bold">ATTENTE</span></div></div>`;
     function sel(id, on, title, sub) {
       return `<button class="role-selector min-h-[52px] p-2 rounded ${on ? "bg-surface-container-high" : "bg-surface-container-lowest opacity-75"} flex flex-col justify-between text-left shadow-inner transition-all" id="${id}" type="button"><div class="flex items-center justify-between w-full"><span class="font-label-sm text-label-sm ${on ? "text-primary" : "text-on-surface-variant"} uppercase font-bold tracking-wider">${title}</span><span class="radio-indicator w-2.5 h-2.5 rounded-full ${on ? "bg-primary shadow-[0_0_8px_rgba(255,159,50,0.8)]" : "bg-surface-bright"}"></span></div><span class="font-body-sm text-body-sm ${on ? "text-on-surface" : "text-on-surface-variant"} font-medium truncate mt-1">${sub}</span></button>`;
     }
@@ -199,7 +201,7 @@
     var solo = (isC && n === 1) ? `<section class="relative bg-surface-container rounded-lg p-3 shadow-md flex flex-col gap-2"><div class="flex items-center justify-between px-3"><span class="font-label-sm text-label-sm text-on-surface-variant tracking-wider uppercase">MODE TEST // SOLO</span><span class="font-label-sm text-label-sm text-primary uppercase">SANS BINÔME</span></div><div class="grid grid-cols-2 gap-2">${sel("solo-op", false, "OPÉRATEUR", "Tester seul")}${sel("solo-tech", false, "TECHNICIEN", "Tester seul")}</div></section>` : "";
     var msg, icon = "lock_open";
     if (!isC) { msg = "EN ATTENTE DU LANCEMENT PAR L'HÔTE"; icon = "hourglass_top"; }
-    else if (n < 2) { msg = "EN ATTENTE DU BINÔME"; icon = "hourglass_top"; }
+    else if (n < 2) { msg = "EN ATTENTE D'UN JOUEUR"; icon = "hourglass_top"; }
     else if (!ready) { msg = "CHOISIS UN RÔLE"; icon = "lock"; }
     else msg = "TOUS LES DÉMINEURS SONT PRÊTS";
     var canLaunch = isC && ready;
@@ -208,10 +210,10 @@
 <section class="relative bg-surface-container rounded-lg p-3 shadow-md flex flex-col justify-between overflow-hidden"><div class="absolute top-1.5 left-1.5 w-2.5 h-2.5 rounded-full bg-surface-bright flex items-center justify-center">${BOLT} rotate-45"></div></div><div class="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-surface-bright flex items-center justify-center">${BOLT} -rotate-45"></div></div><div class="absolute bottom-1.5 left-1.5 w-2.5 h-2.5 rounded-full bg-surface-bright flex items-center justify-center">${BOLT} -rotate-12"></div></div><div class="absolute bottom-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-surface-bright flex items-center justify-center">${BOLT} rotate-12"></div></div>
 <div class="flex items-center justify-between mb-1 px-3"><span class="font-label-sm text-label-sm text-on-surface-variant tracking-wider uppercase flex items-center gap-1.5"><span class="material-symbols-outlined text-xs text-primary">key</span>CODE ACCÈS OPÉRATION</span><span class="font-code-serial text-label-sm text-primary uppercase">SER-${escS(view.code)}</span></div>
 <div class="bg-surface-container-lowest rounded p-2 flex items-center justify-between shadow-inner"><div class="flex flex-col pl-2"><span class="font-label-sm text-label-sm text-on-surface-variant tracking-widest text-[9px] uppercase">LIAISON DÉCRYPTÉE</span><div class="flex items-center gap-2"><span class="font-display-timer-mobile text-display-timer-mobile text-primary tracking-widest drop-shadow-[0_0_12px_rgba(255,159,50,0.45)]" id="room-code">${escS(view.code)}</span></div></div><button class="min-h-[48px] px-3 bg-surface-container hover:bg-surface-bright active:bg-primary text-primary hover:text-on-primary-fixed rounded flex items-center gap-1.5 transition-all" id="copy-btn" type="button"><span class="material-symbols-outlined text-base" id="copy-icon">content_copy</span><span class="font-label-md text-label-md uppercase tracking-wider font-bold" id="copy-text">COPIER</span></button></div>
-<div class="mt-1.5 flex items-center justify-center gap-1 px-1"><span class="material-symbols-outlined text-xs text-secondary">record_voice_over</span><span class="font-label-sm text-label-sm text-secondary truncate">TRANSMETTRE CE CODE AU DÉMINEUR BINÔME</span></div></section>
+<div class="mt-1.5 flex items-center justify-center gap-1 px-1"><span class="material-symbols-outlined text-xs text-secondary">record_voice_over</span><span class="font-label-sm text-label-sm text-secondary truncate">TRANSMETTRE CE CODE AUX AUTRES DÉMINEURS (2 À 4 JOUEURS)</span></div></section>
 <section class="relative bg-surface-container rounded-lg p-3 shadow-md flex flex-col gap-2"><div class="absolute top-1.5 left-1.5 w-2.5 h-2.5 rounded-full bg-surface-bright flex items-center justify-center">${BOLT} rotate-90"></div></div><div class="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-surface-bright flex items-center justify-center">${BOLT}"></div></div>
-<div class="flex items-center justify-between px-3"><span class="font-label-sm text-label-sm text-on-surface-variant tracking-wider uppercase">EFFECTIF ENGAGÉ (${n}/2)</span><span class="font-label-sm text-label-sm text-secondary uppercase flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>${n === 2 ? "VOIE 2-WAY OK" : "VOIE 1-WAY"}</span></div>
-${players.map(slot).join("")}${n < 2 ? emptySlot : ""}</section>
+<div class="flex items-center justify-between px-3"><span class="font-label-sm text-label-sm text-on-surface-variant tracking-wider uppercase">EFFECTIF ENGAGÉ (${n}/4)</span><span class="font-label-sm text-label-sm text-secondary uppercase flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>${n >= 2 ? "ÉQUIPE PRÊTE" : "EN ATTENTE"}</span></div>
+${players.map(slot).join("")}${n < 4 ? emptySlot : ""}</section>
 <section class="relative bg-surface-container rounded-lg p-3 shadow-md flex flex-col gap-2"><div class="absolute bottom-1.5 left-1.5 w-2.5 h-2.5 rounded-full bg-surface-bright flex items-center justify-center">${BOLT} rotate-45"></div></div><div class="absolute bottom-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-surface-bright flex items-center justify-center">${BOLT} -rotate-45"></div></div>
 <div class="flex items-center justify-between px-3"><span class="font-label-sm text-label-sm text-on-surface-variant tracking-wider uppercase">PARAMÈTRE D'ATTRIBUTION</span><span class="font-label-sm text-label-sm text-primary uppercase">AUTORITÉ HÔTE</span></div>
 <div class="grid grid-cols-2 gap-2">${sel("role-mode-manual", manual, "MANUEL", "Attribution Fixe")}${sel("role-mode-random", !manual, "ALÉATOIRE", "Tirage Au Sort")}</div>${roleRow}</section>
@@ -260,7 +262,7 @@ ${solo}
     });
   }
   function buzz(p) { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} }
-  function resetGameFlags() { endFxKey = null; errFlash = null; alertFlash = null; seenEvent = undefined; alerted = {}; alertInit = false; tickSent = false; }
+  function resetGameFlags() { techTouched = false; endFxKey = null; errFlash = null; alertFlash = null; seenEvent = undefined; alerted = {}; alertInit = false; tickSent = false; }
 
   function stopTimer() { if (timerId) { clearInterval(timerId); timerId = null; } }
   function fmt(ms) {
@@ -687,12 +689,15 @@ ${solo}
     w8: { tab: "8 fils", title: "Section 08 — Module 8 fils", sub: "Harnais maximal à 8 connexions", pg: "p. 08", ind: "Page 8 / 8 — Module 8 fils" },
     index: { tab: "", title: "Sommaire du Manuel", sub: "Index rapide des modules de déminage", pg: "INDEX", ind: "Sommaire général" }
   };
-  var techQuery = "";
+  var techQuery = "", techTouched = false;
   function techHead(k, extra) {
     var m = TECH_META[k];
     return '<div class="border-b-2 border-inkBlue/30 pb-2 mb-3 flex items-baseline justify-between"><div><div class="font-hand text-3xl font-bold text-inkBlue tracking-wide flex items-center gap-2"><span>' + m.title + "</span>" + (extra || "") + '</div><p class="font-notes text-xs text-slate-600 italic">' + m.sub + '</p></div><div class="font-typewriter text-xs text-slate-500 font-bold">' + m.pg + "</div></div>";
   }
   function techPageHtml(k, m) {
+    if (/^w[3-8]$/.test(k) && !m[k]) {
+      return techHead(k) + '<div class="mt-6 p-4 rounded border-2 border-dashed border-inkRed/50 bg-red-50/40 text-center font-hand text-xl text-inkRed leading-snug">🔒 Cette page est chez un autre technicien.<br><span class="text-base text-slate-700">Demande-lui de te lire ses règles : annonce le nombre de fils et les couleurs.</span></div>';
+    }
     if (k === "w4") {
       return techHead(k, '<span class="inline-block px-1.5 py-0.5 rounded text-[11px] font-notes text-inkRed border border-inkRed/40 bg-red-50/50 rotate-[-2deg]">URGENT</span>') +
         '<ol class="space-y-3 font-hand text-lg text-inkBlue">' + m.w4.map(function (r, i) { return ruleLi(r, i, true); }).join("") + "</ol>" +
@@ -711,17 +716,21 @@ ${solo}
     return techHead("index") +
       '<div class="mb-4 bg-amber-50/70 p-2.5 rounded border border-amber-900/30 shadow-inner"><label class="block font-notes text-xs text-slate-700 font-bold mb-1">🔍 Recherche de mot-clé ou module :</label><div class="relative"><input type="text" id="indexSearchInput" placeholder="Ex: 4 fils, série, pair..." class="w-full bg-transparent border-b-2 border-inkBlue text-inkBlue font-hand text-xl px-1 py-0.5 focus:outline-none focus:border-inkRed placeholder-slate-400"/><span class="absolute right-1 top-1 text-xs text-slate-400 font-notes italic">écrire ici</span></div></div>' +
       '<ul id="indexList" class="space-y-2.5 font-hand text-lg text-inkBlue">' + items.map(function (x) {
-        return '<li class="index-item flex items-center justify-between border-b border-dotted border-inkBlue/40 pb-1 cursor-pointer" data-go="' + x[0] + '"><span class="flex items-center gap-2"><span>' + x[1] + "</span> <b>" + x[2] + '</b> <span class="font-notes text-xs text-slate-500">' + x[3] + '</span></span><span class="font-typewriter text-sm font-bold text-inkBlue">' + x[4] + "</span></li>";
+        var lk = /^w[3-8]$/.test(x[0]) && !m[x[0]];
+        return '<li class="index-item flex items-center justify-between border-b border-dotted border-inkBlue/40 pb-1 cursor-pointer' + (lk ? " opacity-50" : "") + '" data-go="' + x[0] + '"><span class="flex items-center gap-2"><span>' + (lk ? "🔒" : x[1]) + "</span> <b>" + x[2] + '</b> <span class="font-notes text-xs text-slate-500">' + (lk ? "(chez un autre technicien)" : x[3]) + '</span></span><span class="font-typewriter text-sm font-bold text-inkBlue">' + x[4] + "</span></li>";
       }).join("") + '<li class="index-item flex items-center justify-between border-b border-dotted border-inkBlue/40 pb-1 opacity-50"><span class="flex items-center gap-2"><span>🔒</span> Module Clavier & Symboles</span><span class="font-typewriter text-sm text-slate-400">p. 09</span></li></ul>';
   }
 
   function renderTechnician() {
     stopTimer();
-    var m = view.manual, k = TECH_META[manualTab] ? manualTab : "w4", meta = TECH_META[k], paused = view.paused;
+    var m = view.manual; if (m.pages && !m["w" + manualTab.slice(1)] && /^w[3-8]$/.test(manualTab) && !techTouched) { manualTab = "w" + m.pages[0]; }
+    var k = TECH_META[manualTab] ? manualTab : "w4", meta = TECH_META[k], paused = view.paused;
+    var lock = function (t) { return /^w[3-8]$/.test(t) && !m[t]; };
     var tabs = TECH_ORDER.map(function (t) {
+      var lab = TECH_META[t].tab + (lock(t) ? " 🔒" : "");
       return t === k
-        ? '<button data-tab="' + t + '" class="tab-btn tab-active px-3 py-1.5 text-sm font-hand text-inkBlue bg-[#f4ecdf] border-t-2 border-x-2 border-amber-800/40 rounded-t-lg shadow-sm whitespace-nowrap">' + TECH_META[t].tab + "</button>"
-        : '<button data-tab="' + t + '" class="tab-btn px-2.5 py-1 text-xs font-hand text-slate-400 bg-[#352d24] border-t border-x border-[#524436] rounded-t-md whitespace-nowrap">' + TECH_META[t].tab + "</button>";
+        ? '<button data-tab="' + t + '" class="tab-btn tab-active px-3 py-1.5 text-sm font-hand text-inkBlue bg-[#f4ecdf] border-t-2 border-x-2 border-amber-800/40 rounded-t-lg shadow-sm whitespace-nowrap">' + lab + "</button>"
+        : '<button data-tab="' + t + '" class="tab-btn px-2.5 py-1 text-xs font-hand text-slate-400 bg-[#352d24] border-t border-x border-[#524436] rounded-t-md whitespace-nowrap">' + lab + "</button>";
     }).join("");
     var lex = m.lexicon.concat([m.penalties]).map(function (t) { return "<div>• " + escH(t) + "</div>"; }).join("");
     var pauseBox = paused ? '<div class="absolute inset-x-3 top-3 z-40 bg-amber-100 border-2 border-inkRed rounded p-2.5 text-center shadow-lg"><div class="font-hand text-2xl font-bold text-inkRed">⏸ En attente de ' + escH(paused.pseudo) + '</div><div class="font-notes text-xs text-slate-700">La partie est en pause. Le temps ne s\'écoule plus.</div>' + (paused.can_abandon ? '<button id="zt-t-abort" class="mt-2 px-3 py-1 rounded border-2 border-inkRed text-inkRed font-notes text-xs font-bold">Abandonner la partie</button>' : "") + "</div>" : "";
@@ -734,7 +743,7 @@ ${solo}
       '<footer class="mt-4 pt-3 border-t-2 border-dashed border-amber-900/30 bg-amber-100/30 p-2 rounded"><div class="flex items-center gap-1.5 mb-1"><span class="font-notes text-xs font-bold text-inkRed">📖 RAPPEL LEXIQUE & CONVENTIONS :</span></div><div class="grid grid-cols-2 gap-2 font-hand text-sm text-slate-700">' + lex + "</div></footer></div>" +
       '<div class="border-t border-amber-900/20 bg-[#ede4d4] px-4 py-2 flex items-center justify-between text-xs font-notes text-inkBlue"><button id="btnPrev" class="flex items-center gap-1 font-bold text-inkBlue active:scale-95 transition-transform"><span>⟵</span> <span>Précédent</span></button><div class="flex items-center gap-1 font-typewriter text-[11px] text-slate-600 bg-amber-200/50 px-2 py-0.5 rounded border border-amber-800/30"><span>' + meta.ind + '</span></div><button id="btnNext" class="flex items-center gap-1 font-bold text-inkBlue active:scale-95 transition-transform"><span>Suivant</span> <span>⟶</span></button></div></div>';
 
-    function go(t) { manualTab = t; render(); }
+    function go(t) { manualTab = t; techTouched = true; render(); }
     function step(d) { var i = TECH_ORDER.indexOf(manualTab); if (i < 0) i = TECH_ORDER.indexOf("w4"); go(TECH_ORDER[(i + d + TECH_ORDER.length) % TECH_ORDER.length]); }
     Array.prototype.forEach.call(app.querySelectorAll("[data-tab]"), function (b) { b.onclick = function () { go(b.getAttribute("data-tab")); }; });
     Array.prototype.forEach.call(app.querySelectorAll("[data-go]"), function (b) { b.onclick = function () { go(b.getAttribute("data-go")); }; });
