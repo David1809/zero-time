@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.25";
+  var APP_VERSION = "1.0.26";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -249,7 +249,7 @@ ${solo}
 
   var COLORS = { red: "Rouge", blue: "Bleu", yellow: "Jaune", white: "Blanc", black: "Noir" };
   var activePanel = 0, selectedWire = null, manualTab = "w4";
-  var timerId = null, offsetMs = 0;
+  var timerId = null, offsetMs = 0, bestOff = null;
   var errFlash = null, alertFlash = null;
   var seenEvent, alerted = {}, alertInit = false, tickSent = false, cutting = false;
   var ALERTS = [120, 60, 30, 10];
@@ -372,7 +372,15 @@ ${solo}
 
   function renderOperator() {
     var g = view.game;
-    offsetMs = new Date(g.server_now).getTime() - Date.now();
+    // Décalage horloge serveur/local : mesuré UNE seule fois à la réception de cette vue (sinon un simple
+    // clic relit un ancien server_now et le temps « remonte »), puis lissé : on garde le meilleur échantillon
+    // (celui où la latence réseau est la plus faible).
+    if (g._off === undefined) {
+      var smp = new Date(g.server_now).getTime() - Date.now();
+      bestOff = bestOff === null ? smp : Math.max(smp, bestOff - 20);
+      g._off = bestOff;
+    }
+    offsetMs = g._off;
     var endsAt = new Date(g.ends_at).getTime();
     var solved = g.panels.filter(function (p) { return p.state === "solved"; }).length;
     var panel = g.panels[activePanel] || g.panels[0];
@@ -408,10 +416,10 @@ ${solo}
       ok: '<span class="w-1.5 h-1.5 rounded-full bg-[#00ffaa] shadow-[0_0_6px_#00ffaa]"></span><span class="font-label-sm text-[8px] font-bold text-[#00ffaa] tracking-widest uppercase">UNITÉ TACTIQUE // DÉMINEUR</span>',
       pause: '<span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span><span class="font-label-sm text-[8px] font-bold text-amber-400 tracking-widest uppercase">UNITÉ TACTIQUE // SUSPENDUE</span>' }[mode];
     var badge = { live: '<div class="flex items-center gap-1 px-2 py-1 rounded bg-[#161a20] border border-[#2c343f]"><span class="w-1.5 h-1.5 rounded-full bg-[#00ffaa] shadow-[0_0_6px_#00ffaa]"></span><span class="font-code-serial text-[8.5px] text-[#9bb1c5] tracking-widest font-bold">ARMÉ</span></div>',
-      alert: '<div class="flex items-center gap-1 px-2 py-1 rounded bg-[#191e25] border border-[#313945]"><span class="w-1.5 h-1.5 rounded-full bg-[#ff4d4d] shadow-[0_0_6px_#ff4d4d] animate-pulse"></span><span class="font-code-serial text-[9px] text-[#ffb4ab] tracking-widest font-bold">ALERTE</span></div>',
-      err: '<div class="flex items-center gap-1 px-2 py-1 rounded bg-[#221010] border border-[#522121]"><span class="w-1.5 h-1.5 rounded-full bg-[#ff3333] shadow-[0_0_6px_#ff3333] animate-pulse"></span><span class="font-code-serial text-[9px] text-[#ff9999] tracking-widest font-bold">ALERTE</span></div>',
-      ok: '<div class="flex items-center gap-1 px-2 py-1 rounded bg-[#13281f] border border-[#00ffaa]/50 shadow-[0_0_8px_rgba(0,255,170,0.3)]"><span class="w-1.5 h-1.5 rounded-full bg-[#00ffaa] shadow-[0_0_6px_#00ffaa]"></span><span class="font-code-serial text-[9px] text-[#00ffaa] tracking-widest font-bold">RÉSOLU</span></div>',
-      pause: '<div class="flex items-center gap-1 px-2 py-1 rounded bg-[#261f14] border border-[#6b4e20]"><span class="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_6px_#ffaa00] animate-ping"></span><span class="font-code-serial text-[9px] text-amber-300 tracking-widest font-bold">PAUSE</span></div>' }[mode];
+      alert: '<div class="flex items-center gap-1 px-2 py-1 rounded bg-[#191e25] border border-[#313945]"><span class="w-1.5 h-1.5 rounded-full bg-[#ff4d4d] shadow-[0_0_6px_#ff4d4d] animate-pulse"></span><span class="font-code-serial text-[8.5px] text-[#ffb4ab] tracking-widest font-bold">ALERTE</span></div>',
+      err: '<div class="flex items-center gap-1 px-2 py-1 rounded bg-[#221010] border border-[#522121]"><span class="w-1.5 h-1.5 rounded-full bg-[#ff3333] shadow-[0_0_6px_#ff3333] animate-pulse"></span><span class="font-code-serial text-[8.5px] text-[#ff9999] tracking-widest font-bold">ALERTE</span></div>',
+      ok: '<div class="flex items-center gap-1 px-2 py-1 rounded bg-[#13281f] border border-[#00ffaa]/50 shadow-[0_0_8px_rgba(0,255,170,0.3)]"><span class="w-1.5 h-1.5 rounded-full bg-[#00ffaa] shadow-[0_0_6px_#00ffaa]"></span><span class="font-code-serial text-[8.5px] text-[#00ffaa] tracking-widest font-bold">RÉSOLU</span></div>',
+      pause: '<div class="flex items-center gap-1 px-2 py-1 rounded bg-[#261f14] border border-[#6b4e20]"><span class="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_6px_#ffaa00] animate-ping"></span><span class="font-code-serial text-[8.5px] text-amber-300 tracking-widest font-bold">PAUSE</span></div>' }[mode];
 
     // --- bloc télémétrie
     var diodes = "";
@@ -428,9 +436,9 @@ ${solo}
     };
     var head = { live: '<span class="pilot-led-green"></span><span class="font-label-sm text-[8.5px] font-bold text-primary tracking-wider uppercase">ATTENTION : DÉTONATION IMMINENTE</span>',
       alert: '<span class="pilot-led-green"></span><span class="font-label-sm text-[8.5px] font-bold text-primary tracking-wider uppercase">ATTENTION : DÉTONATION IMMINENTE</span>',
-      err: '<span class="pilot-led-red"></span><span class="font-label-sm text-[9px] font-bold text-[#ff6666] tracking-wider uppercase">ATTENTION : DÉTONATION IMMINENTE</span>',
-      ok: '<span class="pilot-led-green"></span><span class="font-label-sm text-[9px] font-bold text-[#00ffaa] tracking-wider uppercase">PANNEAU SÉCURISÉ // DÉSAMORÇAGE EFFECTIF</span>',
-      pause: '<span class="pilot-led-pause"></span><span class="font-label-sm text-[9px] font-bold text-amber-400 tracking-wider uppercase flex items-center gap-1.5"><span class="material-symbols-outlined text-[13px]">pause_circle</span>SESSION EN PAUSE // HORLOGE FIGÉE</span>' }[mode];
+      err: '<span class="pilot-led-red"></span><span class="font-label-sm text-[8.5px] font-bold text-[#ff6666] tracking-wider uppercase">ATTENTION : DÉTONATION IMMINENTE</span>',
+      ok: '<span class="pilot-led-green"></span><span class="font-label-sm text-[8.5px] font-bold text-[#00ffaa] tracking-wider uppercase">PANNEAU SÉCURISÉ // DÉSAMORÇAGE EFFECTIF</span>',
+      pause: '<span class="pilot-led-pause"></span><span class="font-label-sm text-[8.5px] font-bold text-amber-400 tracking-wider uppercase flex items-center gap-1.5"><span class="material-symbols-outlined text-[13px]">pause_circle</span>SESSION EN PAUSE // HORLOGE FIGÉE</span>' }[mode];
     var chan = { live: '<span class="font-code-serial text-[8.5px] text-slate-400 tracking-widest uppercase">CANAL 03 // LIVE</span>',
       alert: '<span class="font-code-serial text-[8.5px] text-slate-400 tracking-widest uppercase">CANAL 03 // LIVE</span>',
       err: '<span class="font-code-serial text-[9px] text-[#ff8080] tracking-widest uppercase font-bold">CANAL 03 // LIVE</span>',
@@ -438,8 +446,8 @@ ${solo}
       pause: '<span class="font-code-serial text-[9px] text-slate-400 tracking-widest uppercase">STANDBY // T-HOLD</span>' }[mode];
     var waiting = paused ? '<div class="relative z-15 flex items-center justify-center gap-2 pb-1"><div class="h-[1px] w-6 bg-gradient-to-r from-transparent to-amber-400/60"></div><span class="font-code-serial text-[10px] font-extrabold text-amber-300 tracking-widest uppercase flex items-center gap-1 bg-amber-500/15 px-2.5 py-0.5 rounded border border-amber-500/30"><span class="material-symbols-outlined text-[12px] animate-spin">sync</span><span id="zt-wait"></span></span><div class="h-[1px] w-6 bg-gradient-to-l from-transparent to-amber-400/60"></div></div>' : "";
     var tele =
-      '<section class="rugged-chassis rounded-xl p-2.5 relative shrink-0' + (mode === "err" ? " border border-[#522020]" : "") + '">' + SCR_TELE + screws("screw-rot-1", "screw-rot-2", "screw-rot-3", "screw-rot-4") +
-      '<div class="px-6 flex items-center justify-between"><div class="flex items-center gap-2">' + head + '</div>' + chan + '</div>' +
+      '<section class="rugged-chassis rounded-xl p-2.5 relative shrink-0' + (mode === "err" ? " border-[#522020]" : "") + '">' + SCR_TELE + screws("screw-rot-1", "screw-rot-2", "screw-rot-3", "screw-rot-4") +
+      '<div class="px-6 flex items-center justify-between h-[16px] overflow-hidden"><div class="flex items-center gap-2">' + head + '</div>' + chan + '</div>' +
       '<div class="relative mt-1 mx-2 p-1.5 rounded-lg bezel-screen-recess overflow-hidden"><div class="polycarbonate-screen-glare' + (mode === "ok" ? " glare-green" : "") + ' absolute inset-0 pointer-events-none z-20"></div>' +
       (paused ? '<div class="pause-scanline-veil absolute inset-0 pointer-events-none z-10"></div>' : "") +
       '<svg class="absolute inset-0 w-full h-full pointer-events-none opacity-25 z-10" preserveAspectRatio="none"><line stroke="#ffffff" stroke-width="0.75" x1="10%" x2="35%" y1="15%" y2="85%"></line><line stroke="#ffffff" stroke-width="0.5" x1="70%" x2="90%" y1="18%" y2="72%"></line><line opacity="0.3" stroke="#ff9f32" stroke-dasharray="2 4" stroke-width="0.5" x1="5%" x2="95%" y1="50%" y2="50%"></line></svg>' +
@@ -560,7 +568,7 @@ ${solo}
       ((mode === "err" || (!paused && remNow <= 30000)) ? '<div class="alarm-vignette-overlay fixed inset-0 pointer-events-none z-40"' + (remNow <= 30000 && !showErr ? ' style="animation-duration:.6s"' : "") + '></div>' : "") +
       '<header class="fixed top-0 left-0 right-0 z-50 pt-safe bg-[#20252c]/95 border-b border-[#353d47] backdrop-blur-md shadow-[0_4px_16px_rgba(0,0,0,0.6)]"><div class="h-11 px-3 flex items-center justify-between max-w-md mx-auto">' +
       '<div class="flex items-center gap-2"><div aria-hidden="true" class="w-7 h-7 flex items-center justify-center rounded bg-[#1a1e24] border border-[#373f4a] text-secondary shadow-inner"><span class="material-symbols-outlined text-[17px]">arrow_back</span></div><div class="flex flex-col"><div class="flex items-center gap-1.5">' + topLed + '</div><span class="font-headline-sm text-[13px] font-bold tracking-tight text-white flex items-center gap-1.5">BAIE CÂBLAGE <span class="text-[9.5px] text-secondary font-code-serial font-normal">[MOD-0' + (activePanel + 1) + ']</span></span></div></div>' +
-      '<div class="flex items-center gap-2"><div class="flex items-center p-0.5 rounded bg-[#14181e] border border-[#2f3640]">' + hsel + '</div>' + badge + '</div></div></header>' +
+      '<div class="flex items-center gap-2"><div class="flex items-center p-0.5 rounded bg-[#14181e] border border-[#2f3640]">' + hsel + '</div><div class="h-[22px] flex items-center">' + badge + '</div></div></div></header>' +
       '<main class="flex-1 w-full max-w-md mx-auto px-2 pb-safe flex flex-col justify-between gap-1 overflow-hidden relative z-30" id="tactical-rack">' + errBanner + tele + select + module + cmd + '</main>';
 
     // Valeurs dynamiques (texte pur)

@@ -1030,3 +1030,7 @@ body.scr .pb-safe{padding-bottom:env(safe-area-inset-bottom,0px)}
 .shockwave-active-2{animation:shockwave-expand 1.4s .18s cubic-bezier(.15,.8,.35,1) forwards}
 .ember-p1{animation:ember-drift-1 2.8s infinite ease-out}.ember-p2{animation:ember-drift-2 3.4s infinite ease-out .4s}.ember-p3{animation:ember-drift-3 2.5s infinite ease-out .9s}.ember-p4{animation:ember-drift-1 3.1s infinite ease-out 1.5s}.ember-p5{animation:ember-drift-2 2.9s infinite ease-out 1.1s}
 @media (prefers-reduced-motion:reduce){.shake-active{animation:none!important}.flash-active{animation:none!important;opacity:0!important}}
+
+/* Écran opérateur figé : la vignette rouge ne touche jamais à la mise en page */
+body.op .alarm-vignette-overlay{position:fixed;inset:0;box-sizing:border-box;will-change:opacity;contain:strict}
+body.op #tactical-rack{overflow:hidden}
