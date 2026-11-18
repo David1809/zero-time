@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000">
+<title>ZERO TIME — test écran de la bombe</title>
+<style>
+html,body{margin:0;height:100%;background:#000;overflow:hidden;-webkit-tap-highlight-color:transparent;font-family:"JetBrains Mono",ui-monospace,monospace}
+#stage{position:absolute;left:50%;top:50%;width:min(100vw,calc(100vh*1918/1080));aspect-ratio:1918/1080;transform:translate(-50%,-50%)}
+#stage img{display:block;width:100%;height:100%;user-select:none;-webkit-user-drag:none}
+.z{position:absolute;border:0;padding:0;background:transparent;border-radius:1.2%;cursor:pointer;outline:0}
+.z[data-t=free],.z[data-t=chrono]{cursor:default}
+.z.on{background:rgba(255,255,255,.14)}
+@keyframes sh{0%,100%{transform:translate(-50%,-50%)}20%{transform:translate(calc(-50% - 7px),-50%)}40%{transform:translate(calc(-50% + 7px),-50%)}60%{transform:translate(calc(-50% - 5px),-50%)}80%{transform:translate(calc(-50% + 5px),-50%)}}
+#stage.sh{animation:sh .35s}
+#toast{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);background:rgba(10,14,18,.92);color:#f3f5f5;border:1px solid #ff9f32;border-radius:8px;padding:8px 14px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:5;max-width:90vw;text-align:center}
+#toast.on{opacity:1}
+#mod{position:fixed;background:#101820;color:#f3f5f5;z-index:10;display:none;overflow:hidden;transition:left .3s ease,top .3s ease,width .3s ease,height .3s ease,border-radius .3s ease;border:1px solid #2a3640}
+#mod .in{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:16px;opacity:0;transition:opacity .2s .2s}
+#mod.full .in{opacity:1}
+#mod h2{margin:0;font-size:22px;letter-spacing:.12em;color:#ff9f32;text-transform:uppercase}
+#mod p{margin:0;color:#a8b3bb;font-size:14px;max-width:520px;line-height:1.5}
+#mod button{margin-top:6px;height:48px;padding:0 24px;border:0;border-radius:8px;background:#ff9f32;color:#101820;font:700 15px inherit;font-family:inherit;letter-spacing:.06em;cursor:pointer}
+#turn{position:fixed;inset:0;background:#000;color:#f3f5f5;z-index:20;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;text-align:center;font-size:18px;letter-spacing:.1em}
+#turn b{font-size:44px;color:#ff9f32}
+@media (orientation:portrait){#turn{display:flex}}
+</style></head><body>
+<div id="stage">
+<img src="bombe.jpg" alt="Bombe : Alimentation, Détonateur, Digicode, Horloge, deux emplacements libres" draggable="false">
+<button class="z" data-t="todo" data-n="Alimentation" style="left:13.608%;top:13.241%;width:19.604%;height:26.389%" aria-label="Alimentation"></button>
+<button class="z" data-t="done" data-n="Détonateur" style="left:13.608%;top:40.741%;width:19.604%;height:25.741%" aria-label="Détonateur"></button>
+<button class="z" data-t="free" data-n="" style="left:13.608%;top:67.870%;width:19.604%;height:20.093%" aria-label="free"></button>
+<button class="z" data-t="todo" data-n="Digicode" style="left:68.352%;top:13.241%;width:18.665%;height:26.389%" aria-label="Digicode"></button>
+<button class="z" data-t="todo" data-n="Horloge" style="left:68.352%;top:40.741%;width:18.665%;height:25.741%" aria-label="Horloge"></button>
+<button class="z" data-t="free" data-n="" style="left:68.352%;top:67.870%;width:18.665%;height:20.093%" aria-label="free"></button>
+<button class="z" data-t="chrono" data-n="" style="left:36.705%;top:16.204%;width:27.894%;height:31.944%" aria-label="chrono"></button>
+<button class="z" data-t="piles" data-n="" style="left:34.776%;top:52.130%;width:32.013%;height:14.722%" aria-label="piles"></button>
+<button class="z" data-t="arm" data-n="" style="left:36.705%;top:68.056%;width:27.894%;height:17.593%" aria-label="arm"></button>
+</div>
+<div id="mod" role="dialog" aria-modal="true"><div class="in"><h2 id="mt"></h2><p id="mp"></p><button id="back" type="button">← BOMBE</button></div></div>
+<div id="toast" role="status"></div>
+<div id="turn"><b>↻</b>TOURNE TON TÉLÉPHONE<br>EN MODE PAYSAGE</div>
+<script>
+(function(){
+var stage=document.getElementById("stage"),mod=document.getElementById("mod"),toast=document.getElementById("toast"),tt;
+function say(m){toast.textContent=m;toast.classList.add("on");clearTimeout(tt);tt=setTimeout(function(){toast.classList.remove("on")},1800)}
+function buzz(n){try{navigator.vibrate&&navigator.vibrate(n)}catch(e){}}
+var cur=null;
+function openMod(z){
+  var r=z.getBoundingClientRect(),done=z.dataset.t==="done";
+  document.getElementById("mt").textContent=z.dataset.n;
+  document.getElementById("mp").textContent=done
+    ? "Module neutralisé. Il s'ouvre en lecture seule."
+    : "Maquette de test : ici s'ouvrirait le module « "+z.dataset.n+" » en grand, avec son état conservé si tu en sors.";
+  mod.style.cssText="display:block;left:"+r.left+"px;top:"+r.top+"px;width:"+r.width+"px;height:"+r.height+"px;border-radius:10px";
+  cur=z; void mod.offsetWidth;
+  mod.style.left="0px";mod.style.top="0px";mod.style.width="100vw";mod.style.height="100vh";mod.style.borderRadius="0";
+  mod.classList.add("full");
+}
+function closeMod(){
+  if(!cur)return;
+  var r=cur.getBoundingClientRect();
+  mod.classList.remove("full");
+  mod.style.left=r.left+"px";mod.style.top=r.top+"px";mod.style.width=r.width+"px";mod.style.height=r.height+"px";mod.style.borderRadius="10px";
+  setTimeout(function(){mod.style.display="none";cur=null},300);
+}
+document.getElementById("back").onclick=closeMod;
+[].forEach.call(document.querySelectorAll(".z"),function(z){
+  function on(){if(z.dataset.t!=="chrono")z.classList.add("on")}
+  function off(){z.classList.remove("on")}
+  z.addEventListener("touchstart",on,{passive:true});z.addEventListener("touchend",off);z.addEventListener("touchcancel",off);
+  z.addEventListener("mousedown",on);z.addEventListener("mouseup",off);z.addEventListener("mouseleave",off);
+  z.addEventListener("click",function(){
+    var t=z.dataset.t;
+    if(t==="todo"||t==="done"){buzz(15);openMod(z)}
+    else if(t==="free"){buzz(10);say("Emplacement libre")}
+    else if(t==="piles"){buzz(10);say("Piles : 3")}
+    else if(t==="chrono"){say("Compte à rebours figé dans la maquette")}
+    else if(t==="arm"){buzz([30,40,30]);stage.classList.remove("sh");void stage.offsetWidth;stage.classList.add("sh");say("Verrouillé : 6/6 modules neutralisés requis")}
+  });
+});
+document.addEventListener("keydown",function(e){if(e.key==="Escape")closeMod()});
+})();
+</script></body></html>
