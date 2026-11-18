@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.41";
+  var APP_VERSION = "1.0.42";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -102,39 +102,41 @@
 
   function renderHome() {
     clear();
-    var BL = '<div class="absolute %P% w-4 h-4 rounded-full bg-surface-variant flex items-center justify-center shadow-md"><div class="w-2.5 h-0.5 bg-surface-container-lowest %R%"></div></div>';
-    function bolt(p, r) { return BL.replace("%P%", p).replace("%R%", r); }
-    app.innerHTML = S(`<div class="flex flex-col w-full min-h-full overflow-hidden select-none justify-between p-3 pt-safe pb-safe box-border bg-gradient-to-b from-[#0c141c] via-[#101923] to-[#070f17]">
-<header class="relative w-full bg-surface-container-low rounded-t-xl rounded-b p-3 shadow-2xl overflow-hidden"><div class="absolute inset-0 bg-gradient-to-b from-surface-bright/20 to-transparent pointer-events-none"></div><div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-primary-container/40 to-transparent"></div><div class="absolute top-2 left-2 w-3.5 h-3.5 rounded-full bg-surface-variant flex items-center justify-center shadow-inner"><div class="w-2 h-0.5 bg-surface-container-lowest rotate-45"></div></div><div class="absolute top-2 right-2 w-3.5 h-3.5 rounded-full bg-surface-variant flex items-center justify-center shadow-inner"><div class="w-2 h-0.5 bg-surface-container-lowest -rotate-45"></div></div>
-<div class="flex items-center justify-between px-4 pt-0.5"><div class="flex items-center space-x-2"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#22c55e] opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-[#22c55e]"></span></span><div class="flex flex-col"><span class="font-label-sm text-on-surface tracking-wider text-[9px] uppercase leading-none">Terminal Opérationnel</span><span class="font-code-serial text-on-surface-variant text-[8px] tracking-tight">FRQ 2.4 GHz CRYPTÉE</span></div></div><div class="flex items-center space-x-1.5 bg-surface-container-lowest px-2 py-1 rounded"><span class="font-label-sm text-primary text-[9px] font-bold tracking-widest">[UNIT-00]</span><span class="material-symbols-outlined text-primary text-[12px]">sensors</span></div></div></header>
-<section class="relative w-full my-auto flex flex-col items-center"><div class="relative w-full bg-surface-container rounded-xl p-4 shadow-2xl flex flex-col items-center">${bolt("top-2.5 left-2.5", "rotate-12")}${bolt("top-2.5 right-2.5", "-rotate-45")}${bolt("bottom-2.5 left-2.5", "-rotate-[30deg]")}${bolt("bottom-2.5 right-2.5", "rotate-90")}
-<div class="flex items-center space-x-2 bg-surface-container-lowest px-3 py-0.5 rounded-full mb-3 shadow-inner"><span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span><span class="font-code-serial text-on-surface-variant text-[10px] tracking-widest uppercase">DISPOSITIF TACTIQUE MIL-STD-810H</span><span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span></div>
-<div class="relative w-full bg-surface-container-lowest rounded-lg py-3 px-2 flex flex-col items-center shadow-inner overflow-hidden mb-3"><div class="absolute inset-0 bg-[radial-gradient(#182029_1px,transparent_1px)] [background-size:16px_16px] opacity-40 pointer-events-none"></div><div class="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-primary/5 pointer-events-none"></div>
-<div class="flex items-baseline justify-center relative"><div class="font-display-timer text-[38px] leading-tight font-bold timer-neon-green tracking-wider">30:00</div><span class="ml-1.5 font-code-serial text-[15px] font-bold timer-neon-green tracking-widest">.00</span></div>
-<div class="w-full flex justify-between px-3 pt-1 text-[8px] font-label-sm text-outline tracking-widest uppercase"><span>CHRONO DETONATEUR</span><span class="text-error font-bold flex items-center gap-0.5"><span class="w-1 h-1 rounded-full bg-error inline-block animate-ping"></span>ARMÉ</span></div></div>
-<div class="text-center w-full px-2"><h1 class="font-headline-lg-mobile text-on-surface tracking-wider font-extrabold uppercase m-0 leading-none drop-shadow-md">ZERO <span class="text-primary-container drop-shadow-[0_0_8px_rgba(255,159,50,0.5)]">TIME</span></h1><p class="font-label-md text-primary tracking-widest uppercase mt-1 mb-0 text-[11px] font-semibold">Protocole de Désamorçage Coopératif</p></div>
-<div class="w-full bg-surface-container-high rounded p-2.5 mt-3 shadow-inner"><div class="flex items-center space-x-2 mb-1 text-primary-container"><span class="material-symbols-outlined text-[16px]">record_voice_over</span><span class="font-label-sm text-[10px] tracking-wider uppercase font-bold">Règles d'Engagement Tactiques</span></div><div class="font-body-sm text-secondary text-[11px] leading-tight space-y-0.5"><div class="flex items-center justify-between"><span class="text-on-surface-variant">Configuration :</span><span class="font-code-serial text-on-surface font-semibold text-[10px]">2 OPÉRATEURS REQUIS</span></div><div class="flex items-center justify-between"><span class="text-on-surface-variant">Canal de secours :</span><span class="font-code-serial text-on-surface font-semibold text-[10px]">LIAISON VOCALE DIRECTE</span></div><div class="flex items-center justify-between pt-1"><span class="text-[9px] text-outline font-label-sm">RÔLE 01: DÉMINEUR</span><span class="text-[9px] text-outline font-label-sm">RÔLE 02: TECHNICIEN</span></div></div></div>
-</div></section>
-<footer class="w-full flex flex-col space-y-2.5 pb-1">
-<div class="w-full bg-surface-container-low rounded-lg p-2 shadow-lg flex flex-col space-y-2"><div class="flex items-center justify-between px-1"><span class="font-label-sm text-on-surface-variant text-[10px] uppercase tracking-wider flex items-center gap-1"><span class="material-symbols-outlined text-[13px] text-primary">badge</span> Identifiant Agent</span><span class="font-code-serial text-[9px] text-outline">16 SIGNES MAX</span></div><div class="relative w-full h-12 bg-surface-container-lowest rounded flex items-center px-3 shadow-inner"><input class="w-full bg-transparent font-code-serial text-on-surface text-center tracking-[0.1em] text-sm focus:outline-none placeholder:text-outline/40 placeholder:tracking-normal font-bold" id="pseudo" maxlength="16" autocomplete="nickname" placeholder="TON PSEUDO" type="text"/></div></div>
-<button class="group relative w-full h-14 bg-gradient-to-r from-primary-container via-primary to-primary-container rounded-lg p-0.5 shadow-[0_4px_20px_rgba(255,159,50,0.35)] active:translate-y-0.5 transition-transform overflow-hidden cursor-pointer" id="btnCreateRoom" type="button"><div class="w-full h-full bg-gradient-to-b from-primary-container to-[#c9741b] rounded-[6px] px-4 flex items-center justify-between"><div class="flex items-center space-x-3"><div class="w-9 h-9 rounded bg-surface-container-lowest/30 flex items-center justify-center text-on-primary"><span class="material-symbols-outlined text-[22px] group-hover:scale-110 transition-transform">cell_tower</span></div><div class="flex flex-col text-left"><span class="font-headline-sm text-on-primary font-bold tracking-wider leading-none text-sm uppercase">Créer une Salle</span><span class="font-code-serial text-on-primary/80 text-[9px] tracking-normal leading-tight mt-0.5">INITIALISER LE POSTE MAÎTRE</span></div></div><div class="flex items-center space-x-1.5 bg-surface-container-lowest/40 px-2 py-1 rounded"><span class="w-2 h-2 rounded-full bg-on-primary animate-pulse"></span><span class="font-label-sm text-on-primary text-[10px] font-bold">HÔTE</span></div></div></button>
-<div class="w-full bg-surface-container-low rounded-lg p-2 shadow-lg flex flex-col space-y-2"><div class="flex items-center justify-between px-1"><span class="font-label-sm text-on-surface-variant text-[10px] uppercase tracking-wider flex items-center gap-1"><span class="material-symbols-outlined text-[13px] text-[#22c55e]">cable</span> Rejoindre une Opération</span><span class="font-code-serial text-[9px] text-outline">CODE 4 SIGNES</span></div><div class="flex items-center space-x-2"><div class="relative flex-1 h-12 bg-surface-container-lowest rounded flex items-center px-3 shadow-inner"><input class="w-full bg-transparent font-code-serial text-on-surface text-center tracking-[0.25em] text-sm uppercase focus:outline-none placeholder:text-outline/40 placeholder:tracking-normal font-bold" id="roomCodeInput" maxlength="4" autocapitalize="characters" autocomplete="off" placeholder="CODE EX: K9X2" type="text"/></div><button class="h-12 px-4 bg-gradient-to-b from-[#22c55e] to-[#15803d] rounded flex items-center justify-center space-x-1.5 shadow-[0_2px_12px_rgba(34,197,94,0.3)] active:translate-y-0.5 transition-transform cursor-pointer" id="btnJoinRoom" type="button"><span class="font-label-md text-surface-container-lowest font-extrabold uppercase text-xs">Entrer</span><span class="material-symbols-outlined text-surface-container-lowest text-[18px]">login</span></button></div></div>
-<div class="w-full bg-surface-container-lowest rounded px-3 py-1 flex items-center justify-between text-[9px] font-label-sm"><button class="flex items-center space-x-1.5 text-on-surface-variant" id="zt-version" type="button"><span class="w-1.5 h-1.5 rounded-full bg-[#22c55e]"></span><span id="zt-version-txt">BUILD v${APP_VERSION} · MAJ</span></button><span class="font-code-serial text-outline uppercase tracking-wider">SERVEUR SÉCURISÉ ACTIF</span></div>
-</footer></div>`);
-    var pseudo = $("pseudo"), code = $("roomCodeInput"), create = $("btnCreateRoom"), join = $("btnJoinRoom");
-    code.addEventListener("input", function () { code.value = code.value.toUpperCase(); });
-    create.onclick = function () {
-      create.disabled = true;
-      sb.rpc("zt_create_room", { p_pseudo: pseudo.value }).then(function (r) {
-        create.disabled = false;
-        if (r.error) return fail(r.error);
-        enter(r.data);
-      });
+    function screw(pos, rot) { return '<div class="absolute ' + pos + ' w-4 h-4 rounded-full bg-[#2a3640] flex items-center justify-center"><div class="w-2.5 h-0.5 bg-[#0c141c] ' + rot + '"></div></div>'; }
+    var FIELD = "w-full h-[52px] rounded-lg border border-[#4a5560] bg-[#141e27] px-4 font-code-serial text-[15px] text-[#e6ebf0] tracking-wider focus:outline-none focus:border-[#ff9f32] placeholder:text-[#6b7783]";
+    app.innerHTML = `<div class="flex flex-col w-full min-h-full select-none justify-center gap-3 p-3 pt-safe pb-safe box-border bg-[#0c141c]">
+<section class="relative w-full rounded-2xl border border-[#2a3640] bg-[#101922] overflow-hidden">
+${screw("top-2.5 left-2.5", "rotate-45")}${screw("top-2.5 right-2.5", "-rotate-45")}
+<div class="flex items-center justify-between px-8 pt-2.5 pb-2"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-[#22c55e] shadow-[0_0_6px_#22c55e]"></span><div class="flex flex-col leading-tight"><span class="font-label-sm text-[10px] tracking-wider text-[#dbe3ef] uppercase">Terminal opérationnel</span><span class="font-code-serial text-[9px] text-[#8a97a3]">FRQ 2.4 GHz CRYPTÉE</span></div></div><div class="flex items-center gap-1.5 rounded-md border border-[#2a3640] bg-[#0b131b] px-2 py-1"><span class="font-label-sm text-[10px] font-bold tracking-widest text-[#ff9f32]">[UNIT-00]</span><span class="material-symbols-outlined text-[13px] text-[#ff9f32]">sensors</span></div></div>
+<div class="relative w-full"><img src="assets/hero-zero.jpg" alt="" class="block w-full h-auto" draggable="false"><div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-b from-transparent to-[#101922]"></div></div>
+<div class="relative text-center px-3 pb-5 -mt-1"><h1 class="m-0 font-tech text-[44px] leading-none font-medium tracking-wide text-[#ffc691]">ZERO TIME</h1><p class="m-0 mt-1.5 font-tech text-[13px] font-medium tracking-wider text-[#ff9f32] uppercase">Protocole de désamorçage coopératif</p></div>
+</section>
+<section class="relative w-full rounded-2xl border border-[#2a3640] bg-[#141e27] px-4 pt-9 pb-4">
+${screw("top-2.5 left-2.5", "rotate-45")}${screw("top-2.5 right-2.5", "-rotate-45")}
+<div class="absolute top-3 inset-x-0 text-center font-tech text-[12px] font-medium tracking-[0.18em] text-[#ff9f32] uppercase">Authentification requise</div>
+<label class="block font-label-md text-[14px] tracking-wider text-[#e6ebf0] mb-1.5" for="pseudo">MATRICULE</label>
+<input class="${FIELD} mb-4" id="pseudo" maxlength="16" autocomplete="nickname" autocapitalize="characters" placeholder="TON IDENTIFIANT AGENT..." type="text"/>
+<label class="block font-label-md text-[14px] tracking-wider text-[#e6ebf0] mb-1.5" for="roomCodeInput">CLÉ DE SÉCURITÉ</label>
+<div class="relative"><input class="${FIELD} pr-12" id="roomCodeInput" maxlength="4" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="••••" style="-webkit-text-security:disc" type="text"/><button class="absolute right-0 top-0 h-[52px] w-12 flex items-center justify-center text-[#8a97a3]" id="btnEye" type="button" aria-label="Afficher la clé"><span class="material-symbols-outlined text-[20px]" id="eyeIco">visibility</span></button></div>
+<p class="m-0 mt-1.5 mb-4 font-code-serial text-[10px] text-[#8a97a3]">Vide : tu crées une salle. Remplie : tu la rejoins.</p>
+<button class="w-full h-[56px] rounded-lg bg-[#ff9f32] flex items-center gap-3 px-2 active:translate-y-0.5 transition-transform cursor-pointer" id="btnGo" type="button"><span class="w-10 h-10 rounded-md bg-[#c9741b]/60 flex items-center justify-center text-[#101820]"><span class="material-symbols-outlined text-[24px]">cell_tower</span></span><span class="flex-1 text-left font-tech text-[17px] font-bold tracking-wide text-[#101820] uppercase" id="goTxt">Initialiser la session</span></button>
+<div class="flex items-center justify-between mt-3 font-code-serial text-[10px] tracking-wider text-[#8a97a3] uppercase"><button class="uppercase text-left" id="zt-version" type="button"><span id="zt-version-txt">BUILD v${APP_VERSION} - MAJ</span></button><span class="flex items-center gap-1.5">Serveur sécurisé actif<span class="w-2.5 h-2.5 rounded-full bg-[#22c55e] shadow-[0_0_8px_#22c55e]"></span></span></div>
+</section></div>`;
+    var pseudo = $("pseudo"), code = $("roomCodeInput"), go = $("btnGo"), shown = false;
+    function label() { $("goTxt").textContent = code.value ? "Rejoindre la session" : "Initialiser la session"; }
+    code.addEventListener("input", function () { code.value = code.value.toUpperCase(); label(); });
+    $("btnEye").onclick = function () {
+      shown = !shown;
+      code.style.webkitTextSecurity = shown ? "none" : "disc";
+      $("eyeIco").textContent = shown ? "visibility_off" : "visibility";
     };
-    join.onclick = function () {
-      join.disabled = true;
-      sb.rpc("zt_join_room", { p_code: code.value, p_pseudo: pseudo.value }).then(function (r) {
-        join.disabled = false;
+    go.onclick = function () {
+      go.disabled = true;
+      var req = code.value
+        ? sb.rpc("zt_join_room", { p_code: code.value, p_pseudo: pseudo.value })
+        : sb.rpc("zt_create_room", { p_pseudo: pseudo.value });
+      req.then(function (r) {
+        go.disabled = false;
         if (r.error) return fail(r.error);
         enter(r.data);
       });
