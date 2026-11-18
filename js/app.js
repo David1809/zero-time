@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.35";
+  var APP_VERSION = "1.0.36";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -325,6 +325,7 @@ ${solo}
     var k = { 6: 5, 7: 3, 8: 3 }[n], c = { 6: 2, 7: 2, 8: 1 }[n], out = [];
     for (i = 0; i < n; i++) {
       var y0 = ys[i], m = y0 + (ys[(i * k + c) % n] - y0) * 0.55;
+      if (Math.abs(m - y0) < 1) m = y0 + (i === n - 1 ? -14 : 14); // un fil parfaitement droit rend son dégradé invisible (boîte englobante plate)
       out.push({ s: [[0, y0, 70, y0, 90, m, 160, m].map(r1), [160, m, 230, m, 250, y0, 320, y0].map(r1)], cut: G2 });
     }
     return out;
