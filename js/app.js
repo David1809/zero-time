@@ -326,9 +326,9 @@
     // --- éléments de l'en-tête
     var chips = g.panels.map(function (p, idx) {
       var on = idx === activePanel, w = p.wires.length;
-      var cls = on ? "px-2 py-0.5 rounded bg-[#2b333d] text-[8px] font-code-serial font-bold " + (mode === "pause" ? "text-slate-300 border border-slate-600/40" : (mode === "ok" ? "text-primary border border-primary/40" : "text-primary border border-primary/40")) + " shadow-sm"
-                  : "px-1.5 py-0.5 rounded text-[8px] font-code-serial font-semibold text-slate-400";
-      return '<button type="button" data-panel="' + idx + '" class="' + cls + '">' + (on ? w + " FILS" : w + "F") + (p.state === "solved" ? " ✓" : "") + '</button>';
+      var cls = on ? "px-2.5 py-1.5 rounded bg-[#2b333d] text-[10px] font-code-serial font-bold " + (mode === "pause" ? "text-slate-300 border border-slate-600/40" : (mode === "ok" ? "text-primary border border-primary/40" : "text-primary border border-primary/40")) + " shadow-sm"
+                  : "px-2.5 py-1.5 rounded text-[10px] font-code-serial font-semibold text-slate-300 border border-slate-600/40";
+      return '<button type="button" data-panel="' + idx + '" class="' + cls + '">' + ((idx + 1) + "·" + w + "F") + (p.state === "solved" ? " ✓" : "") + '</button>';
     }).join("");
     var topLed = { live: '<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span><span class="font-label-sm text-[8px] font-bold text-primary tracking-widest uppercase">UNITÉ TACTIQUE // DÉMINEUR</span>',
       alert: '<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span><span class="font-label-sm text-[8px] font-bold text-primary tracking-widest uppercase">UNITÉ TACTIQUE // DÉMINEUR</span>',
