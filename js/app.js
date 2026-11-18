@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.20";
+  var APP_VERSION = "1.0.21";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -25,7 +25,8 @@
     coupe_invalide: "Ce fil ne peut pas être coupé.",
     panneau_inconnu: "Panneau inconnu.",
     abandon_indisponible: "Abandon impossible pour le moment.",
-    mode_solo_indisponible: "Mode solo indisponible : un autre joueur est dans la salle."
+    mode_solo_indisponible: "Mode solo indisponible : un autre joueur est dans la salle.",
+    partie_non_en_cours: "Aucune partie en cours."
   };
 
   function toast(msg, ok) {
@@ -256,7 +257,7 @@
     x1: "M 125,86 C 145,98 172,106 190,118",
     x2: "M 120,186 C 138,191 166,196 182,198"
   };
-  var BASE = { red: "#250202", yellow: "#240c01", blue: "#040914", black: "#010204", white: "#0f172a" };
+  var BASE = { red: "#250202", yellow: "#240c01", blue: "#040914", black: "#000000", white: "#475569" };
 
   function r1(v) { return Math.round(v * 10) / 10; }
   function cubic(p, t0, t1) { // sous-courbe [t0,t1] d'une Bézier cubique (de Casteljau)
@@ -296,17 +297,17 @@
   function lugsL(isCut) { return '<div class="flex flex-col items-center gap-0.5' + (isCut ? " opacity-40" : "") + '"><span class="w-1.5 h-1 rounded-xs terminal-lug"></span><span class="w-1.5 h-1 rounded-xs bg-[#111418]' + (isCut ? "" : " border border-[#3b434e]") + '"></span></div>'; }
   function lugsR(isCut) { return '<div class="flex flex-col items-center gap-0.5' + (isCut ? " opacity-40" : "") + '"><span class="w-1.5 h-1 rounded-xs bg-[#111418]' + (isCut ? "" : " border border-[#3b434e]") + '"></span><span class="w-1.5 h-1 rounded-xs terminal-lug"></span></div>'; }
 
-  var GRADS = "<linearGradient id=\"grad-wire-red\" x1=\"0%\" x2=\"0%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#3d0303\"/><stop offset=\"12%\" stop-color=\"#880f0f\"/><stop offset=\"26%\" stop-color=\"#dc2626\"/><stop offset=\"38%\" stop-color=\"#f87171\"/><stop offset=\"46%\" stop-color=\"#ffffff\"/><stop offset=\"56%\" stop-color=\"#ef4444\"/><stop offset=\"78%\" stop-color=\"#b91c1c\"/><stop offset=\"92%\" stop-color=\"#650909\"/><stop offset=\"100%\" stop-color=\"#2d0202\"/></linearGradient><linearGradient id=\"grad-wire-white\" x1=\"0%\" x2=\"0%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#1e293b\"/><stop offset=\"14%\" stop-color=\"#475569\"/><stop offset=\"28%\" stop-color=\"#94a3b8\"/><stop offset=\"40%\" stop-color=\"#e2e8f0\"/><stop offset=\"48%\" stop-color=\"#ffffff\"/><stop offset=\"58%\" stop-color=\"#cbd5e1\"/><stop offset=\"80%\" stop-color=\"#64748b\"/><stop offset=\"94%\" stop-color=\"#334155\"/><stop offset=\"100%\" stop-color=\"#141c27\"/></linearGradient><linearGradient id=\"grad-wire-yellow\" x1=\"0%\" x2=\"0%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#451a03\"/><stop offset=\"14%\" stop-color=\"#92400e\"/><stop offset=\"28%\" stop-color=\"#d97706\"/><stop offset=\"40%\" stop-color=\"#fbbf24\"/><stop offset=\"48%\" stop-color=\"#ffffff\"/><stop offset=\"58%\" stop-color=\"#f59e0b\"/><stop offset=\"80%\" stop-color=\"#b45309\"/><stop offset=\"94%\" stop-color=\"#712e06\"/><stop offset=\"100%\" stop-color=\"#2d1001\"/></linearGradient><linearGradient id=\"grad-wire-blue\" x1=\"0%\" x2=\"0%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#050e20\"/><stop offset=\"14%\" stop-color=\"#1e3a8a\"/><stop offset=\"28%\" stop-color=\"#2563eb\"/><stop offset=\"40%\" stop-color=\"#60a5fa\"/><stop offset=\"48%\" stop-color=\"#ffffff\"/><stop offset=\"58%\" stop-color=\"#3b82f6\"/><stop offset=\"80%\" stop-color=\"#1d4ed8\"/><stop offset=\"94%\" stop-color=\"#112763\"/><stop offset=\"100%\" stop-color=\"#040b19\"/></linearGradient><linearGradient id=\"grad-wire-black\" x1=\"0%\" x2=\"0%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#020406\"/><stop offset=\"14%\" stop-color=\"#0f172a\"/><stop offset=\"28%\" stop-color=\"#334155\"/><stop offset=\"40%\" stop-color=\"#64748b\"/><stop offset=\"48%\" stop-color=\"#cbd5e1\"/><stop offset=\"58%\" stop-color=\"#475569\"/><stop offset=\"80%\" stop-color=\"#1e293b\"/><stop offset=\"94%\" stop-color=\"#0f141d\"/><stop offset=\"100%\" stop-color=\"#010204\"/></linearGradient><linearGradient id=\"copper-wires\" x1=\"0%\" x2=\"100%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#b45309\"/><stop offset=\"35%\" stop-color=\"#fde047\"/><stop offset=\"65%\" stop-color=\"#ea580c\"/><stop offset=\"100%\" stop-color=\"#78350f\"/></linearGradient>";
+  var GRADS = "<linearGradient id=\"grad-wire-red\" x1=\"0%\" x2=\"0%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#3d0303\"/><stop offset=\"12%\" stop-color=\"#880f0f\"/><stop offset=\"26%\" stop-color=\"#dc2626\"/><stop offset=\"38%\" stop-color=\"#f87171\"/><stop offset=\"46%\" stop-color=\"#ffffff\"/><stop offset=\"56%\" stop-color=\"#ef4444\"/><stop offset=\"78%\" stop-color=\"#b91c1c\"/><stop offset=\"92%\" stop-color=\"#650909\"/><stop offset=\"100%\" stop-color=\"#2d0202\"/></linearGradient><linearGradient id=\"grad-wire-white\" x1=\"0%\" x2=\"0%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#8fa0b5\"/><stop offset=\"15%\" stop-color=\"#dbe4ee\"/><stop offset=\"30%\" stop-color=\"#f8fafc\"/><stop offset=\"46%\" stop-color=\"#ffffff\"/><stop offset=\"58%\" stop-color=\"#ffffff\"/><stop offset=\"76%\" stop-color=\"#e2e8f0\"/><stop offset=\"92%\" stop-color=\"#94a3b8\"/><stop offset=\"100%\" stop-color=\"#64748b\"/></linearGradient><linearGradient id=\"grad-wire-yellow\" x1=\"0%\" x2=\"0%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#451a03\"/><stop offset=\"14%\" stop-color=\"#92400e\"/><stop offset=\"28%\" stop-color=\"#d97706\"/><stop offset=\"40%\" stop-color=\"#fbbf24\"/><stop offset=\"48%\" stop-color=\"#ffffff\"/><stop offset=\"58%\" stop-color=\"#f59e0b\"/><stop offset=\"80%\" stop-color=\"#b45309\"/><stop offset=\"94%\" stop-color=\"#712e06\"/><stop offset=\"100%\" stop-color=\"#2d1001\"/></linearGradient><linearGradient id=\"grad-wire-blue\" x1=\"0%\" x2=\"0%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#050e20\"/><stop offset=\"14%\" stop-color=\"#1e3a8a\"/><stop offset=\"28%\" stop-color=\"#2563eb\"/><stop offset=\"40%\" stop-color=\"#60a5fa\"/><stop offset=\"48%\" stop-color=\"#ffffff\"/><stop offset=\"58%\" stop-color=\"#3b82f6\"/><stop offset=\"80%\" stop-color=\"#1d4ed8\"/><stop offset=\"94%\" stop-color=\"#112763\"/><stop offset=\"100%\" stop-color=\"#040b19\"/></linearGradient><linearGradient id=\"grad-wire-black\" x1=\"0%\" x2=\"0%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#000000\"/><stop offset=\"14%\" stop-color=\"#0e1116\"/><stop offset=\"32%\" stop-color=\"#181d24\"/><stop offset=\"45%\" stop-color=\"#374151\"/><stop offset=\"52%\" stop-color=\"#4b5563\"/><stop offset=\"65%\" stop-color=\"#1a1f26\"/><stop offset=\"85%\" stop-color=\"#0f1217\"/><stop offset=\"100%\" stop-color=\"#000000\"/></linearGradient><linearGradient id=\"copper-wires\" x1=\"0%\" x2=\"100%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#b45309\"/><stop offset=\"35%\" stop-color=\"#fde047\"/><stop offset=\"65%\" stop-color=\"#ea580c\"/><stop offset=\"100%\" stop-color=\"#78350f\"/></linearGradient>";
   var DEFS = '<defs>' +
     '<filter height="200%" id="cavity-shadow" width="140%" x="-20%" y="-40%"><feGaussianBlur in="SourceAlpha" stdDeviation="5"/><feOffset dx="0" dy="7" result="offsetblur"/><feComponentTransfer><feFuncA slope="0.82" type="linear"/></feComponentTransfer><feMerge><feMergeNode/></feMerge></filter>' +
     '<filter height="220%" id="crossing-shadow" width="160%" x="-30%" y="-50%"><feGaussianBlur in="SourceAlpha" stdDeviation="3"/><feOffset dx="0" dy="5" result="offsetblur"/><feComponentTransfer><feFuncA slope="0.9" type="linear"/></feComponentTransfer><feMerge><feMergeNode/></feMerge></filter>' +
     GRADS +
     '</defs>';
 
-  var SCR_TELE = "<svg class=\"scratches-svg-overlay\" viewBox=\"0 0 380 130\"><path d=\"M 28,12 L 48,16 M 34,9 L 52,14 M 22,22 L 32,27\" fill=\"none\" stroke=\"rgba(255,255,255,0.45)\" stroke-linecap=\"round\" stroke-width=\"0.8\"></path><path d=\"M 330,14 L 355,22 M 338,10 L 362,19\" fill=\"none\" stroke=\"rgba(255,255,255,0.4)\" stroke-linecap=\"round\" stroke-width=\"0.75\"></path><path d=\"M 24,96 L 46,108 M 30,102 L 54,115 M 18,110 L 38,120\" fill=\"none\" stroke=\"rgba(255,255,255,0.42)\" stroke-linecap=\"round\" stroke-width=\"0.8\"></path><path d=\"M 342,98 L 364,112 M 336,105 L 358,118\" fill=\"none\" stroke=\"rgba(255,255,255,0.38)\" stroke-linecap=\"round\" stroke-width=\"0.75\"></path><path d=\"M 120,6 L 165,11 M 230,8 L 275,5\" fill=\"none\" stroke=\"rgba(255,255,255,0.3)\" stroke-linecap=\"round\" stroke-width=\"0.6\"></path><path d=\"M 90,124 L 140,121 M 240,123 L 290,125\" fill=\"none\" stroke=\"rgba(255,255,255,0.28)\" stroke-linecap=\"round\" stroke-width=\"0.6\"></path></svg>";
-  var SCR_SEL = "<svg class=\"scratches-svg-overlay\" viewBox=\"0 0 380 90\"><path d=\"M 22,8 L 44,14 M 30,5 L 50,11\" fill=\"none\" stroke=\"rgba(255,255,255,0.45)\" stroke-linecap=\"round\" stroke-width=\"0.75\"></path><path d=\"M 334,8 L 356,15 M 342,5 L 364,12\" fill=\"none\" stroke=\"rgba(255,255,255,0.42)\" stroke-linecap=\"round\" stroke-width=\"0.75\"></path><path d=\"M 20,74 L 46,82 M 28,68 L 52,77\" fill=\"none\" stroke=\"rgba(255,255,255,0.4)\" stroke-linecap=\"round\" stroke-width=\"0.75\"></path><path d=\"M 336,72 L 360,82 M 344,67 L 366,76\" fill=\"none\" stroke=\"rgba(255,255,255,0.4)\" stroke-linecap=\"round\" stroke-width=\"0.75\"></path></svg>";
-  var SCR_MOD = "<svg class=\"scratches-svg-overlay\" viewBox=\"0 0 380 230\"><path d=\"M 24,10 L 48,18 M 32,6 L 56,15\" fill=\"none\" stroke=\"rgba(255,255,255,0.45)\" stroke-linecap=\"round\" stroke-width=\"0.75\"></path><path d=\"M 332,10 L 358,19 M 340,5 L 366,15\" fill=\"none\" stroke=\"rgba(255,255,255,0.42)\" stroke-linecap=\"round\" stroke-width=\"0.75\"></path><path d=\"M 22,210 L 46,220 M 30,204 L 54,215\" fill=\"none\" stroke=\"rgba(255,255,255,0.45)\" stroke-linecap=\"round\" stroke-width=\"0.75\"></path><path d=\"M 334,208 L 360,220 M 342,203 L 368,214\" fill=\"none\" stroke=\"rgba(255,255,255,0.42)\" stroke-linecap=\"round\" stroke-width=\"0.75\"></path><path d=\"M 140,5 L 180,3 M 190,6 L 230,4\" fill=\"none\" stroke=\"rgba(255,255,255,0.3)\" stroke-linecap=\"round\" stroke-width=\"0.6\"></path><path d=\"M 130,224 L 175,226 M 200,225 L 245,223\" fill=\"none\" stroke=\"rgba(255,255,255,0.3)\" stroke-linecap=\"round\" stroke-width=\"0.6\"></path></svg>";
-  var SCR_PUSH = "<svg class=\"absolute inset-0 w-full h-full pointer-events-none opacity-40 z-10\" preserveAspectRatio=\"none\" viewBox=\"0 0 300 44\"><path d=\"M 12,8 L 34,12 M 18,14 L 40,18\" fill=\"none\" stroke=\"rgba(255,255,255,0.4)\" stroke-width=\"0.7\"></path><path d=\"M 260,8 L 285,13 M 255,15 L 280,20\" fill=\"none\" stroke=\"rgba(255,255,255,0.4)\" stroke-width=\"0.7\"></path><path d=\"M 2,12 Q 8,16 4,28\" fill=\"none\" stroke=\"rgba(255,255,255,0.2)\" stroke-width=\"1.2\"></path><path d=\"M 298,14 Q 292,18 296,30\" fill=\"none\" stroke=\"rgba(255,255,255,0.2)\" stroke-width=\"1.2\"></path></svg>";
+  var SCR_TELE = "";
+  var SCR_SEL = "";
+  var SCR_MOD = "";
+  var SCR_PUSH = "";
   var lastCut = null; // fil qui vient d'être coupé (pour l'animation de recul)
 
   function renderOperator() {
@@ -438,20 +439,23 @@
       if (typeof o === "string") { if (n === 5) wiresSvg += '<path d="' + XSHADOW[o] + '" fill="none" filter="url(#crossing-shadow)" opacity="0.8" pointer-events="none" stroke="#000" stroke-linecap="round" stroke-width="14"></path>'; return; }
       var idx = o - 1, color = panel.wires[idx], P = parts[idx], isCut = panel.cut.indexOf(o) !== -1, isSel = selectedWire === o;
       var grad = "url(#grad-wire-" + color + ")", base = BASE[color] || "#10141a", spec = color === "black" ? "#cbd5e1" : "#ffffff";
+      var cutBase = (color === "white" || color === "black") ? base : "#10141a";
+      var cs = color === "white" ? { o: "0.95", w: "2.4" } : { o: "0.8", w: "2" };
       var top = zi === order.length - 1;
       if (isCut) {
         var anim = cutNow === o;
         var cu = function (x, y, dir) { return "M " + r1(x) + "," + r1(y - 1) + " L " + r1(x + dir * 13) + "," + r1(y - 7) + " M " + r1(x + dir) + "," + r1(y) + " L " + r1(x + dir * 16) + "," + r1(y) + " M " + r1(x) + "," + r1(y + 1) + " L " + r1(x + dir * 12) + "," + r1(y + 7); };
         wiresSvg += '<g class="opacity-80" data-wire-group="' + o + '" pointer-events="none">' +
-          '<g' + (anim ? ' class="cut-recoil-left"' : "") + '><path d="' + P.left + '" fill="none" stroke="#10141a" stroke-linecap="round" stroke-width="14.5"></path><path d="' + P.left + '" fill="none" stroke="' + grad + '" stroke-linecap="round" stroke-width="13"></path><path transform="translate(0,-2.5)" d="' + P.left + '" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-width="2" opacity="0.8"></path><path d="' + cu(P.ex, P.ey, 1) + '" fill="none" stroke="url(#copper-wires)" stroke-linecap="round" stroke-width="2.2"></path></g>' +
-          '<g' + (anim ? ' class="cut-recoil-right"' : "") + '><path d="' + cu(P.sx, P.sy, -1) + '" fill="none" stroke="url(#copper-wires)" stroke-linecap="round" stroke-width="2.2"></path><path d="' + P.right + '" fill="none" stroke="#10141a" stroke-linecap="round" stroke-width="14.5"></path><path d="' + P.right + '" fill="none" stroke="' + grad + '" stroke-linecap="round" stroke-width="13"></path><path transform="translate(0,-2.5)" d="' + P.right + '" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-width="2" opacity="0.8"></path></g></g>';
+          '<g' + (anim ? ' class="cut-recoil-left"' : "") + '><path d="' + P.left + '" fill="none" stroke="' + cutBase + '" stroke-linecap="round" stroke-width="14.5"></path><path d="' + P.left + '" fill="none" stroke="' + grad + '" stroke-linecap="round" stroke-width="13"></path><path transform="translate(0,-2.5)" d="' + P.left + '" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-width="' + cs.w + '" opacity="' + cs.o + '"></path><path d="' + cu(P.ex, P.ey, 1) + '" fill="none" stroke="url(#copper-wires)" stroke-linecap="round" stroke-width="2.2"></path></g>' +
+          '<g' + (anim ? ' class="cut-recoil-right"' : "") + '><path d="' + cu(P.sx, P.sy, -1) + '" fill="none" stroke="url(#copper-wires)" stroke-linecap="round" stroke-width="2.2"></path><path d="' + P.right + '" fill="none" stroke="' + cutBase + '" stroke-linecap="round" stroke-width="14.5"></path><path d="' + P.right + '" fill="none" stroke="' + grad + '" stroke-linecap="round" stroke-width="13"></path><path transform="translate(0,-2.5)" d="' + P.right + '" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-width="' + cs.w + '" opacity="' + cs.o + '"></path></g></g>';
       } else {
         wiresSvg += '<g class="' + (locked ? "" : "interactive-wire-group") + (isSel ? " wire-selected-glow" : "") + '"' + (locked ? ' pointer-events="none"' : ' data-wire="' + o + '"') + '>' +
           (top ? '<path d="' + P.full + '" fill="none" filter="url(#crossing-shadow)" opacity="0.92" pointer-events="none" stroke="#000000" stroke-linecap="round" stroke-width="15"></path>' : "") +
-          '<path d="' + P.full + '" fill="none" stroke="' + base + '" stroke-linecap="round" stroke-width="15"></path>' +
+          '<path d="' + P.full + '" fill="none" stroke="' + base + '" stroke-linecap="round" stroke-width="' + (color === "black" ? "15.5" : "15") + '"></path>' +
           '<path class="wire-body-core" d="' + P.full + '" fill="none" stroke="' + grad + '" stroke-linecap="round" stroke-width="13.5"></path>' +
-          '<path transform="translate(0,-2.5)" d="' + P.full + '" fill="none" opacity="0.82" stroke="' + spec + '" stroke-linecap="round" stroke-width="2.2"></path>' +
-          '<path transform="translate(0,-3)" d="' + P.full + '" fill="none" opacity="0.95" stroke="#ffffff" stroke-linecap="round" stroke-width="0.9"></path></g>';
+          (color === "black"
+            ? '<path transform="translate(0,-2.5)" d="' + P.full + '" fill="none" opacity="0.55" stroke="#9ca3af" stroke-linecap="round" stroke-width="1.8"></path><path transform="translate(0,-3)" d="' + P.full + '" fill="none" opacity="0.75" stroke="#cbd5e1" stroke-linecap="round" stroke-width="0.8"></path>'
+            : '<path transform="translate(0,-2.5)" d="' + P.full + '" fill="none" opacity="' + (color === "white" ? "0.95" : "0.82") + '" stroke="' + spec + '" stroke-linecap="round" stroke-width="' + (color === "white" ? "2.4" : "2.2") + '"></path><path transform="translate(0,-3)" d="' + P.full + '" fill="none" opacity="0.95" stroke="#ffffff" stroke-linecap="round" stroke-width="0.9"></path>') + '</g>';
       }
     });
 
@@ -713,14 +717,27 @@
     var old = document.getElementById("zt-solo"); if (old) old.remove();
     if (!(session && view && view.solo && view.status === "playing" && view.me)) return;
     var other = view.me.role === "operator" ? "technician" : "operator";
+    var box = document.createElement("div");
+    box.id = "zt-solo";
+    box.style.cssText = "position:fixed;right:14px;" + (document.body.classList.contains("tech") ? "bottom:calc(64px + env(safe-area-inset-bottom,0px));" : "top:calc(60px + env(safe-area-inset-top,0px));") + "z-index:90;display:flex;flex-direction:column;align-items:flex-end;gap:4px";
+    var base = "min-height:0;width:auto;padding:5px 9px;border-radius:6px;background:#1a1e23ee;font:700 10px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;";
     var b = document.createElement("button");
-    b.id = "zt-solo"; b.type = "button";
+    b.type = "button";
     b.textContent = "TEST ⇄ " + (other === "operator" ? "voir opérateur" : "voir technicien");
-    b.style.cssText = "position:fixed;right:14px;" + (document.body.classList.contains("tech") ? "bottom:calc(64px + env(safe-area-inset-bottom,0px));" : "top:calc(60px + env(safe-area-inset-top,0px));") + "z-index:90;min-height:0;padding:5px 9px;border-radius:6px;border:1px solid #ff9f32;background:#1a1e23ee;color:#ff9f32;font:700 10px 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase";
+    b.style.cssText = base + "border:1px solid #ff9f32;color:#ff9f32";
     b.onclick = function () {
       sb.rpc("zt_solo_role", { p_code: session.code, p_token: session.token, p_role: other }).then(function (r) { if (r.error) return fail(r.error); view = r.data; render(); });
     };
-    document.body.appendChild(b);
+    var st = document.createElement("button");
+    st.type = "button";
+    st.textContent = "■ TEST : arrêter la partie";
+    st.style.cssText = base + "border:1px solid #ff5252;color:#ff8a8a";
+    st.onclick = function () {
+      if (!window.confirm("Arrêter la partie de test ?")) return;
+      sb.rpc("zt_solo_stop", { p_code: session.code, p_token: session.token }).then(function (r) { if (r.error) return fail(r.error); view = r.data; resetGameFlags(); render(); });
+    };
+    box.appendChild(b); box.appendChild(st);
+    document.body.appendChild(box);
   }
   document.addEventListener("touchmove", function (e) { if (document.body.classList.contains("op")) e.preventDefault(); }, { passive: false });
   function doRender() {
