@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.36";
+  var APP_VERSION = "1.0.37";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -331,6 +331,7 @@ ${solo}
     return out;
   }
   [6, 7, 8].forEach(function (n) { GEOM[n] = mkGeom(n); ORDER[n] = []; for (var i = 1; i <= n; i++) ORDER[n].push(i); });
+  var MOD_NAME = { 3: "Alimentation", 4: "Horloge", 5: "Détonateur", 6: "Capteur", 7: "Relais", 8: "Charge" };
   var BASE = { red: "#250202", yellow: "#240c01", blue: "#040914", black: "#000000", white: "#475569" };
 
   function r1(v) { return Math.round(v * 10) / 10; }
@@ -501,7 +502,7 @@ ${solo}
         ico = '<span class="material-symbols-outlined text-[13px] text-slate-500 font-light">lock_open</span>';
         wCls = "font-bold text-slate-400"; bar = '<div class="w-full h-1 rounded-full bg-[#161c24] border border-[#252f3b] mt-1"></div>';
       }
-      return '<button class="' + cls + '" type="button" data-panel="' + idx + '"><div class="w-full flex items-center justify-between mb-0.5"><div class="flex items-center gap-1">' + led + '<span class="font-label-sm text-[8px] ' + nameCls + ' tracking-wider uppercase">MODULE ' + (idx + 1) + '</span></div>' + ico + '</div><span class="font-code-serial text-[11px] ' + wCls + ' tracking-tight leading-none my-0.5">' + w + ' FILS</span>' + bar + '</button>';
+      return '<button class="' + cls + '" type="button" data-panel="' + idx + '"><div class="w-full flex items-center justify-between mb-0.5"><div class="flex items-center gap-1">' + led + '<span class="font-label-sm text-[8px] ' + nameCls + ' tracking-wider uppercase">' + MOD_NAME[w].toUpperCase() + '</span></div>' + ico + '</div><span class="font-code-serial text-[11px] ' + wCls + ' tracking-tight leading-none my-0.5">' + w + ' FILS</span>' + bar + '</button>';
     }).join("");
     var select =
       '<section class="rugged-chassis rounded-xl p-2.5 relative shrink-0">' + SCR_SEL + screws("screw-rot-3", "screw-rot-1", "screw-rot-4", "screw-rot-2") +
@@ -551,9 +552,9 @@ ${solo}
     });
 
     var modHead = isSolved
-      ? '<div class="px-4 flex items-center justify-between"><div class="flex items-center gap-2"><div class="w-7 h-7 rounded bg-[#10291f] border border-[#00ffaa]/60 flex items-center justify-center text-[#00ffaa] shadow-[0_0_8px_rgba(0,255,170,0.35)]"><span class="material-symbols-outlined text-[17px] font-bold">check</span></div><div class="flex flex-col"><span class="font-label-sm text-[7.5px] tracking-widest text-[#00ffaa] uppercase font-bold">MODULE ' + n + ' FILS // RÉSOLU ✓</span><span class="font-headline-sm text-[12px] font-bold text-white tracking-wide">CORPS DE LIAISON PRINCIPAL</span></div></div>' +
+      ? '<div class="px-4 flex items-center justify-between"><div class="flex items-center gap-2"><div class="w-7 h-7 rounded bg-[#10291f] border border-[#00ffaa]/60 flex items-center justify-center text-[#00ffaa] shadow-[0_0_8px_rgba(0,255,170,0.35)]"><span class="material-symbols-outlined text-[17px] font-bold">check</span></div><div class="flex flex-col"><span class="font-label-sm text-[7.5px] tracking-widest text-[#00ffaa] uppercase font-bold">MODULE ' + n + ' FILS // RÉSOLU ✓</span><span class="font-headline-sm text-[12px] font-bold text-white tracking-wide">' + MOD_NAME[n].toUpperCase() + '</span></div></div>' +
         '<div class="px-2.5 py-1 rounded-md bg-gradient-to-r from-[#122e22] via-[#1a3d2e] to-[#122e22] border border-[#00ffaa]/70 shadow-[0_0_12px_rgba(0,255,170,0.35)] flex items-center gap-1.5"><span class="material-symbols-outlined text-[#00ffaa] text-[14px] font-bold">verified</span><div class="flex flex-col items-end"><span class="font-code-serial text-[9.5px] font-black tracking-wider text-[#00ffaa] leading-tight">RÉSOLU ✓</span><span class="font-code-serial text-[7px] text-[#71cf9e] tracking-widest uppercase" id="zt-serial"></span></div></div></div>'
-      : '<div class="px-6 flex items-center justify-between"><div class="flex items-center gap-1.5"><div class="w-6 h-6 rounded bg-[#20262e] border border-[#3b4552] flex items-center justify-center ' + (paused ? "text-secondary" : "text-primary") + ' shadow-inner"><span class="material-symbols-outlined text-[15px]">cable</span></div><div class="flex flex-col"><span class="font-label-sm text-[7px] tracking-widest text-slate-300 uppercase">MODULE ' + n + ' FILS // HARNESS</span><span class="font-headline-sm text-[11px] font-bold text-white tracking-wide">CORPS DE LIAISON PRINCIPAL</span></div></div>' +
+      : '<div class="px-6 flex items-center justify-between"><div class="flex items-center gap-1.5"><div class="w-6 h-6 rounded bg-[#20262e] border border-[#3b4552] flex items-center justify-center ' + (paused ? "text-secondary" : "text-primary") + ' shadow-inner"><span class="material-symbols-outlined text-[15px]">cable</span></div><div class="flex flex-col"><span class="font-label-sm text-[7px] tracking-widest text-slate-300 uppercase">MODULE ' + n + ' FILS // HARNESS</span><span class="font-headline-sm text-[11px] font-bold text-white tracking-wide">' + MOD_NAME[n].toUpperCase() + '</span></div></div>' +
         '<div class="px-2 py-0.5 rounded bg-gradient-to-r from-[#232931] via-[#2f3742] to-[#232931] border border-[#444f5c] shadow-sm flex items-center gap-1.5"><div class="flex flex-col items-end"><span class="font-label-sm text-[6px] text-slate-400 uppercase tracking-widest leading-none">SÉRIE / LOT</span><span class="font-code-serial text-[10px] font-black tracking-widest text-[#ffdcbf] leading-tight" id="zt-serial"></span></div></div></div>';
     var resolvedBar = isSolved ? '<div class="absolute top-2 inset-x-12 z-40 resolved-badge-bar rounded-md px-3 py-1 flex items-center justify-between pointer-events-none"><div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-[#00ffaa] shadow-[0_0_6px_#00ffaa] animate-ping"></span><span class="font-code-serial text-[9px] font-bold text-[#00ffaa] tracking-widest uppercase">CIRCUIT DÉSAMORCÉ AVEC SUCCÈS</span></div><span class="font-code-serial text-[8.5px] text-[#a4e6c3] tracking-widest font-semibold">STATUS: SECURE</span></div>' : "";
     var veil = paused ? '<div class="absolute inset-0 pointer-events-none z-25 bg-[#090d12]/30 backdrop-contrast-90"></div>' : "";
@@ -682,12 +683,12 @@ ${solo}
   var TECH_ORDER = ["lecture", "w3", "w4", "w5", "w6", "w7", "w8"];
   var TECH_META = {
     lecture: { tab: "📌 Lire un panneau", title: "Section 02 — Lire un Panneau", sub: "Protocole de communication avec l'opérateur", pg: "p. 02", ind: "Page 2 / 8 — Lire un panneau" },
-    w3: { tab: "3 fils", title: "Section 03 — Module 3 fils", sub: "Configuration compacte à 3 connexions", pg: "p. 03", ind: "Page 3 / 8 — Module 3 fils" },
-    w4: { tab: "4 fils", title: "Section 04 — Module 4 fils", sub: "Règles de désamorçage de la baie câblée à 4 connexions", pg: "p. 04", ind: "Page 4 / 8 — Module 4 fils" },
-    w5: { tab: "5 fils", title: "Section 05 — Module 5 fils", sub: "Harnais principal lourd à 5 connexions", pg: "p. 05", ind: "Page 5 / 8 — Module 5 fils" },
-    w6: { tab: "6 fils", title: "Section 06 — Module 6 fils", sub: "Faisceau étendu à 6 connexions", pg: "p. 06", ind: "Page 6 / 8 — Module 6 fils" },
-    w7: { tab: "7 fils", title: "Section 07 — Module 7 fils", sub: "Faisceau dense à 7 connexions", pg: "p. 07", ind: "Page 7 / 8 — Module 7 fils" },
-    w8: { tab: "8 fils", title: "Section 08 — Module 8 fils", sub: "Harnais maximal à 8 connexions", pg: "p. 08", ind: "Page 8 / 8 — Module 8 fils" },
+    w3: { tab: "Alimentation", title: "Section 03 — Alimentation", sub: "Configuration compacte à 3 connexions", pg: "p. 03", ind: "Page 3 / 8 — Alimentation (3 fils)" },
+    w4: { tab: "Horloge", title: "Section 04 — Horloge", sub: "Règles de désamorçage de la baie câblée à 4 connexions", pg: "p. 04", ind: "Page 4 / 8 — Horloge (4 fils)" },
+    w5: { tab: "Détonateur", title: "Section 05 — Détonateur", sub: "Harnais principal lourd à 5 connexions", pg: "p. 05", ind: "Page 5 / 8 — Détonateur (5 fils)" },
+    w6: { tab: "Capteur", title: "Section 06 — Capteur", sub: "Faisceau étendu à 6 connexions", pg: "p. 06", ind: "Page 6 / 8 — Capteur (6 fils)" },
+    w7: { tab: "Relais", title: "Section 07 — Relais", sub: "Faisceau dense à 7 connexions", pg: "p. 07", ind: "Page 7 / 8 — Relais (7 fils)" },
+    w8: { tab: "Charge", title: "Section 08 — Charge", sub: "Harnais maximal à 8 connexions", pg: "p. 08", ind: "Page 8 / 8 — Charge (8 fils)" },
     index: { tab: "", title: "Sommaire du Manuel", sub: "Index rapide des modules de déminage", pg: "INDEX", ind: "Sommaire général" }
   };
   var techQuery = "", techTouched = false;
@@ -713,7 +714,7 @@ ${solo}
         return '<div class="bg-amber-100/40 p-2.5 rounded border border-amber-800/30"><span class="font-notes text-xs font-bold text-inkRed uppercase tracking-wider block">' + L[i % 3] + '</span><p class="mt-1">' + escH(t) + "</p></div>";
       }).join("") + "</div>";
     }
-    var items = [["lecture", "📌", "Lire un panneau", "(protocole série, comptage)", "p. 02"], ["w3", "⚡", "Module 3 fils", "(combinaisons de base)", "p. 03"], ["w4", "⚡", "Module 4 fils", "(série pair/impair & règles)", "p. 04"], ["w5", "⚡", "Module 5 fils", "(harnais complexe à 5 brins)", "p. 05"], ["w6", "⚡", "Module 6 fils", "(faisceau étendu)", "p. 06"], ["w7", "⚡", "Module 7 fils", "(faisceau dense)", "p. 07"], ["w8", "⚡", "Module 8 fils", "(harnais maximal)", "p. 08"]];
+    var items = [["lecture", "📌", "Lire un panneau", "(protocole série, comptage)", "p. 02"], ["w3", "⚡", "Alimentation (3 fils)", "(combinaisons de base)", "p. 03"], ["w4", "⚡", "Horloge (4 fils)", "(série pair/impair & règles)", "p. 04"], ["w5", "⚡", "Détonateur (5 fils)", "(harnais complexe à 5 brins)", "p. 05"], ["w6", "⚡", "Capteur (6 fils)", "(faisceau étendu)", "p. 06"], ["w7", "⚡", "Relais (7 fils)", "(faisceau dense)", "p. 07"], ["w8", "⚡", "Charge (8 fils)", "(harnais maximal)", "p. 08"]];
     return techHead("index") +
       '<div class="mb-4 bg-amber-50/70 p-2.5 rounded border border-amber-900/30 shadow-inner"><label class="block font-notes text-xs text-slate-700 font-bold mb-1">🔍 Recherche de mot-clé ou module :</label><div class="relative"><input type="text" id="indexSearchInput" placeholder="Ex: 4 fils, série, pair..." class="w-full bg-transparent border-b-2 border-inkBlue text-inkBlue font-hand text-xl px-1 py-0.5 focus:outline-none focus:border-inkRed placeholder-slate-400"/><span class="absolute right-1 top-1 text-xs text-slate-400 font-notes italic">écrire ici</span></div></div>' +
       '<ul id="indexList" class="space-y-2.5 font-hand text-lg text-inkBlue">' + items.map(function (x) {
