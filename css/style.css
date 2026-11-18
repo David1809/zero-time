@@ -480,3 +480,12 @@ body.op #toast{bottom:auto;top:60px}
 
 html:has(body.op){overflow:hidden;overscroll-behavior:none;height:100%}
 body.op{position:fixed;inset:0;width:100%;touch-action:manipulation}
+
+.zt-tabs{position:relative;z-index:30;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:100%;margin:2px 0 6px}
+.zt-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-height:40px;padding:4px 2px;border-radius:8px;border:1px solid #3b4450;background:#1a1f26;color:#9bb1c5;font-family:'JetBrains Mono',monospace;cursor:pointer}
+.zt-tab-n{font-size:8px;letter-spacing:.12em;opacity:.8}
+.zt-tab-w{font-size:12px;font-weight:800;letter-spacing:.06em}
+.zt-tab.on{background:#2b333d;border-color:#ff9f32;color:#ff9f32;box-shadow:0 0 8px rgba(255,159,50,.35)}
+.zt-tab.done{color:#00ffaa}
+.zt-tab.done.on{border-color:#00ffaa;box-shadow:0 0 8px rgba(0,255,170,.35)}
+.zt-tab.paused.on{border-color:#94a3b8;color:#cbd5e1;box-shadow:none}

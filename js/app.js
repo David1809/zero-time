@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.15";
+  var APP_VERSION = "1.0.16";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -337,9 +337,7 @@
     // --- éléments de l'en-tête
     var chips = g.panels.map(function (p, idx) {
       var on = idx === activePanel, w = p.wires.length;
-      var cls = on ? "px-2.5 py-1.5 rounded bg-[#2b333d] text-[10px] font-code-serial font-bold " + (mode === "pause" ? "text-slate-300 border border-slate-600/40" : (mode === "ok" ? "text-primary border border-primary/40" : "text-primary border border-primary/40")) + " shadow-sm"
-                  : "px-2.5 py-1.5 rounded text-[10px] font-code-serial font-semibold text-slate-300 border border-slate-600/40";
-      return '<button type="button" data-panel="' + idx + '" class="' + cls + '">' + ((idx + 1) + "·" + w + "F") + (p.state === "solved" ? " ✓" : "") + '</button>';
+      return '<button type="button" data-panel="' + idx + '" class="zt-tab' + (on ? " on" : "") + (p.state === "solved" ? " done" : "") + (mode === "pause" ? " paused" : "") + '"><span class="zt-tab-n">MODULE ' + (idx + 1) + '</span><span class="zt-tab-w">' + w + ' FILS' + (p.state === "solved" ? " ✓" : "") + '</span></button>';
     }).join("");
     var topLed = { live: '<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span><span class="font-label-sm text-[8px] font-bold text-primary tracking-widest uppercase">UNITÉ TACTIQUE // DÉMINEUR</span>',
       alert: '<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span><span class="font-label-sm text-[8px] font-bold text-primary tracking-widest uppercase">UNITÉ TACTIQUE // DÉMINEUR</span>',
@@ -382,7 +380,7 @@
       waiting +
       '<div class="flex items-baseline justify-center relative z-15 py-0.5"><div class="font-display-timer text-[46px] leading-none font-bold tracking-wider transition-colors duration-300" id="chrono-display">00:00</div><span class="ml-2 font-code-serial text-[16px] font-bold tracking-widest transition-colors duration-300" id="chrono-ms">.00</span>' +
       (paused ? '<span class="ml-2.5 px-1.5 py-0.5 rounded bg-black/60 border border-slate-700 text-[8px] font-code-serial text-slate-400 uppercase tracking-widest">FIGÉ</span>' : "") + '</div>' +
-      '<div class="flex items-center justify-center gap-1.5 relative z-15 pb-1">' + chips + '</div>' +
+      '<div class="zt-tabs">' + chips + '</div>' +
       '<div class="mt-1 pt-1 border-t border-[#182029] grid grid-cols-2 gap-2 items-center relative z-15">' +
       '<div class="flex flex-col gap-0.5"><div class="flex items-center gap-1"><span class="material-symbols-outlined text-error text-[12px]' + (mode === "err" ? " animate-pulse" : "") + '">warning</span><span class="font-label-sm text-[8px] font-bold tracking-wider text-error uppercase">ERREURS ' + g.errors + '/3</span></div><div class="flex items-center gap-1.5">' + diodes + '</div></div>' +
       '<div class="flex flex-col items-end gap-0.5"><div class="flex items-center gap-1 ' + (mode === "ok" ? "text-[#00ffaa]" : "text-secondary") + '"><span class="font-label-sm text-[8px] font-bold tracking-wider uppercase">MODULES VALIDES ' + solved + '/3</span><span class="material-symbols-outlined text-[12px]">' + (mode === "ok" ? "check_circle" : "grid_view") + '</span></div><div class="flex items-center gap-1.5 w-24 h-3.5 bg-[#0e1216] p-0.5 rounded border border-[#28323d] shadow-inner">' + crans + '</div></div>' +
