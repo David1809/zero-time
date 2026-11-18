@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.34";
+  var APP_VERSION = "1.0.35";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -726,7 +726,7 @@ ${solo}
     var m = view.manual; if (m.pages && !m["w" + manualTab.slice(1)] && /^w[3-8]$/.test(manualTab) && !techTouched) { manualTab = "w" + m.pages[0]; }
     var k = TECH_META[manualTab] ? manualTab : "w4", meta = TECH_META[k], paused = view.paused;
     var lock = function (t) { return /^w[3-8]$/.test(t) && !m[t]; };
-    var tabs = TECH_ORDER.map(function (t) {
+    var tabs = TECH_ORDER.filter(function (t) { return t === k || !lock(t); }).map(function (t) {
       var lab = TECH_META[t].tab + (lock(t) ? " 🔒" : "");
       return t === k
         ? '<button data-tab="' + t + '" class="tab-btn tab-active px-3 py-1.5 text-sm font-hand text-inkBlue bg-[#f4ecdf] border-t-2 border-x-2 border-amber-800/40 rounded-t-lg shadow-sm whitespace-nowrap">' + lab + "</button>"
@@ -744,7 +744,7 @@ ${solo}
       '<div class="border-t border-amber-900/20 bg-[#ede4d4] px-4 py-2 flex items-center justify-between text-xs font-notes text-inkBlue"><button id="btnPrev" class="flex items-center gap-1 font-bold text-inkBlue active:scale-95 transition-transform"><span>⟵</span> <span>Précédent</span></button><div class="flex items-center gap-1 font-typewriter text-[11px] text-slate-600 bg-amber-200/50 px-2 py-0.5 rounded border border-amber-800/30"><span>' + meta.ind + '</span></div><button id="btnNext" class="flex items-center gap-1 font-bold text-inkBlue active:scale-95 transition-transform"><span>Suivant</span> <span>⟶</span></button></div></div>';
 
     function go(t) { manualTab = t; techTouched = true; render(); }
-    function step(d) { var i = TECH_ORDER.indexOf(manualTab); if (i < 0) i = TECH_ORDER.indexOf("w4"); go(TECH_ORDER[(i + d + TECH_ORDER.length) % TECH_ORDER.length]); }
+    function step(d) { var L = TECH_ORDER.filter(function (t) { return !/^w[3-8]$/.test(t) || m[t]; }), i = L.indexOf(manualTab); if (i < 0) i = 0; go(L[(i + d + L.length) % L.length]); }
     Array.prototype.forEach.call(app.querySelectorAll("[data-tab]"), function (b) { b.onclick = function () { go(b.getAttribute("data-tab")); }; });
     Array.prototype.forEach.call(app.querySelectorAll("[data-go]"), function (b) { b.onclick = function () { go(b.getAttribute("data-go")); }; });
     document.getElementById("btnPrev").onclick = function () { step(-1); };

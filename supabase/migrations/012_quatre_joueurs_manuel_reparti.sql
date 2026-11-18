@@ -41,14 +41,13 @@ begin
   update zt.players set role = case when id = v_op then 'operator' else 'technician' end, pages = null, last_seen = now()
    where room_code = v_code;
   -- Répartition des pages du manuel (3 à 8 fils) entre les techniciens, s'ils sont au moins deux.
+  -- Répartition par chapitres consécutifs : 2 techniciens = pages 3-5 / 6-8 ; 3 techniciens = 3-4 / 5-6 / 7-8.
   if v_count >= 3 then
-    update zt.players p set pages = s.pg
-      from (select t.id pid, array_agg(x.page order by x.page) pg
-              from (select id, row_number() over (order by random()) rn from zt.players where room_code = v_code and role = 'technician') t
-              join (select page, row_number() over (order by random()) rn from generate_series(3,8) page) x
-                on ((x.rn - 1) % (v_count - 1)) = t.rn - 1
-             group by t.id) s
-     where p.id = s.pid;
+    update zt.players p set pages = case
+        when v_count = 3 then (case t.rn when 1 then array[3,4,5] else array[6,7,8] end)
+        else (case t.rn when 1 then array[3,4] when 2 then array[5,6] else array[7,8] end) end
+      from (select id, row_number() over (order by random()) rn from zt.players where room_code = v_code and role = 'technician') t
+     where p.id = t.id;
   end if;
   delete from zt.configs c where c.id like 'G%' and not exists (select 1 from zt.room_panels rp where rp.config_id = c.id);
   foreach v_n in array array(select x from generate_series(3,8) x order by random() limit 3) loop
