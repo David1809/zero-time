@@ -367,21 +367,22 @@ body.op{overflow:hidden;height:100dvh;color:#e1e7f0;user-select:none;-webkit-use
       radial-gradient(circle at 50% 10%, #2f353e 0%, #171b20 85%);
   }
 .pilot-led-green {
-    width: 13px;
-    height: 13px;
+    width: 11px;
+    height: 11px;
     border-radius: 9999px;
     background: radial-gradient(circle at 35% 35%, #9ffff0 0%, #10ff98 45%, #05a85c 80%, #024825 100%);
     box-shadow: 
-      0 0 10px #10ff98,
-      0 0 20px rgba(16, 255, 152, 0.65),
+      0 0 8px #10ff98,
+      0 0 16px rgba(16, 255, 152, 0.65),
       inset 0 1px 2px rgba(255,255,255,0.8),
-      0 0 0 1.5px #15221b;
+      0 0 0 1px #15221b;
     position: relative;
+    display: inline-block;
   }
 .pilot-led-green::after {
     content: '';
     position: absolute;
-    inset: -3px;
+    inset: -2.5px;
     border-radius: 9999px;
     border: 1px solid #485b52;
     box-shadow: inset 0 1px 1px rgba(255,255,255,0.4);
@@ -474,8 +475,8 @@ body.op{overflow:hidden;height:100dvh;color:#e1e7f0;user-select:none;-webkit-use
 :where(body.op) svg{display:block}
 :where(body.op) button{background:transparent;padding:0;min-height:0;border-radius:0;font:inherit;color:inherit}
 body.op #app{max-width:none;padding:0;gap:0;display:block;min-height:0}
-body.op #tactical-rack{height:100dvh;padding-top:calc(52px + env(safe-area-inset-top,0px))}
-body.op #harness-chamber{flex:1 1 0;min-height:130px;max-height:256px}
+body.op #tactical-rack{height:100dvh;padding-top:calc(max(env(safe-area-inset-top,0px),6px) + 48px)}
+body.op #harness-chamber{flex:1 1 0;min-height:104px;max-height:180px}
 body.op #toast{bottom:auto;top:60px}
 
 html:has(body.op){overflow:hidden;overscroll-behavior:none;height:100%}
@@ -489,3 +490,21 @@ body.op{position:fixed;inset:0;width:100%;touch-action:manipulation}
 .zt-tab.done{color:#00ffaa}
 .zt-tab.done.on{border-color:#00ffaa;box-shadow:0 0 8px rgba(0,255,170,.35)}
 .zt-tab.paused.on{border-color:#94a3b8;color:#cbd5e1;box-shadow:none}
+
+/* ===== Maquette OP03 V3 : sélecteur de modules ===== */
+.pilot-led-orange {
+  width: 9px; height: 9px; border-radius: 9999px;
+  background: radial-gradient(circle at 35% 35%, #fff0d0 0%, #ff9f32 50%, #b25100 100%);
+  box-shadow: 0 0 8px #ff9f32, 0 0 14px rgba(255, 159, 50, 0.7);
+  position: relative; display: inline-block;
+}
+.module-cell-recess {
+  background: #080c10; border: 1.5px solid #1c232b;
+  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.95), 0 1px 0 rgba(255, 255, 255, 0.15);
+  position: relative; overflow: hidden;
+}
+.module-cell-recess::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 40%, rgba(255,255,255,0.02) 100%);
+  pointer-events: none; z-index: 5;
+}

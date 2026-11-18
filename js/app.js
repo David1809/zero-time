@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.16";
+  var APP_VERSION = "1.0.17";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -287,14 +287,14 @@
       ex: le[6], ey: le[7], sx: rs[0], sy: rs[1], cx: (le[6] + rs[0]) / 2, cy: (le[7] + rs[1]) / 2 };
   }
 
-  var CL_BASE = "terminal-clamp-block w-6 h-6 rounded flex items-center justify-center font-code-serial font-bold text-[11px]";
+  var CL_BASE = "terminal-clamp-block w-[22px] h-[22px] rounded flex items-center justify-center font-code-serial font-bold text-[10px]";
   function clampCls(isCut, isSel, locked) {
     if (isCut) return CL_BASE + " text-slate-500 line-through";
-    if (isSel) return "terminal-clamp-block active-clamp w-6 h-6 rounded flex items-center justify-center font-code-serial font-black text-[12px]";
+    if (isSel) return "terminal-clamp-block active-clamp w-[22px] h-[22px] rounded flex items-center justify-center font-code-serial font-black text-[11px]";
     return CL_BASE + (locked ? " text-slate-300" : " text-slate-200 group-hover:border-primary");
   }
-  function lugsL(isCut) { return '<div class="flex flex-col items-center gap-0.5' + (isCut ? " opacity-40" : "") + '"><span class="w-1.5 h-1 rounded-xs terminal-lug"></span><span class="w-2 h-1.5 rounded-xs bg-[#111418]' + (isCut ? "" : " border border-[#3b434e]") + '"></span></div>'; }
-  function lugsR(isCut) { return '<div class="flex flex-col items-center gap-0.5' + (isCut ? " opacity-40" : "") + '"><span class="w-2 h-1.5 rounded-xs bg-[#111418]' + (isCut ? "" : " border border-[#3b434e]") + '"></span><span class="w-1.5 h-1 rounded-xs terminal-lug"></span></div>'; }
+  function lugsL(isCut) { return '<div class="flex flex-col items-center gap-0.5' + (isCut ? " opacity-40" : "") + '"><span class="w-1.5 h-1 rounded-xs terminal-lug"></span><span class="w-1.5 h-1 rounded-xs bg-[#111418]' + (isCut ? "" : " border border-[#3b434e]") + '"></span></div>'; }
+  function lugsR(isCut) { return '<div class="flex flex-col items-center gap-0.5' + (isCut ? " opacity-40" : "") + '"><span class="w-1.5 h-1 rounded-xs bg-[#111418]' + (isCut ? "" : " border border-[#3b434e]") + '"></span><span class="w-1.5 h-1 rounded-xs terminal-lug"></span></div>'; }
 
   var GRADS = "<linearGradient id=\"grad-wire-red\" x1=\"0%\" x2=\"0%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#3d0303\"/><stop offset=\"12%\" stop-color=\"#880f0f\"/><stop offset=\"26%\" stop-color=\"#dc2626\"/><stop offset=\"38%\" stop-color=\"#f87171\"/><stop offset=\"46%\" stop-color=\"#ffffff\"/><stop offset=\"56%\" stop-color=\"#ef4444\"/><stop offset=\"78%\" stop-color=\"#b91c1c\"/><stop offset=\"92%\" stop-color=\"#650909\"/><stop offset=\"100%\" stop-color=\"#2d0202\"/></linearGradient><linearGradient id=\"grad-wire-white\" x1=\"0%\" x2=\"0%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#1e293b\"/><stop offset=\"14%\" stop-color=\"#475569\"/><stop offset=\"28%\" stop-color=\"#94a3b8\"/><stop offset=\"40%\" stop-color=\"#e2e8f0\"/><stop offset=\"48%\" stop-color=\"#ffffff\"/><stop offset=\"58%\" stop-color=\"#cbd5e1\"/><stop offset=\"80%\" stop-color=\"#64748b\"/><stop offset=\"94%\" stop-color=\"#334155\"/><stop offset=\"100%\" stop-color=\"#141c27\"/></linearGradient><linearGradient id=\"grad-wire-yellow\" x1=\"0%\" x2=\"0%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#451a03\"/><stop offset=\"14%\" stop-color=\"#92400e\"/><stop offset=\"28%\" stop-color=\"#d97706\"/><stop offset=\"40%\" stop-color=\"#fbbf24\"/><stop offset=\"48%\" stop-color=\"#ffffff\"/><stop offset=\"58%\" stop-color=\"#f59e0b\"/><stop offset=\"80%\" stop-color=\"#b45309\"/><stop offset=\"94%\" stop-color=\"#712e06\"/><stop offset=\"100%\" stop-color=\"#2d1001\"/></linearGradient><linearGradient id=\"grad-wire-blue\" x1=\"0%\" x2=\"0%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#050e20\"/><stop offset=\"14%\" stop-color=\"#1e3a8a\"/><stop offset=\"28%\" stop-color=\"#2563eb\"/><stop offset=\"40%\" stop-color=\"#60a5fa\"/><stop offset=\"48%\" stop-color=\"#ffffff\"/><stop offset=\"58%\" stop-color=\"#3b82f6\"/><stop offset=\"80%\" stop-color=\"#1d4ed8\"/><stop offset=\"94%\" stop-color=\"#112763\"/><stop offset=\"100%\" stop-color=\"#040b19\"/></linearGradient><linearGradient id=\"grad-wire-black\" x1=\"0%\" x2=\"0%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#020406\"/><stop offset=\"14%\" stop-color=\"#0f172a\"/><stop offset=\"28%\" stop-color=\"#334155\"/><stop offset=\"40%\" stop-color=\"#64748b\"/><stop offset=\"48%\" stop-color=\"#cbd5e1\"/><stop offset=\"58%\" stop-color=\"#475569\"/><stop offset=\"80%\" stop-color=\"#1e293b\"/><stop offset=\"94%\" stop-color=\"#0f141d\"/><stop offset=\"100%\" stop-color=\"#010204\"/></linearGradient><linearGradient id=\"copper-wires\" x1=\"0%\" x2=\"100%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#b45309\"/><stop offset=\"35%\" stop-color=\"#fde047\"/><stop offset=\"65%\" stop-color=\"#ea580c\"/><stop offset=\"100%\" stop-color=\"#78350f\"/></linearGradient>";
   var DEFS = '<defs>' +
@@ -327,8 +327,6 @@
     }
     var showErr = errFlash && errFlash.until > now && !paused;
     if (showErr) setTimeout(function () { render(); }, errFlash.until - now + 30);
-    var showAlert = alertFlash && alertFlash.until > now && !paused;
-    if (showAlert) setTimeout(function () { render(); }, alertFlash.until - now + 30);
 
     var remNow = paused ? paused.remaining_ms : endsAt - (now + offsetMs);
     var critical = remNow <= 60000;
@@ -344,7 +342,7 @@
       err: '<span class="w-1.5 h-1.5 rounded-full bg-error animate-ping"></span><span class="font-label-sm text-[8px] font-bold text-error tracking-widest uppercase">UNITÉ TACTIQUE // DÉMINEUR</span>',
       ok: '<span class="w-1.5 h-1.5 rounded-full bg-[#00ffaa] shadow-[0_0_6px_#00ffaa]"></span><span class="font-label-sm text-[8px] font-bold text-[#00ffaa] tracking-widest uppercase">UNITÉ TACTIQUE // DÉMINEUR</span>',
       pause: '<span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span><span class="font-label-sm text-[8px] font-bold text-amber-400 tracking-widest uppercase">UNITÉ TACTIQUE // SUSPENDUE</span>' }[mode];
-    var badge = { live: '<div class="flex items-center gap-1 px-2 py-1 rounded bg-[#101923] border border-[#1e2d3d]"><span class="w-1.5 h-1.5 rounded-full bg-[#10b981]"></span><span class="font-code-serial text-[9px] text-[#9bb1c5] tracking-widest font-bold">ACTIF</span></div>',
+    var badge = { live: '<div class="flex items-center gap-1 px-2 py-1 rounded bg-[#101923] border border-[#1e2d3d]"><span class="w-1.5 h-1.5 rounded-full bg-[#00ffaa] shadow-[0_0_6px_#00ffaa]"></span><span class="font-code-serial text-[8.5px] text-[#9bb1c5] tracking-widest font-bold">ARMÉ</span></div>',
       alert: '<div class="flex items-center gap-1 px-2 py-1 rounded bg-[#191e25] border border-[#313945]"><span class="w-1.5 h-1.5 rounded-full bg-[#ff4d4d] shadow-[0_0_6px_#ff4d4d] animate-pulse"></span><span class="font-code-serial text-[9px] text-[#ffb4ab] tracking-widest font-bold">ALERTE</span></div>',
       err: '<div class="flex items-center gap-1 px-2 py-1 rounded bg-[#221010] border border-[#522121]"><span class="w-1.5 h-1.5 rounded-full bg-[#ff3333] shadow-[0_0_6px_#ff3333] animate-pulse"></span><span class="font-code-serial text-[9px] text-[#ff9999] tracking-widest font-bold">ALERTE</span></div>',
       ok: '<div class="flex items-center gap-1 px-2 py-1 rounded bg-[#13281f] border border-[#00ffaa]/50 shadow-[0_0_8px_rgba(0,255,170,0.3)]"><span class="w-1.5 h-1.5 rounded-full bg-[#00ffaa] shadow-[0_0_6px_#00ffaa]"></span><span class="font-code-serial text-[9px] text-[#00ffaa] tracking-widest font-bold">RÉSOLU</span></div>',
@@ -353,46 +351,71 @@
     // --- bloc télémétrie
     var diodes = "";
     for (var i = 0; i < 3; i++) diodes += i < g.errors
-      ? '<div class="w-5 h-5 rounded bg-[#4a0d0d] border border-[#ff4d4d] flex items-center justify-center shadow-[0_0_10px_rgba(255,77,77,0.85)]"><span class="material-symbols-outlined text-white text-[12px] font-black">priority_high</span></div>'
-      : '<div class="w-5 h-5 rounded bg-[#101419] border border-[#26313d] flex items-center justify-center shadow-inner"><span class="w-1.5 h-1.5 rounded-full bg-[#1b232c]"></span></div>';
+      ? '<div class="w-[18px] h-[18px] rounded bg-[#4a0d0d] border border-[#ff4d4d] flex items-center justify-center shadow-[0_0_8px_rgba(255,77,77,0.85)]"><span class="material-symbols-outlined text-white text-[11px] font-black">priority_high</span></div>'
+      : '<div class="w-[18px] h-[18px] rounded bg-[#101419] border border-[#26313d] flex items-center justify-center shadow-inner"><span class="w-1.5 h-1.5 rounded-full bg-[#1b232c]"></span></div>';
     var crans = "";
     for (var k = 0; k < 3; k++) crans += k < solved
-      ? '<div class="flex-1 h-full rounded-xs bg-gradient-to-r ' + (mode === "ok" ? "from-[#00ffaa] to-[#10ff98] shadow-[0_0_8px_rgba(0,255,170,0.8)]" : "from-primary to-[#ffbe73] shadow-[0_0_8px_rgba(255,159,50,0.7)]") + '"></div>'
+      ? '<div class="flex-1 h-full rounded-xs bg-[#00ffaa] shadow-[0_0_6px_#00ffaa]"></div>'
       : '<div class="flex-1 h-full rounded-xs bg-[#171d24]"></div>';
     var screws = function (a, b, c, d) { return '<span class="screw-cross ' + a + ' top-2 left-2"></span><span class="screw-cross ' + b + ' top-2 right-2"></span><span class="screw-cross ' + c + ' bottom-2 left-2"></span><span class="screw-cross ' + d + ' bottom-2 right-2"></span>'; };
-    var head = { live: '<span class="pilot-led-alert"></span><span class="font-label-sm text-[9px] font-bold text-primary tracking-wider uppercase">DÉTONATION IMMINENTE</span>',
-      alert: '<span class="pilot-led-alert"></span><span class="font-label-sm text-[9px] font-bold text-[#ffb4ab] tracking-wider uppercase">ATTENTION : COMPTE À REBOURS CRITIQUE</span>',
+    var head = { live: '<span class="pilot-led-green"></span><span class="font-label-sm text-[8.5px] font-bold text-primary tracking-wider uppercase">ATTENTION : DÉTONATION IMMINENTE</span>',
+      alert: '<span class="pilot-led-green"></span><span class="font-label-sm text-[8.5px] font-bold text-primary tracking-wider uppercase">ATTENTION : DÉTONATION IMMINENTE</span>',
       err: '<span class="pilot-led-red"></span><span class="font-label-sm text-[9px] font-bold text-[#ff6666] tracking-wider uppercase">ATTENTION : DÉTONATION IMMINENTE</span>',
       ok: '<span class="pilot-led-green"></span><span class="font-label-sm text-[9px] font-bold text-[#00ffaa] tracking-wider uppercase">PANNEAU SÉCURISÉ // DÉSAMORÇAGE EFFECTIF</span>',
       pause: '<span class="pilot-led-pause"></span><span class="font-label-sm text-[9px] font-bold text-amber-400 tracking-wider uppercase flex items-center gap-1.5"><span class="material-symbols-outlined text-[13px]">pause_circle</span>SESSION EN PAUSE // HORLOGE FIGÉE</span>' }[mode];
-    var chan = { live: '<span class="font-code-serial text-[9px] text-primary tracking-widest uppercase">CANAL 03 // LIVE</span>',
-      alert: '<span class="font-code-serial text-[9px] text-primary tracking-widest uppercase">CANAL 03 // LIVE</span>',
+    var chan = { live: '<span class="font-code-serial text-[8.5px] text-slate-400 tracking-widest uppercase">CANAL 03 // LIVE</span>',
+      alert: '<span class="font-code-serial text-[8.5px] text-slate-400 tracking-widest uppercase">CANAL 03 // LIVE</span>',
       err: '<span class="font-code-serial text-[9px] text-[#ff8080] tracking-widest uppercase font-bold">CANAL 03 // LIVE</span>',
       ok: '<span class="font-code-serial text-[9px] text-slate-400 tracking-widest uppercase">CANAL 03 // OK</span>',
       pause: '<span class="font-code-serial text-[9px] text-slate-400 tracking-widest uppercase">STANDBY // T-HOLD</span>' }[mode];
     var waiting = paused ? '<div class="relative z-15 flex items-center justify-center gap-2 pb-1"><div class="h-[1px] w-6 bg-gradient-to-r from-transparent to-amber-400/60"></div><span class="font-code-serial text-[10px] font-extrabold text-amber-300 tracking-widest uppercase flex items-center gap-1 bg-amber-500/15 px-2.5 py-0.5 rounded border border-amber-500/30"><span class="material-symbols-outlined text-[12px] animate-spin">sync</span><span id="zt-wait"></span></span><div class="h-[1px] w-6 bg-gradient-to-l from-transparent to-amber-400/60"></div></div>' : "";
     var tele =
-      '<section class="rugged-chassis rounded-xl p-2.5 mt-0.5' + (mode === "err" ? " border border-[#522020]" : "") + '">' + screws("screw-rot-1", "screw-rot-2", "screw-rot-3", "screw-rot-4") +
-      '<div class="px-4 flex items-center justify-between"><div class="flex items-center gap-2">' + head + '</div>' + chan + '</div>' +
-      '<div class="relative mt-1.5 mx-0.5 p-2 rounded-lg bezel-screen-recess overflow-hidden"><div class="polycarbonate-screen-glare' + (mode === "ok" ? " glare-green" : "") + ' absolute inset-0 pointer-events-none z-20"></div>' +
+      '<section class="rugged-chassis rounded-xl p-2.5 relative shrink-0' + (mode === "err" ? " border border-[#522020]" : "") + '">' + screws("screw-rot-1", "screw-rot-2", "screw-rot-3", "screw-rot-4") +
+      '<div class="px-6 flex items-center justify-between"><div class="flex items-center gap-2">' + head + '</div>' + chan + '</div>' +
+      '<div class="relative mt-1 mx-2 p-1.5 rounded-lg bezel-screen-recess overflow-hidden"><div class="polycarbonate-screen-glare' + (mode === "ok" ? " glare-green" : "") + ' absolute inset-0 pointer-events-none z-20"></div>' +
       (paused ? '<div class="pause-scanline-veil absolute inset-0 pointer-events-none z-10"></div>' : "") +
       '<svg class="absolute inset-0 w-full h-full pointer-events-none opacity-20 z-10" preserveAspectRatio="none"><line stroke="#ffffff" stroke-width="0.75" x1="10%" x2="35%" y1="15%" y2="85%"></line><line stroke="#ffffff" stroke-width="0.5" x1="70%" x2="90%" y1="18%" y2="72%"></line></svg>' +
       waiting +
-      '<div class="flex items-baseline justify-center relative z-15 py-0.5"><div class="font-display-timer text-[46px] leading-none font-bold tracking-wider transition-colors duration-300" id="chrono-display">00:00</div><span class="ml-2 font-code-serial text-[16px] font-bold tracking-widest transition-colors duration-300" id="chrono-ms">.00</span>' +
+      '<div class="flex items-baseline justify-center relative z-15 py-0"><div class="font-display-timer text-[38px] leading-tight font-bold tracking-wider transition-colors duration-300" id="chrono-display">00:00</div><span class="ml-1.5 font-code-serial text-[15px] font-bold tracking-widest transition-colors duration-300" id="chrono-ms">.00</span>' +
       (paused ? '<span class="ml-2.5 px-1.5 py-0.5 rounded bg-black/60 border border-slate-700 text-[8px] font-code-serial text-slate-400 uppercase tracking-widest">FIGÉ</span>' : "") + '</div>' +
-      '<div class="zt-tabs">' + chips + '</div>' +
-      '<div class="mt-1 pt-1 border-t border-[#182029] grid grid-cols-2 gap-2 items-center relative z-15">' +
-      '<div class="flex flex-col gap-0.5"><div class="flex items-center gap-1"><span class="material-symbols-outlined text-error text-[12px]' + (mode === "err" ? " animate-pulse" : "") + '">warning</span><span class="font-label-sm text-[8px] font-bold tracking-wider text-error uppercase">ERREURS ' + g.errors + '/3</span></div><div class="flex items-center gap-1.5">' + diodes + '</div></div>' +
-      '<div class="flex flex-col items-end gap-0.5"><div class="flex items-center gap-1 ' + (mode === "ok" ? "text-[#00ffaa]" : "text-secondary") + '"><span class="font-label-sm text-[8px] font-bold tracking-wider uppercase">MODULES VALIDES ' + solved + '/3</span><span class="material-symbols-outlined text-[12px]">' + (mode === "ok" ? "check_circle" : "grid_view") + '</span></div><div class="flex items-center gap-1.5 w-24 h-3.5 bg-[#0e1216] p-0.5 rounded border border-[#28323d] shadow-inner">' + crans + '</div></div>' +
+      '<div class="mt-0.5 pt-1 border-t border-[#182029] grid grid-cols-2 gap-2 items-center relative z-15">' +
+      '<div class="flex flex-col gap-0.5"><div class="flex items-center gap-1"><span class="material-symbols-outlined text-error text-[11px]">warning</span><span class="font-label-sm text-[7.5px] font-bold tracking-wider text-error uppercase">ERREURS ' + g.errors + '/3</span></div><div class="flex items-center gap-1.5">' + diodes + '</div></div>' +
+      '<div class="flex flex-col items-end gap-0.5"><div class="flex items-center gap-1 ' + (mode === "ok" ? "text-[#00ffaa]" : "text-secondary") + '"><span class="font-label-sm text-[7.5px] font-bold tracking-wider uppercase">MODULES VALIDÉS ' + solved + '/3</span><span class="material-symbols-outlined text-[11px]">grid_view</span></div><div class="flex items-center gap-1 w-20 h-3 bg-[#0e1216] p-0.5 rounded border border-[#28323d] shadow-inner">' + crans + '</div></div>' +
       '</div></div></section>';
 
-    var errBanner = showErr
-      ? '<aside class="relative z-30 flex items-center justify-between px-3 py-1.5 rounded-lg bg-gradient-to-r from-[#3e0b0b] via-[#521010] to-[#3e0b0b] border border-[#ff3333]/80 shadow-[0_0_18px_rgba(255,51,51,0.45)]"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-[#ff4d4d] text-[20px] animate-bounce">warning</span><div class="flex flex-col"><span class="font-label-sm text-[11px] font-black text-white tracking-widest uppercase flex items-center gap-1.5">ERREUR ' + errFlash.n + '/3' + (errFlash.penalty ? ' <span class="text-[#ffb3ad] font-code-serial font-bold">— PÉNALITÉ APPLIQUÉE</span>' : "") + '</span><span class="font-code-serial text-[8.5px] text-[#ffc2bd] tracking-wider uppercase">CIRCUIT COURT-CIRCUIT DÉTECTÉ</span></div></div>' + (errFlash.penalty ? '<div class="px-2 py-0.5 rounded bg-[#1f0505] border border-[#ff4d4d] text-right"><span class="font-code-serial text-[13px] font-black text-[#ff3333] tracking-wider drop-shadow-[0_0_8px_rgba(255,51,51,0.8)]">−' + errFlash.penalty + ' s</span></div>' : "") + '</aside>'
-      : "";
-    var alertStrip = showAlert
-      ? '<div class="time-alert-strip rounded-lg px-2.5 py-1 flex items-center justify-between mx-0.5"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[15px] animate-pulse">timer</span><span class="font-label-sm text-[8.5px] font-bold tracking-widest text-[#ffd3a0] uppercase">ALERTE SEUIL // TEMPS CRITIQUE :</span></div><div class="flex items-center gap-1.5"><span class="px-2 py-0.5 rounded bg-[#451208] border border-[#ff6e40] font-code-serial text-[11px] font-black text-[#ffbe73] tracking-widest shadow-[0_0_8px_rgba(255,110,64,0.6)]">' + fmt(alertFlash.T * 1000) + '</span><span class="font-code-serial text-[8.5px] text-slate-300 font-bold uppercase tracking-wider">RESTANT</span></div></div>'
-      : "";
+    // --- sélection des 3 modules (cadrans encastrés)
+    var cells = g.panels.map(function (p, idx) {
+      var on = idx === activePanel, ok = p.state === "solved", w = p.wires.length;
+      var cls, led, ico, nameCls, wCls, bar;
+      if (on) {
+        cls = "module-cell-recess rounded-lg p-1.5 flex flex-col items-center justify-between active:scale-[0.97] transition-transform text-left cursor-pointer border-2 " + (ok ? "border-[#00ffaa] bg-gradient-to-b from-[#0d2a20] to-[#14181f] shadow-[0_0_14px_rgba(0,255,170,0.35)]" : "border-primary bg-gradient-to-b from-[#2a1c0d] to-[#14181f] shadow-[0_0_14px_rgba(255,159,50,0.4)]");
+        led = ok ? '<span class="w-1.5 h-1.5 rounded-full bg-[#00ffaa] shadow-[0_0_6px_#00ffaa]"></span>' : '<span class="pilot-led-orange animate-pulse"></span>';
+        nameCls = ok ? "font-black text-[#00ffaa]" : "font-black text-primary";
+        ico = ok ? '<span class="material-symbols-outlined text-[13px] text-[#00ffaa] font-black drop-shadow-[0_0_4px_rgba(0,255,170,0.8)]">check_circle</span>' : '<span class="material-symbols-outlined text-[13px] text-primary font-black animate-spin" style="animation-duration: 8s;">sync</span>';
+        wCls = ok ? "font-black text-[#d1fae5]" : "font-black text-[#ffdcbf]";
+        bar = ok ? '<div class="w-full h-1 rounded-full bg-[#00ffaa] shadow-[0_0_8px_#00ffaa] mt-1"></div>' : '<div class="w-full h-1 rounded-full bg-primary shadow-[0_0_10px_#ff9f32] mt-1 animate-pulse"></div>';
+      } else if (ok) {
+        cls = "module-cell-recess rounded-lg p-1.5 flex flex-col items-center justify-between active:scale-[0.97] transition-transform text-left cursor-pointer border border-[#1b3d2f]";
+        led = '<span class="w-1.5 h-1.5 rounded-full bg-[#00ffaa] shadow-[0_0_6px_#00ffaa]"></span>'; nameCls = "font-bold text-[#00ffaa]";
+        ico = '<span class="material-symbols-outlined text-[13px] text-[#00ffaa] font-black drop-shadow-[0_0_4px_rgba(0,255,170,0.8)]">check_circle</span>';
+        wCls = "font-black text-[#d1fae5]"; bar = '<div class="w-full h-1 rounded-full bg-[#00ffaa] shadow-[0_0_8px_#00ffaa] mt-1"></div>';
+      } else {
+        cls = "module-cell-recess rounded-lg p-1.5 flex flex-col items-center justify-between active:scale-[0.97] transition-transform text-left cursor-pointer border border-[#222933] opacity-75";
+        led = '<span class="w-1.5 h-1.5 rounded-full bg-[#2a333e]"></span>'; nameCls = "font-semibold text-slate-400";
+        ico = '<span class="material-symbols-outlined text-[13px] text-slate-500 font-light">lock_open</span>';
+        wCls = "font-bold text-slate-400"; bar = '<div class="w-full h-1 rounded-full bg-[#161c24] border border-[#252f3b] mt-1"></div>';
+      }
+      return '<button class="' + cls + '" type="button" data-panel="' + idx + '"><div class="w-full flex items-center justify-between mb-0.5"><div class="flex items-center gap-1">' + led + '<span class="font-label-sm text-[8px] ' + nameCls + ' tracking-wider uppercase">MODULE ' + (idx + 1) + '</span></div>' + ico + '</div><span class="font-code-serial text-[11px] ' + wCls + ' tracking-tight leading-none my-0.5">' + w + ' FILS</span>' + bar + '</button>';
+    }).join("");
+    var select =
+      '<section class="rugged-chassis rounded-xl p-2.5 relative shrink-0">' + screws("screw-rot-3", "screw-rot-1", "screw-rot-4", "screw-rot-2") +
+      '<div class="px-6 pb-1 flex items-center justify-between border-b border-[#3b434e]/60"><div class="flex items-center gap-2"><span class="pilot-led-green"></span><span class="font-label-sm text-[8.5px] font-bold text-slate-200 tracking-wider uppercase">MODULE SELECT // RACK-01</span></div>' +
+      '<div class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#101419] border border-[#2e3742] shadow-inner"><span class="w-1.5 h-1.5 rounded-full bg-[#00ffaa] shadow-[0_0_5px_#00ffaa]"></span><span class="font-code-serial text-[8px] font-bold text-[#a7f3d0] tracking-wider uppercase">' + solved + '/3 VALIDÉ</span></div></div>' +
+      '<div class="grid grid-cols-3 gap-1.5 pt-1.5 mx-2">' + cells + '</div></section>';
 
+    var errBanner = showErr
+      ? '<aside style="position:fixed;left:10px;right:10px;top:calc(max(env(safe-area-inset-top,0px),6px) + 50px);z-index:45" class="flex items-center justify-between px-3 py-1.5 rounded-lg bg-gradient-to-r from-[#3e0b0b] via-[#521010] to-[#3e0b0b] border border-[#ff3333]/80 shadow-[0_0_18px_rgba(255,51,51,0.45)]"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-[#ff4d4d] text-[20px] animate-bounce">warning</span><div class="flex flex-col"><span class="font-label-sm text-[11px] font-black text-white tracking-widest uppercase flex items-center gap-1.5">ERREUR ' + errFlash.n + '/3' + (errFlash.penalty ? ' <span class="text-[#ffb3ad] font-code-serial font-bold">— PÉNALITÉ APPLIQUÉE</span>' : "") + '</span><span class="font-code-serial text-[8.5px] text-[#ffc2bd] tracking-wider uppercase">CIRCUIT COURT-CIRCUIT DÉTECTÉ</span></div></div>' + (errFlash.penalty ? '<div class="px-2 py-0.5 rounded bg-[#1f0505] border border-[#ff4d4d] text-right"><span class="font-code-serial text-[13px] font-black text-[#ff3333] tracking-wider drop-shadow-[0_0_8px_rgba(255,51,51,0.8)]">−' + errFlash.penalty + ' s</span></div>' : "") + '</aside>'
+      : "";
     // --- module de câblage
     var locked = paused || isSolved;
     var order = ORDER[n] || ORDER[5], cutNow = (lastCut && lastCut.pos === panel.pos) ? lastCut.wire : 0;
@@ -432,15 +455,15 @@
     var modHead = isSolved
       ? '<div class="px-4 flex items-center justify-between"><div class="flex items-center gap-2"><div class="w-7 h-7 rounded bg-[#10291f] border border-[#00ffaa]/60 flex items-center justify-center text-[#00ffaa] shadow-[0_0_8px_rgba(0,255,170,0.35)]"><span class="material-symbols-outlined text-[17px] font-bold">check</span></div><div class="flex flex-col"><span class="font-label-sm text-[7.5px] tracking-widest text-[#00ffaa] uppercase font-bold">MODULE ' + n + ' FILS // RÉSOLU ✓</span><span class="font-headline-sm text-[12px] font-bold text-white tracking-wide">CORPS DE LIAISON PRINCIPAL</span></div></div>' +
         '<div class="px-2.5 py-1 rounded-md bg-gradient-to-r from-[#122e22] via-[#1a3d2e] to-[#122e22] border border-[#00ffaa]/70 shadow-[0_0_12px_rgba(0,255,170,0.35)] flex items-center gap-1.5"><span class="material-symbols-outlined text-[#00ffaa] text-[14px] font-bold">verified</span><div class="flex flex-col items-end"><span class="font-code-serial text-[9.5px] font-black tracking-wider text-[#00ffaa] leading-tight">RÉSOLU ✓</span><span class="font-code-serial text-[7px] text-[#71cf9e] tracking-widest uppercase" id="zt-serial"></span></div></div></div>'
-      : '<div class="px-4 flex items-center justify-between"><div class="flex items-center gap-2"><div class="w-7 h-7 rounded bg-[#20262e] border border-[#3b4552] flex items-center justify-center ' + (paused ? "text-secondary" : "text-primary") + ' shadow-inner"><span class="material-symbols-outlined text-[16px]">cable</span></div><div class="flex flex-col"><span class="font-label-sm text-[7.5px] tracking-widest text-slate-300 uppercase">MODULE ' + n + ' FILS // HARNESS</span><span class="font-headline-sm text-[12px] font-bold text-white tracking-wide">CORPS DE LIAISON PRINCIPAL</span></div></div>' +
-        '<div class="px-2 py-0.5 rounded bg-gradient-to-r from-[#232931] via-[#2f3742] to-[#232931] border border-[#444f5c] shadow-sm flex items-center gap-1.5"><div class="flex flex-col items-end"><span class="font-label-sm text-[6.5px] text-slate-400 uppercase tracking-widest leading-none">SÉRIE / LOT</span><span class="font-code-serial text-[10.5px] font-black tracking-widest text-[#ffdcbf] leading-tight" id="zt-serial"></span></div></div></div>';
+      : '<div class="px-6 flex items-center justify-between"><div class="flex items-center gap-1.5"><div class="w-6 h-6 rounded bg-[#20262e] border border-[#3b4552] flex items-center justify-center ' + (paused ? "text-secondary" : "text-primary") + ' shadow-inner"><span class="material-symbols-outlined text-[15px]">cable</span></div><div class="flex flex-col"><span class="font-label-sm text-[7px] tracking-widest text-slate-300 uppercase">MODULE ' + n + ' FILS // HARNESS</span><span class="font-headline-sm text-[11px] font-bold text-white tracking-wide">CORPS DE LIAISON PRINCIPAL</span></div></div>' +
+        '<div class="px-2 py-0.5 rounded bg-gradient-to-r from-[#232931] via-[#2f3742] to-[#232931] border border-[#444f5c] shadow-sm flex items-center gap-1.5"><div class="flex flex-col items-end"><span class="font-label-sm text-[6px] text-slate-400 uppercase tracking-widest leading-none">SÉRIE / LOT</span><span class="font-code-serial text-[10px] font-black tracking-widest text-[#ffdcbf] leading-tight" id="zt-serial"></span></div></div></div>';
     var resolvedBar = isSolved ? '<div class="absolute top-2 inset-x-12 z-40 resolved-badge-bar rounded-md px-3 py-1 flex items-center justify-between pointer-events-none"><div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-[#00ffaa] shadow-[0_0_6px_#00ffaa] animate-ping"></span><span class="font-code-serial text-[9px] font-bold text-[#00ffaa] tracking-widest uppercase">CIRCUIT DÉSAMORCÉ AVEC SUCCÈS</span></div><span class="font-code-serial text-[8.5px] text-[#a4e6c3] tracking-widest font-semibold">STATUS: SECURE</span></div>' : "";
     var veil = paused ? '<div class="absolute inset-0 pointer-events-none z-25 bg-[#090d12]/30 backdrop-contrast-90"></div>' : "";
-    var colCls = locked ? "flex flex-col justify-between py-1 z-30 pointer-events-none opacity-85" : "flex flex-col justify-between py-1 z-30 pointer-events-auto";
+    var colCls = locked ? "flex flex-col justify-between py-0.5 z-30 pointer-events-none opacity-85" : "flex flex-col justify-between py-0.5 z-30 pointer-events-auto";
     var module =
-      '<section class="rugged-chassis rounded-xl p-2.5 flex flex-col gap-1.5 relative min-h-0 flex-1">' + screws("screw-rot-4", "screw-rot-3", "screw-rot-2", "screw-rot-1") + modHead +
-      '<div class="relative bay-chassis-inner rounded-lg p-1.5 flex items-stretch justify-between overflow-hidden" id="harness-chamber">' + veil +
-      '<div class="absolute inset-0 pointer-events-none opacity-20 flex flex-col justify-between py-5 px-12"><div class="h-0.5 border-b border-dashed border-slate-400"></div><div class="h-0.5 border-b border-dashed border-slate-400"></div><div class="h-0.5 border-b border-dashed border-slate-400"></div><div class="h-0.5 border-b border-dashed border-slate-400"></div></div>' + resolvedBar +
+      '<section class="rugged-chassis rounded-xl p-2.5 flex flex-col gap-1 relative min-h-0 flex-1">' + screws("screw-rot-4", "screw-rot-3", "screw-rot-2", "screw-rot-1") + modHead +
+      '<div class="relative bay-chassis-inner rounded-lg p-1 mx-2 flex items-stretch justify-between overflow-hidden" id="harness-chamber">' + veil +
+      '<div class="absolute inset-0 pointer-events-none opacity-20 flex flex-col justify-between py-4 px-10"><div class="h-0.5 border-b border-dashed border-slate-400"></div><div class="h-0.5 border-b border-dashed border-slate-400"></div><div class="h-0.5 border-b border-dashed border-slate-400"></div><div class="h-0.5 border-b border-dashed border-slate-400"></div></div>' + resolvedBar +
       '<div class="' + colCls + '">' + leftCol + '</div>' +
       '<div class="flex-1 mx-1 relative overflow-hidden" id="svg-wire-zone"><svg class="w-full h-full" id="wires-canvas" preserveAspectRatio="none" viewBox="0 0 320 256">' + DEFS +
       '<g opacity="0.95" pointer-events="none">' + shadows + '</g>' + wiresSvg + '</svg></div>' +
@@ -456,16 +479,19 @@
       cmd = '<section class="mt-0.5 mb-1 flex flex-col gap-1"><div class="flex items-center justify-between px-2 font-code-serial text-[9.5px]"><span class="flex items-center gap-1.5 text-[#00ffaa]"><span class="w-2 h-2 rounded-full bg-[#00ffaa] shadow-[0_0_8px_#00ffaa]"></span><span class="uppercase tracking-wider font-bold">MODULE SÉCURISÉ</span></span><span class="font-bold text-[#00ffaa] tracking-wider uppercase flex items-center gap-1"><span class="material-symbols-outlined text-[13px]">lock</span>SÉCURITÉ ENGAGÉE</span></div>' +
         '<div class="p-1 rounded-xl bg-gradient-to-b from-[#222930] to-[#161b21] border border-[#323b46] shadow-xl relative"><button class="push-trigger-secured w-full min-h-[48px] rounded-lg text-slate-400 font-headline-sm text-[13.5px] font-bold tracking-widest uppercase flex items-center justify-center gap-2 select-none cursor-not-allowed opacity-80" disabled type="button"><span class="material-symbols-outlined text-[#00ffaa] text-[20px]">check_circle</span><span class="text-slate-300">MODULE SÉCURISÉ — DÉSAMORÇAGE EFFECTIF</span><span class="material-symbols-outlined text-slate-500 text-[18px]">lock</span></button></div></section>';
     } else {
-      cmd = '<section class="mt-0.5 mb-1 flex flex-col gap-1"><div class="flex items-center justify-between px-2 font-code-serial text-[9.5px]"><span class="flex items-center gap-1.5 text-secondary"><span class="w-2 h-2 rounded-full ' + (selectedWire ? "bg-primary shadow-[0_0_8px_#ff9f32] animate-pulse" : "bg-slate-500") + ' transition-colors"></span><span class="uppercase tracking-wider">PINCE HYDRAULIQUE PRÊTE</span></span><span class="font-bold ' + (selectedWire ? "text-primary" : "text-slate-400") + ' tracking-wider uppercase transition-colors" id="zt-target"></span></div>' +
-        '<div class="p-1 rounded-xl bg-gradient-to-b from-[#2a3038] to-[#1c2127] border border-[#3b4450] shadow-xl relative"><button class="push-trigger-heavy w-full min-h-[48px] rounded-lg text-[#261100] font-headline-sm text-[14.5px] font-black tracking-widest uppercase flex items-center justify-center gap-2 select-none transition-all duration-150' + (selectedWire ? "" : " opacity-40 pointer-events-none grayscale cursor-not-allowed") + '"' + (selectedWire ? "" : " disabled") + ' id="cut-wire-button" type="button"><span class="material-symbols-outlined text-[22px]">content_cut</span><span>COUPER CE FIL</span><span class="material-symbols-outlined text-[18px]">bolt</span></button></div></section>';
+      cmd = '<section class="mb-0.5 flex flex-col gap-0.5 shrink-0"><div class="flex items-center justify-between px-2 font-code-serial text-[9px] whitespace-nowrap"><span class="flex items-center gap-1.5 text-secondary"><span class="w-2 h-2 rounded-full ' + (selectedWire ? "bg-primary shadow-[0_0_8px_#ff9f32] animate-pulse" : "bg-slate-500") + ' transition-colors"></span><span class="uppercase tracking-wider">PINCE HYDRAULIQUE PRÊTE</span></span><span class="font-bold ' + (selectedWire ? "text-primary" : "text-slate-400") + ' tracking-wider uppercase transition-colors" id="zt-target"></span></div>' +
+        '<div class="p-1 rounded-xl bg-gradient-to-b from-[#2a3038] to-[#1c2127] border border-[#3b4450] shadow-xl relative"><button class="push-trigger-heavy w-full min-h-[44px] rounded-lg text-[#261100] font-headline-sm text-[14px] font-black tracking-widest uppercase flex items-center justify-center gap-2 select-none transition-all duration-150' + (selectedWire ? "" : " opacity-40 pointer-events-none grayscale cursor-not-allowed") + '"' + (selectedWire ? "" : " disabled") + ' id="cut-wire-button" type="button"><span class="material-symbols-outlined text-[20px]">content_cut</span><span>COUPER CE FIL</span><span class="material-symbols-outlined text-[17px]">bolt</span></button></div></section>';
     }
 
+    var hsel = g.panels.map(function (p, idx) { return idx === activePanel
+      ? '<span class="px-2 py-0.5 rounded bg-[#2b333d] text-[8px] font-code-serial font-bold text-primary border border-primary/40 shadow-sm">' + p.wires.length + ' FILS</span>'
+      : '<span class="px-1.5 py-0.5 rounded text-[8px] font-code-serial font-semibold text-slate-400">' + p.wires.length + 'F</span>'; }).join("");
     app.innerHTML =
       ((mode === "err" || (!paused && remNow <= 30000)) ? '<div class="alarm-vignette-overlay fixed inset-0 pointer-events-none z-40"' + (remNow <= 30000 && !showErr ? ' style="animation-duration:.6s"' : "") + '></div>' : "") +
-      '<header class="fixed top-0 left-0 right-0 z-50 pt-safe bg-[#242930]/95 border-b border-[#3b434e] backdrop-blur-md shadow-[0_4px_16px_rgba(0,0,0,0.6)]"><div class="h-12 px-3 flex items-center justify-between max-w-md mx-auto">' +
-      '<div class="flex items-center gap-2"><div class="flex flex-col"><div class="flex items-center gap-1.5">' + topLed + '</div><span class="font-headline-sm text-[14px] font-bold tracking-tight text-white flex items-center gap-1.5">BAIE CÂBLAGE <span class="text-[10px] text-secondary font-code-serial font-normal">[MOD-0' + (activePanel + 1) + ']</span></span></div></div>' +
-      '<div class="flex items-center gap-2">' + badge + '</div></div></header>' +
-      '<main class="w-full max-w-md mx-auto px-2.5 pb-safe flex flex-col justify-between gap-1 overflow-hidden relative z-30" id="tactical-rack">' + errBanner + tele + module + cmd + '</main>';
+      '<header class="fixed top-0 left-0 right-0 z-50 pt-safe bg-[#242930]/95 border-b border-[#3b434e] backdrop-blur-md shadow-[0_4px_16px_rgba(0,0,0,0.6)]"><div class="h-11 px-3 flex items-center justify-between max-w-md mx-auto">' +
+      '<div class="flex items-center gap-2"><div aria-hidden="true" class="w-7 h-7 flex items-center justify-center rounded bg-[#1e2329] border border-[#3c4450] text-secondary shadow-inner"><span class="material-symbols-outlined text-[17px]">arrow_back</span></div><div class="flex flex-col"><div class="flex items-center gap-1.5">' + topLed + '</div><span class="font-headline-sm text-[13px] font-bold tracking-tight text-white flex items-center gap-1.5">BAIE CÂBLAGE <span class="text-[9.5px] text-secondary font-code-serial font-normal">[MOD-0' + (activePanel + 1) + ']</span></span></div></div>' +
+      '<div class="flex items-center gap-2"><div class="flex items-center p-0.5 rounded bg-[#161a20] border border-[#333a44]">' + hsel + '</div>' + badge + '</div></div></header>' +
+      '<main class="flex-1 w-full max-w-md mx-auto px-2 pb-safe flex flex-col justify-between gap-1 overflow-hidden relative z-30" id="tactical-rack">' + errBanner + tele + select + module + cmd + '</main>';
 
     // Valeurs dynamiques (texte pur)
     var se = document.getElementById("zt-serial"); if (se) se.textContent = panel.serial;
@@ -491,7 +517,7 @@
     var timerMain = document.getElementById("chrono-display"), timerMs = document.getElementById("chrono-ms");
     function paint(ms) {
       var f = fmtH(ms); timerMain.textContent = f[0]; timerMs.textContent = f[1];
-      var cls = paused ? "timer-neon-paused" : (ms > 60000 ? "timer-neon-green" : (ms > 15000 ? "timer-neon-warning" : "timer-neon-alert"));
+      var cls = paused ? "timer-neon-paused" : (ms > 20000 ? "timer-neon-green" : "timer-neon-alert");
       [timerMain, timerMs].forEach(function (e) {
         if (e.getAttribute("data-t") !== cls) { e.classList.remove("timer-neon-green", "timer-neon-warning", "timer-neon-alert", "timer-neon-paused"); e.classList.add(cls); e.setAttribute("data-t", cls); }
       });
