@@ -4,6 +4,8 @@
 <meta name="theme-color" content="#000">
 <title>ZERO TIME — test écran de la bombe</title>
 <style>
+@font-face{font-family:"ZTOrb";src:url(exo2-700.woff2) format("woff2");font-weight:700;font-display:block}
+
 html,body{margin:0;height:100%;background:#000;overflow:hidden;-webkit-tap-highlight-color:transparent;font-family:"JetBrains Mono",ui-monospace,monospace}
 #stage{position:absolute;left:50%;top:50%;width:min(100vw,calc(100vh*1918/1080));aspect-ratio:1918/1080;transform:translate(-50%,-50%)}
 #stage img{display:block;width:100%;height:100%;user-select:none;-webkit-user-drag:none}
@@ -23,9 +25,48 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;-webkit-tap-highl
 #turn{position:fixed;inset:0;background:#000;color:#f3f5f5;z-index:20;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;text-align:center;font-size:18px;letter-spacing:.1em}
 #turn b{font-size:44px;color:#ff9f32}
 @media (orientation:portrait){#turn{display:flex}}
+
+#fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+#fx .dig{font-family:"ZTOrb",ui-monospace,monospace;font-weight:700;font-size:112px;fill:#fc2723;text-anchor:middle;filter:drop-shadow(0 0 5px rgba(255,40,30,.85)) drop-shadow(0 0 14px rgba(255,30,20,.45))}
+#fx .off{opacity:0}
+@keyframes bl{0%,44%{opacity:0}50%,94%{opacity:1}100%{opacity:0}}
+@keyframes bl2{0%,44%{opacity:1}50%,94%{opacity:0}100%{opacity:1}}
+@keyframes pu{0%,100%{opacity:0}50%{opacity:.42}}
+.a1{animation:bl 1.2s steps(1,end) infinite}
+.a2{animation:bl2 1.2s steps(1,end) infinite}
+.a3{animation:pu 2.4s ease-in-out infinite}
+.a4{animation:bl 2.4s steps(1,end) infinite}
+#fx.fast .a1,#fx.fast .a2{animation-duration:.5s}
+#fx.fast .a4{animation-duration:1s}
+#boom{position:fixed;inset:0;background:#2a0000;color:#fff;z-index:15;display:none;align-items:center;justify-content:center;flex-direction:column;gap:18px;text-align:center}
+#boom.on{display:flex;animation:fl .5s 3}
+@keyframes fl{0%,100%{background:#2a0000}50%{background:#b00000}}
+#boom h2{margin:0;font-size:40px;letter-spacing:.2em;color:#ff4b43}
+#boom button{height:48px;padding:0 26px;border:0;border-radius:8px;background:#ff9f32;color:#101820;font-family:inherit;font-size:15px;font-weight:700;letter-spacing:.06em;cursor:pointer}
+#mod .tm{position:absolute;top:10px;right:14px;font-family:"ZTOrb",monospace;font-weight:700;font-size:22px;color:#fc2723}
 </style></head><body>
 <div id="stage">
 <img src="bombe.jpg" alt="Bombe : Alimentation, Détonateur, Digicode, Horloge, deux emplacements libres" draggable="false">
+<svg id="fx" viewBox="0 0 1918 1080" aria-hidden="true">
+<defs>
+<radialGradient id="offR"><stop offset="0" stop-color="#2b0707"/><stop offset=".5" stop-color="#3a0b0b"/><stop offset=".62" stop-color="#1c0606" stop-opacity=".9"/><stop offset="1" stop-color="#0d0404" stop-opacity="0"/></radialGradient>
+<radialGradient id="offG"><stop offset="0" stop-color="#062a12"/><stop offset=".5" stop-color="#0a3a18"/><stop offset=".62" stop-color="#05200c" stop-opacity=".9"/><stop offset="1" stop-color="#030f06" stop-opacity="0"/></radialGradient>
+<radialGradient id="offY"><stop offset="0" stop-color="#2a2204"/><stop offset=".55" stop-color="#3a2f06"/><stop offset="1" stop-color="#120d02" stop-opacity="0"/></radialGradient>
+</defs>
+<rect x="752" y="294" width="436" height="102" rx="6" fill="#090405" style="filter:blur(3px)"/>
+<g id="dg">
+<text class="dig" id="d1" x="805" y="385">0</text>
+<text class="dig" id="d2" x="889" y="385">2</text>
+<text class="dig" id="dc" x="970" y="385">:</text>
+<text class="dig" id="d3" x="1054" y="385">2</text>
+<text class="dig" id="d4" x="1139" y="385">7</text>
+</g>
+<circle class="a1" cx="1632" cy="183" r="38" fill="url(#offR)"/>
+<circle class="a2" cx="1634" cy="481" r="38" fill="url(#offR)"/>
+<circle class="a3" cx="597" cy="481" r="38" fill="url(#offG)"/>
+<circle class="a1" cx="1036" cy="238" r="26" fill="url(#offR)"/>
+<ellipse class="a4" cx="1049" cy="96" rx="22" ry="26" fill="url(#offY)"/>
+</svg>
 <button class="z" data-t="todo" data-n="Alimentation" style="left:13.608%;top:13.241%;width:19.604%;height:26.389%" aria-label="Alimentation"></button>
 <button class="z" data-t="done" data-n="Détonateur" style="left:13.608%;top:40.741%;width:19.604%;height:25.741%" aria-label="Détonateur"></button>
 <button class="z" data-t="free" data-n="" style="left:13.608%;top:67.870%;width:19.604%;height:20.093%" aria-label="free"></button>
@@ -36,8 +77,9 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;-webkit-tap-highl
 <button class="z" data-t="piles" data-n="" style="left:34.776%;top:52.130%;width:32.013%;height:14.722%" aria-label="piles"></button>
 <button class="z" data-t="arm" data-n="" style="left:36.705%;top:68.056%;width:27.894%;height:17.593%" aria-label="arm"></button>
 </div>
-<div id="mod" role="dialog" aria-modal="true"><div class="in"><h2 id="mt"></h2><p id="mp"></p><button id="back" type="button">← BOMBE</button></div></div>
+<div id="mod" role="dialog" aria-modal="true"><div class="tm" id="tm"></div><div class="in"><h2 id="mt"></h2><p id="mp"></p><button id="back" type="button">← BOMBE</button></div></div>
 <div id="toast" role="status"></div>
+<div id="boom"><h2>EXPLOSION</h2><div>Le temps est écoulé.</div><button id="again" type="button">REJOUER</button></div>
 <div id="turn"><b>↻</b>TOURNE TON TÉLÉPHONE<br>EN MODE PAYSAGE</div>
 <script>
 (function(){
@@ -74,10 +116,27 @@ document.getElementById("back").onclick=closeMod;
     if(t==="todo"||t==="done"){buzz(15);openMod(z)}
     else if(t==="free"){buzz(10);say("Emplacement libre")}
     else if(t==="piles"){buzz(10);say("Piles : 3")}
-    else if(t==="chrono"){say("Compte à rebours figé dans la maquette")}
+    else if(t==="chrono"){}
     else if(t==="arm"){buzz([30,40,30]);stage.classList.remove("sh");void stage.offsetWidth;stage.classList.add("sh");say("Verrouillé : 6/6 modules neutralisés requis")}
   });
 });
+
+var Q=new URLSearchParams(location.search),LEFT=+(Q.get("t")||147),PAUSE=Q.has("pause"),end=Date.now()+LEFT*1000,boom=false;
+var fx=document.getElementById("fx"),dd=["d1","d2","d3","d4"].map(function(i){return document.getElementById(i)}),tm=document.getElementById("tm");
+function show(sec){
+  var m=Math.floor(sec/60),s=sec%60,t=("0"+m).slice(-2)+("0"+s).slice(-2);
+  for(var i=0;i<4;i++)dd[i].textContent=t[i];
+  tm.textContent=t.slice(0,2)+":"+t.slice(2);
+  fx.classList.toggle("fast",sec<=30);
+}
+function tick(){
+  if(PAUSE){show(LEFT);return}
+  var sec=Math.max(0,Math.ceil((end-Date.now())/1000));
+  show(sec);
+  if(sec===0&&!boom){boom=true;buzz([200,80,200,80,400]);closeMod();document.getElementById("boom").classList.add("on")}
+}
+document.getElementById("again").onclick=function(){boom=false;end=Date.now()+LEFT*1000;document.getElementById("boom").classList.remove("on");tick()};
+tick();setInterval(tick,200);
 document.addEventListener("keydown",function(e){if(e.key==="Escape")closeMod()});
 })();
 </script></body></html>
