@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.39";
+  var APP_VERSION = "1.0.40";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -250,7 +250,7 @@ ${solo}
   }
 
   var COLORS = { red: "Rouge", blue: "Bleu", yellow: "Jaune", white: "Blanc", black: "Noir" };
-  var activePanel = 0, selectedWire = null, manualTab = "w4";
+  var activePanel = 0, selectedWire = null, manualTab = "w4", pinEntry = "";
   var timerId = null, offsetMs = 0, bestOff = null;
   var errFlash = null, alertFlash = null;
   var seenEvent, alerted = {}, alertInit = false, tickSent = false, cutting = false;
@@ -262,7 +262,7 @@ ${solo}
     });
   }
   function buzz(p) { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} }
-  function resetGameFlags() { techTouched = false; endFxKey = null; errFlash = null; alertFlash = null; seenEvent = undefined; alerted = {}; alertInit = false; tickSent = false; }
+  function resetGameFlags() { pinEntry = ""; techTouched = false; endFxKey = null; errFlash = null; alertFlash = null; seenEvent = undefined; alerted = {}; alertInit = false; tickSent = false; }
 
   function stopTimer() { if (timerId) { clearInterval(timerId); timerId = null; } }
   function fmt(ms) {
@@ -331,6 +331,7 @@ ${solo}
     return out;
   }
   [6, 7, 8].forEach(function (n) { GEOM[n] = mkGeom(n); ORDER[n] = []; for (var i = 1; i <= n; i++) ORDER[n].push(i); });
+  function modName(p) { return p.kind === "pin" ? "Digicode" : MOD_NAME[p.wires.length]; }
   var MOD_NAME = { 3: "Alimentation", 4: "Horloge", 5: "Détonateur", 6: "Capteur", 7: "Relais", 8: "Charge" };
   var BASE = { red: "#250202", yellow: "#240c01", blue: "#040914", black: "#000000", white: "#475569" };
 
@@ -401,7 +402,7 @@ ${solo}
     var solved = g.panels.filter(function (p) { return p.state === "solved"; }).length;
     var panel = g.panels[activePanel] || g.panels[0];
     var paused = view.paused;
-    var n = panel.wires.length;
+    var n = panel.wires.length, isPin = panel.kind === "pin";
     clampPx = n >= 7 ? 18 : 22;
     var isSolved = panel.state === "solved";
     var geom0 = GEOM[n] || GEOM[5];
@@ -502,7 +503,7 @@ ${solo}
         ico = '<span class="material-symbols-outlined text-[13px] text-slate-500 font-light">lock_open</span>';
         wCls = "font-bold text-slate-400"; bar = '<div class="w-full h-1 rounded-full bg-[#161c24] border border-[#252f3b] mt-1"></div>';
       }
-      return '<button class="' + cls + '" type="button" data-panel="' + idx + '"><div class="w-full flex items-center justify-between mb-0.5"><div class="flex items-center gap-1">' + led + '<span class="font-label-sm text-[10px] ' + nameCls + ' tracking-wider uppercase">' + MOD_NAME[w].toUpperCase() + '</span></div>' + ico + '</div>' + bar + '</button>';
+      return '<button class="' + cls + '" type="button" data-panel="' + idx + '"><div class="w-full flex items-center justify-between mb-0.5"><div class="flex items-center gap-1">' + led + '<span class="font-label-sm text-[10px] ' + nameCls + ' tracking-wider uppercase">' + modName(p).toUpperCase() + '</span></div>' + ico + '</div>' + bar + '</button>';
     }).join("");
     var select =
       '<section class="rugged-chassis rounded-xl p-2.5 relative shrink-0">' + SCR_SEL + screws("screw-rot-3", "screw-rot-1", "screw-rot-4", "screw-rot-2") +
@@ -514,7 +515,7 @@ ${solo}
 
     // --- module de câblage
     var locked = paused || isSolved;
-    var order = ORDER[n] || ORDER[5], cutNow = (lastCut && lastCut.pos === panel.pos) ? lastCut.wire : 0;
+    var order = isPin ? [] : (ORDER[n] || ORDER[5]), cutNow = (lastCut && lastCut.pos === panel.pos) ? lastCut.wire : 0;
     var shadows = "", wiresSvg = "", leftCol = "", rightCol = "";
     var parts = geom.map(function (gm) { return wireParts(gm); });
     panel.wires.forEach(function (color, idx) {
@@ -552,9 +553,9 @@ ${solo}
     });
 
     var modHead = isSolved
-      ? '<div class="px-4 flex items-center justify-between"><div class="flex items-center gap-2"><div class="w-7 h-7 rounded bg-[#10291f] border border-[#00ffaa]/60 flex items-center justify-center text-[#00ffaa] shadow-[0_0_8px_rgba(0,255,170,0.35)]"><span class="material-symbols-outlined text-[17px] font-bold">check</span></div><div class="flex flex-col"><span class="font-label-sm text-[7.5px] tracking-widest text-[#00ffaa] uppercase font-bold">RÉSOLU ✓</span><span class="font-headline-sm text-[12px] font-bold text-white tracking-wide">' + MOD_NAME[n].toUpperCase() + '</span></div></div>' +
+      ? '<div class="px-4 flex items-center justify-between"><div class="flex items-center gap-2"><div class="w-7 h-7 rounded bg-[#10291f] border border-[#00ffaa]/60 flex items-center justify-center text-[#00ffaa] shadow-[0_0_8px_rgba(0,255,170,0.35)]"><span class="material-symbols-outlined text-[17px] font-bold">check</span></div><div class="flex flex-col"><span class="font-label-sm text-[7.5px] tracking-widest text-[#00ffaa] uppercase font-bold">RÉSOLU ✓</span><span class="font-headline-sm text-[12px] font-bold text-white tracking-wide">' + modName(panel).toUpperCase() + '</span></div></div>' +
         '<div class="px-2.5 py-1 rounded-md bg-gradient-to-r from-[#122e22] via-[#1a3d2e] to-[#122e22] border border-[#00ffaa]/70 shadow-[0_0_12px_rgba(0,255,170,0.35)] flex items-center gap-1.5"><span class="material-symbols-outlined text-[#00ffaa] text-[14px] font-bold">verified</span><div class="flex flex-col items-end"><span class="font-code-serial text-[9.5px] font-black tracking-wider text-[#00ffaa] leading-tight">RÉSOLU ✓</span><span class="font-code-serial text-[7px] text-[#71cf9e] tracking-widest uppercase" id="zt-serial"></span></div></div></div>'
-      : '<div class="px-6 flex items-center justify-between"><div class="flex items-center gap-1.5"><div class="w-6 h-6 rounded bg-[#20262e] border border-[#3b4552] flex items-center justify-center ' + (paused ? "text-secondary" : "text-primary") + ' shadow-inner"><span class="material-symbols-outlined text-[15px]">cable</span></div><div class="flex flex-col"><span class="font-label-sm text-[7px] tracking-widest text-slate-300 uppercase">HARNESS</span><span class="font-headline-sm text-[11px] font-bold text-white tracking-wide">' + MOD_NAME[n].toUpperCase() + '</span></div></div>' +
+      : '<div class="px-6 flex items-center justify-between"><div class="flex items-center gap-1.5"><div class="w-6 h-6 rounded bg-[#20262e] border border-[#3b4552] flex items-center justify-center ' + (paused ? "text-secondary" : "text-primary") + ' shadow-inner"><span class="material-symbols-outlined text-[15px]">cable</span></div><div class="flex flex-col"><span class="font-label-sm text-[7px] tracking-widest text-slate-300 uppercase">HARNESS</span><span class="font-headline-sm text-[11px] font-bold text-white tracking-wide">' + modName(panel).toUpperCase() + '</span></div></div>' +
         '<div class="px-2 py-0.5 rounded bg-gradient-to-r from-[#232931] via-[#2f3742] to-[#232931] border border-[#444f5c] shadow-sm flex items-center gap-1.5"><div class="flex flex-col items-end"><span class="font-label-sm text-[6px] text-slate-400 uppercase tracking-widest leading-none">SÉRIE / LOT</span><span class="font-code-serial text-[10px] font-black tracking-widest text-[#ffdcbf] leading-tight" id="zt-serial"></span></div></div></div>';
     var resolvedBar = isSolved ? '<div class="absolute top-2 inset-x-12 z-40 resolved-badge-bar rounded-md px-3 py-1 flex items-center justify-between pointer-events-none"><div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-[#00ffaa] shadow-[0_0_6px_#00ffaa] animate-ping"></span><span class="font-code-serial text-[9px] font-bold text-[#00ffaa] tracking-widest uppercase">CIRCUIT DÉSAMORCÉ AVEC SUCCÈS</span></div><span class="font-code-serial text-[8.5px] text-[#a4e6c3] tracking-widest font-semibold">STATUS: SECURE</span></div>' : "";
     var veil = paused ? '<div class="absolute inset-0 pointer-events-none z-25 bg-[#090d12]/30 backdrop-contrast-90"></div>' : "";
@@ -582,9 +583,40 @@ ${solo}
         '<div class="p-1 rounded-xl bg-gradient-to-b from-[#282e36] to-[#1a1f25] border border-[#363f4b] shadow-xl relative overflow-hidden">' + SCR_PUSH + '<button class="push-trigger-heavy w-full min-h-[44px] rounded-lg text-[#261100] font-headline-sm text-[14px] font-black tracking-widest uppercase flex items-center justify-center gap-2 select-none transition-all duration-150 relative z-20' + (selectedWire ? "" : " opacity-40 pointer-events-none grayscale cursor-not-allowed") + '"' + (selectedWire ? "" : " disabled") + ' id="cut-wire-button" type="button"><span class="material-symbols-outlined text-[20px]">content_cut</span><span>COUPER CE FIL</span><span class="material-symbols-outlined text-[17px]">bolt</span></button></div></section>';
     }
 
+
+    if (isPin) {
+      var pinLocked = !!(paused || isSolved);
+      var lamps = function (cnt, on, off) { var h = ""; for (var li = 0; li < 4; li++) h += '<span class="w-5 h-5 rounded-full ' + (li < cnt ? on : off) + '"></span>'; return h; };
+      var bat = g.batteries || 0, batIc = "";
+      for (var bi = 0; bi < bat; bi++) batIc += '<span class="material-symbols-outlined text-[18px] text-amber-300" style="font-variation-settings:\'FILL\' 1">battery_full</span>';
+      var VST = { g: "bg-[#0f3d2c] border-[#00ffaa] text-[#00ffaa]", o: "bg-[#3d2a0f] border-[#ff9f32] text-[#ffb15e]", x: "bg-[#1a1f26] border-[#3a424d] text-slate-400" };
+      var atts = (panel.attempts || []).map(function (a) {
+        var bx = ""; for (var ai = 0; ai < 4; ai++) bx += '<span class="w-8 h-8 rounded border flex items-center justify-center font-code-serial text-[15px] font-black ' + VST[a.verdict.charAt(ai)] + '">' + a.digits.charAt(ai) + "</span>";
+        return '<div class="flex items-center justify-center gap-1.5">' + bx + "</div>";
+      }).join("");
+      var slots = ""; for (var si = 0; si < 4; si++) slots += '<span class="w-10 h-12 rounded border ' + (si === pinEntry.length && !pinLocked ? "border-primary shadow-[0_0_8px_rgba(255,159,50,0.6)]" : "border-[#3b4552]") + ' bg-[#0b0e12] flex items-center justify-center font-display-timer text-[28px] font-bold text-[#ffdcbf]">' + (si < pinEntry.length ? pinEntry.charAt(si) : "") + "</span>";
+      module =
+        '<section class="rugged-chassis rounded-xl p-2.5 flex flex-col gap-1 relative min-h-0 flex-1">' + SCR_MOD + screws("screw-rot-4", "screw-rot-3", "screw-rot-2", "screw-rot-1") + modHead +
+        '<div class="relative bay-chassis-inner rounded-lg p-2 mx-2 flex-1 min-h-0 flex flex-col justify-between gap-1 overflow-hidden" id="harness-chamber">' +
+          '<div class="flex items-center justify-between"><span class="font-code-serial text-[9px] tracking-widest text-slate-400 uppercase">PILES</span><span class="flex items-center gap-0.5">' + (batIc || '<span class="font-code-serial text-[10px] text-slate-500">—</span>') + "</span></div>" +
+          '<div class="flex items-center justify-between"><span class="font-code-serial text-[9px] tracking-widest text-[#ff9999] uppercase">VOYANTS ROUGES</span><span class="flex items-center gap-1.5">' + lamps(panel.reds, "bg-[#ff3b3b] shadow-[0_0_8px_#ff3b3b]", "bg-[#2a1416] border border-[#4a2327]") + "</span></div>" +
+          '<div class="flex items-center justify-between"><span class="font-code-serial text-[9px] tracking-widest text-[#93b4ff] uppercase">VOYANTS BLEUS</span><span class="flex items-center gap-1.5">' + lamps(panel.blues, "bg-[#3b82f6] shadow-[0_0_8px_#3b82f6]", "bg-[#101a2c] border border-[#243a5e]") + "</span></div>" +
+          '<div class="flex flex-col gap-1 min-h-0 overflow-hidden">' + (atts || '<div class="text-center font-code-serial text-[9px] tracking-widest text-slate-500 uppercase">AUCUN ESSAI</div>') + "</div>" +
+          '<div class="flex items-center justify-center gap-2">' + slots + "</div>" +
+        "</div></section>";
+      if (!paused && !isSolved) {
+        var keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "back", "0", "ok"].map(function (kk) {
+          var base = "min-h-[40px] rounded-lg font-code-serial text-[18px] font-black flex items-center justify-center select-none active:scale-95 transition-transform ";
+          if (kk === "back") return '<button type="button" data-pk="back" class="' + base + 'bg-[#232931] border border-[#3b4552] text-slate-300"><span class="material-symbols-outlined text-[20px]">backspace</span></button>';
+          if (kk === "ok") return '<button type="button" id="pin-ok" data-pk="ok" class="' + base + 'text-[#261100] push-trigger-heavy' + (pinEntry.length === 4 ? "" : " opacity-40 grayscale pointer-events-none") + '"><span class="text-[13px] tracking-widest">VALIDER</span></button>';
+          return '<button type="button" data-pk="' + kk + '" class="' + base + 'bg-[#2a313a] border border-[#404a57] text-[#ffdcbf]">' + kk + "</button>";
+        }).join("");
+        cmd = '<section class="mb-0.5 flex flex-col gap-1 shrink-0"><div class="flex items-center justify-between px-2 font-code-serial text-[9px] whitespace-nowrap"><span class="flex items-center gap-1.5 text-secondary"><span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span><span class="uppercase tracking-wider">SAISIE DU CODE</span></span><span class="font-bold text-primary tracking-wider uppercase">4 CHIFFRES</span></div><div class="grid grid-cols-3 gap-1.5">' + keys + "</div></section>";
+      }
+    }
     var hsel = g.panels.map(function (p, idx) { return idx === activePanel
-      ? '<span class="px-2 py-0.5 rounded bg-[#272e37] text-[8px] font-code-serial font-bold text-primary border border-primary/40 shadow-sm">' + MOD_NAME[p.wires.length].toUpperCase() + '</span>'
-      : '<span class="px-1.5 py-0.5 rounded text-[8px] font-code-serial font-semibold text-slate-400">' + MOD_NAME[p.wires.length].slice(0, 3).toUpperCase() + '</span>'; }).join("");
+      ? '<span class="px-2 py-0.5 rounded bg-[#272e37] text-[8px] font-code-serial font-bold text-primary border border-primary/40 shadow-sm">' + modName(p).toUpperCase() + '</span>'
+      : '<span class="px-1.5 py-0.5 rounded text-[8px] font-code-serial font-semibold text-slate-400">' + modName(p).slice(0, 3).toUpperCase() + '</span>'; }).join("");
     app.innerHTML =
       ((mode === "err" || (!paused && remNow <= 30000)) ? '<div class="alarm-vignette-overlay fixed inset-0 pointer-events-none z-40"' + (remNow <= 30000 && !showErr ? ' style="animation-duration:.6s"' : "") + '></div>' : "") +
       '<header class="fixed top-0 left-0 right-0 z-50 pt-safe bg-[#20252c]/95 border-b border-[#353d47] backdrop-blur-md shadow-[0_4px_16px_rgba(0,0,0,0.6)]"><div class="h-11 px-3 flex items-center justify-between max-w-md mx-auto">' +
@@ -600,11 +632,28 @@ ${solo}
 
     // Interactions
     Array.prototype.forEach.call(app.querySelectorAll("[data-panel]"), function (b) {
-      b.onclick = function () { activePanel = +b.getAttribute("data-panel"); selectedWire = null; render(); };
+      b.onclick = function () { activePanel = +b.getAttribute("data-panel"); selectedWire = null; pinEntry = ""; render(); };
     });
     Array.prototype.forEach.call(app.querySelectorAll("[data-wire]"), function (b) {
       var onSel = function () { var w = +b.getAttribute("data-wire"); selectedWire = (selectedWire === w) ? null : w; render(); };
       if (b.tagName === "g" || b.namespaceURI === "http://www.w3.org/2000/svg") b.addEventListener("click", onSel); else b.onclick = onSel;
+    });
+    Array.prototype.forEach.call(app.querySelectorAll("[data-pk]"), function (b) {
+      b.onclick = function () {
+        var kk = b.getAttribute("data-pk");
+        if (kk === "back") { pinEntry = pinEntry.slice(0, -1); render(); return; }
+        if (kk === "ok") {
+          if (cutting || pinEntry.length !== 4 || view.paused) return;
+          cutting = true; var digs = pinEntry; buzz([24, 15, 45]);
+          sb.rpc("zt_pin_try", { p_code: session.code, p_token: session.token, p_action: uuid(), p_pos: panel.pos, p_digits: digs }).then(function (r) {
+            cutting = false;
+            if (r.error) { fail(r.error); return render(); }
+            pinEntry = ""; view = r.data; render();
+          });
+          return;
+        }
+        if (pinEntry.length < 4) { pinEntry += kk; render(); }
+      };
     });
     var ab = document.getElementById("zt-abort");
     if (ab) ab.onclick = function () {
@@ -680,15 +729,17 @@ ${solo}
     if (circle) return '<li class="flex items-start gap-2.5 ' + bg + '"><span class="font-notes font-bold text-inkBlue text-base bg-amber-200/60 w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5">' + n + '</span><div class="leading-snug"><span>' + cond + "</span>" + act + "</div></li>";
     return '<li class="' + bg + '"><span class="font-notes font-bold text-inkBlue text-base bg-amber-200/60 px-1.5 rounded">' + n + "</span> <span>" + cond + "</span>" + act + "</li>";
   }
-  var TECH_ORDER = ["lecture", "w3", "w4", "w5", "w6", "w7", "w8"];
+  var TECH_ORDER = ["lecture", "w3", "w4", "w5", "w6", "w7", "w8", "pin"];
+  function isMan(t) { return /^(w[3-8]|pin)$/.test(t); }
   var TECH_META = {
-    lecture: { tab: "📌 Lire un panneau", title: "Section 02 — Lire un Panneau", sub: "Protocole de communication avec l'opérateur", pg: "p. 02", ind: "Page 2 / 8 — Lire un panneau" },
-    w3: { tab: "Alimentation", title: "Section 03 — Alimentation", sub: "Configuration compacte à 3 connexions", pg: "p. 03", ind: "Page 3 / 8 — Alimentation" },
-    w4: { tab: "Horloge", title: "Section 04 — Horloge", sub: "Règles de désamorçage de la baie câblée à 4 connexions", pg: "p. 04", ind: "Page 4 / 8 — Horloge" },
-    w5: { tab: "Détonateur", title: "Section 05 — Détonateur", sub: "Harnais principal lourd à 5 connexions", pg: "p. 05", ind: "Page 5 / 8 — Détonateur" },
-    w6: { tab: "Capteur", title: "Section 06 — Capteur", sub: "Faisceau étendu à 6 connexions", pg: "p. 06", ind: "Page 6 / 8 — Capteur" },
-    w7: { tab: "Relais", title: "Section 07 — Relais", sub: "Faisceau dense à 7 connexions", pg: "p. 07", ind: "Page 7 / 8 — Relais" },
-    w8: { tab: "Charge", title: "Section 08 — Charge", sub: "Harnais maximal à 8 connexions", pg: "p. 08", ind: "Page 8 / 8 — Charge" },
+    lecture: { tab: "📌 Lire un panneau", title: "Section 02 — Lire un Panneau", sub: "Protocole de communication avec l'opérateur", pg: "p. 02", ind: "Page 2 / 9 — Lire un panneau" },
+    w3: { tab: "Alimentation", title: "Section 03 — Alimentation", sub: "Configuration compacte à 3 connexions", pg: "p. 03", ind: "Page 3 / 9 — Alimentation" },
+    w4: { tab: "Horloge", title: "Section 04 — Horloge", sub: "Règles de désamorçage de la baie câblée à 4 connexions", pg: "p. 04", ind: "Page 4 / 9 — Horloge" },
+    w5: { tab: "Détonateur", title: "Section 05 — Détonateur", sub: "Harnais principal lourd à 5 connexions", pg: "p. 05", ind: "Page 5 / 9 — Détonateur" },
+    w6: { tab: "Capteur", title: "Section 06 — Capteur", sub: "Faisceau étendu à 6 connexions", pg: "p. 06", ind: "Page 6 / 9 — Capteur" },
+    w7: { tab: "Relais", title: "Section 07 — Relais", sub: "Faisceau dense à 7 connexions", pg: "p. 07", ind: "Page 7 / 9 — Relais" },
+    w8: { tab: "Charge", title: "Section 08 — Charge", sub: "Harnais maximal à 8 connexions", pg: "p. 08", ind: "Page 8 / 9 — Charge" },
+    pin: { tab: "Digicode", title: "Section 09 — Digicode", sub: "Code à 4 chiffres : numéro de série, piles et voyants", pg: "p. 09", ind: "Page 9 / 9 — Digicode" },
     index: { tab: "", title: "Sommaire du Manuel", sub: "Index rapide des modules de déminage", pg: "INDEX", ind: "Sommaire général" }
   };
   var techQuery = "", techTouched = false;
@@ -697,7 +748,7 @@ ${solo}
     return '<div class="border-b-2 border-inkBlue/30 pb-2 mb-3 flex items-baseline justify-between"><div><div class="font-hand text-3xl font-bold text-inkBlue tracking-wide flex items-center gap-2"><span>' + m.title + "</span>" + (extra || "") + '</div><p class="font-notes text-xs text-slate-600 italic">' + m.sub + '</p></div><div class="font-typewriter text-xs text-slate-500 font-bold">' + m.pg + "</div></div>";
   }
   function techPageHtml(k, m) {
-    if (/^w[3-8]$/.test(k) && !m[k]) {
+    if (isMan(k) && !m[k]) {
       return techHead(k) + '<div class="mt-6 p-4 rounded border-2 border-dashed border-inkRed/50 bg-red-50/40 text-center font-hand text-xl text-inkRed leading-snug">🔒 Cette page est chez un autre technicien.<br><span class="text-base text-slate-700">Demande-lui de te lire ses règles : annonce le nombre de fils et les couleurs.</span></div>';
     }
     if (k === "w4") {
@@ -708,26 +759,30 @@ ${solo}
     if (k === "w3" || k === "w5" || k === "w6" || k === "w7" || k === "w8") {
       return techHead(k) + '<ol class="space-y-' + (k === "w5" ? "2.5" : "3") + ' font-hand text-lg text-inkBlue">' + m[k].map(function (r, i) { return ruleLi(r, i, false); }).join("") + "</ol>";
     }
+    if (k === "pin") {
+      return techHead(k) + '<ol class="space-y-3 font-hand text-lg text-inkBlue">' + m.pin.rules.map(function (r, i) { return ruleLi(r, i, true); }).join("") + "</ol>" +
+        '<div class="mt-4 pt-2 border-t border-inkBlue/20 font-hand text-base text-slate-700 space-y-1"><div class="font-notes text-xs font-bold text-inkRed uppercase tracking-wider">Verdict après chaque essai</div>' + m.pin.verdicts.map(function (t) { return "<div>• " + escH(t) + "</div>"; }).join("") + '<div class="font-notes text-xs text-inkRed font-bold pt-1">' + escH(m.pin.penalties) + "</div></div>";
+    }
     if (k === "lecture") {
       var L = ["Étape A : Annoncer le module", "Étape B : Relever le numéro de série", "Étape C : Lister les couleurs"];
       return techHead(k) + '<div class="space-y-3 font-hand text-lg text-inkBlue leading-snug">' + m.read.map(function (t, i) {
         return '<div class="bg-amber-100/40 p-2.5 rounded border border-amber-800/30"><span class="font-notes text-xs font-bold text-inkRed uppercase tracking-wider block">' + L[i % 3] + '</span><p class="mt-1">' + escH(t) + "</p></div>";
       }).join("") + "</div>";
     }
-    var items = [["lecture", "📌", "Lire un panneau", "(protocole série, comptage)", "p. 02"], ["w3", "⚡", "Alimentation", "(combinaisons de base)", "p. 03"], ["w4", "⚡", "Horloge", "(série pair/impair & règles)", "p. 04"], ["w5", "⚡", "Détonateur", "(harnais complexe à 5 brins)", "p. 05"], ["w6", "⚡", "Capteur", "(faisceau étendu)", "p. 06"], ["w7", "⚡", "Relais", "(faisceau dense)", "p. 07"], ["w8", "⚡", "Charge", "(harnais maximal)", "p. 08"]];
+    var items = [["lecture", "📌", "Lire un panneau", "(protocole série, comptage)", "p. 02"], ["w3", "⚡", "Alimentation", "(combinaisons de base)", "p. 03"], ["w4", "⚡", "Horloge", "(série pair/impair & règles)", "p. 04"], ["w5", "⚡", "Détonateur", "(harnais complexe à 5 brins)", "p. 05"], ["w6", "⚡", "Capteur", "(faisceau étendu)", "p. 06"], ["w7", "⚡", "Relais", "(faisceau dense)", "p. 07"], ["w8", "⚡", "Charge", "(harnais maximal)", "p. 08"], ["pin", "🔢", "Digicode", "(code à 4 chiffres)", "p. 09"]];
     return techHead("index") +
       '<div class="mb-4 bg-amber-50/70 p-2.5 rounded border border-amber-900/30 shadow-inner"><label class="block font-notes text-xs text-slate-700 font-bold mb-1">🔍 Recherche de mot-clé ou module :</label><div class="relative"><input type="text" id="indexSearchInput" placeholder="Ex: 4 fils, série, pair..." class="w-full bg-transparent border-b-2 border-inkBlue text-inkBlue font-hand text-xl px-1 py-0.5 focus:outline-none focus:border-inkRed placeholder-slate-400"/><span class="absolute right-1 top-1 text-xs text-slate-400 font-notes italic">écrire ici</span></div></div>' +
       '<ul id="indexList" class="space-y-2.5 font-hand text-lg text-inkBlue">' + items.map(function (x) {
-        var lk = /^w[3-8]$/.test(x[0]) && !m[x[0]];
+        var lk = isMan(x[0]) && !m[x[0]];
         return '<li class="index-item flex items-center justify-between border-b border-dotted border-inkBlue/40 pb-1 cursor-pointer' + (lk ? " opacity-50" : "") + '" data-go="' + x[0] + '"><span class="flex items-center gap-2"><span>' + (lk ? "🔒" : x[1]) + "</span> <b>" + x[2] + '</b> <span class="font-notes text-xs text-slate-500">' + (lk ? "(chez un autre technicien)" : x[3]) + '</span></span><span class="font-typewriter text-sm font-bold text-inkBlue">' + x[4] + "</span></li>";
-      }).join("") + '<li class="index-item flex items-center justify-between border-b border-dotted border-inkBlue/40 pb-1 opacity-50"><span class="flex items-center gap-2"><span>🔒</span> Module Clavier & Symboles</span><span class="font-typewriter text-sm text-slate-400">p. 09</span></li></ul>';
+      }).join("") + '</ul>';
   }
 
   function renderTechnician() {
     stopTimer();
-    var m = view.manual; if (m.pages && !m["w" + manualTab.slice(1)] && /^w[3-8]$/.test(manualTab) && !techTouched) { manualTab = "w" + m.pages[0]; }
+    var m = view.manual; if (m.pages && isMan(manualTab) && !m[manualTab] && !techTouched) { manualTab = m.pages[0] === 9 ? "pin" : "w" + m.pages[0]; }
     var k = TECH_META[manualTab] ? manualTab : "w4", meta = TECH_META[k], paused = view.paused;
-    var lock = function (t) { return /^w[3-8]$/.test(t) && !m[t]; };
+    var lock = function (t) { return isMan(t) && !m[t]; };
     var tabs = TECH_ORDER.filter(function (t) { return t === k || !lock(t); }).map(function (t) {
       var lab = TECH_META[t].tab + (lock(t) ? " 🔒" : "");
       return t === k
@@ -746,7 +801,7 @@ ${solo}
       '<div class="border-t border-amber-900/20 bg-[#ede4d4] px-4 py-2 flex items-center justify-between text-xs font-notes text-inkBlue"><button id="btnPrev" class="flex items-center gap-1 font-bold text-inkBlue active:scale-95 transition-transform"><span>⟵</span> <span>Précédent</span></button><div class="flex items-center gap-1 font-typewriter text-[11px] text-slate-600 bg-amber-200/50 px-2 py-0.5 rounded border border-amber-800/30"><span>' + meta.ind + '</span></div><button id="btnNext" class="flex items-center gap-1 font-bold text-inkBlue active:scale-95 transition-transform"><span>Suivant</span> <span>⟶</span></button></div></div>';
 
     function go(t) { manualTab = t; techTouched = true; render(); }
-    function step(d) { var L = TECH_ORDER.filter(function (t) { return !/^w[3-8]$/.test(t) || m[t]; }), i = L.indexOf(manualTab); if (i < 0) i = 0; go(L[(i + d + L.length) % L.length]); }
+    function step(d) { var L = TECH_ORDER.filter(function (t) { return !isMan(t) || m[t]; }), i = L.indexOf(manualTab); if (i < 0) i = 0; go(L[(i + d + L.length) % L.length]); }
     Array.prototype.forEach.call(app.querySelectorAll("[data-tab]"), function (b) { b.onclick = function () { go(b.getAttribute("data-tab")); }; });
     Array.prototype.forEach.call(app.querySelectorAll("[data-go]"), function (b) { b.onclick = function () { go(b.getAttribute("data-go")); }; });
     document.getElementById("btnPrev").onclick = function () { step(-1); };
