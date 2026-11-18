@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.21";
+  var APP_VERSION = "1.0.22";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -102,89 +102,149 @@
 
   function renderHome() {
     clear();
-    header().forEach(function (n) { app.appendChild(n); });
-    var pseudo = el("input", { id: "pseudo", maxlength: "16", autocomplete: "nickname", placeholder: "Ton pseudo" });
-    var code = el("input", { id: "code", maxlength: "4", autocapitalize: "characters", autocomplete: "off", placeholder: "CODE" });
-    var create = el("button", { class: "primary", text: "Créer une salle", onclick: function () {
+    var BL = '<div class="absolute %P% w-4 h-4 rounded-full bg-surface-variant flex items-center justify-center shadow-md"><div class="w-2.5 h-0.5 bg-surface-container-lowest %R%"></div></div>';
+    function bolt(p, r) { return BL.replace("%P%", p).replace("%R%", r); }
+    app.innerHTML = S(`<div class="flex flex-col w-full min-h-[100dvh] overflow-hidden select-none justify-between p-3 pt-safe pb-safe box-border bg-gradient-to-b from-[#0c141c] via-[#101923] to-[#070f17]">
+<header class="relative w-full bg-surface-container-low rounded-t-xl rounded-b p-3 shadow-2xl overflow-hidden"><div class="absolute inset-0 bg-gradient-to-b from-surface-bright/20 to-transparent pointer-events-none"></div><div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-primary-container/40 to-transparent"></div><div class="absolute top-2 left-2 w-3.5 h-3.5 rounded-full bg-surface-variant flex items-center justify-center shadow-inner"><div class="w-2 h-0.5 bg-surface-container-lowest rotate-45"></div></div><div class="absolute top-2 right-2 w-3.5 h-3.5 rounded-full bg-surface-variant flex items-center justify-center shadow-inner"><div class="w-2 h-0.5 bg-surface-container-lowest -rotate-45"></div></div>
+<div class="flex items-center justify-between px-4 pt-0.5"><div class="flex items-center space-x-2"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#22c55e] opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-[#22c55e]"></span></span><div class="flex flex-col"><span class="font-label-sm text-on-surface tracking-wider text-[9px] uppercase leading-none">Terminal Opérationnel</span><span class="font-code-serial text-on-surface-variant text-[8px] tracking-tight">FRQ 2.4 GHz CRYPTÉE</span></div></div><div class="flex items-center space-x-1.5 bg-surface-container-lowest px-2 py-1 rounded"><span class="font-label-sm text-primary text-[9px] font-bold tracking-widest">[UNIT-00]</span><span class="material-symbols-outlined text-primary text-[12px]">sensors</span></div></div></header>
+<section class="relative w-full my-auto flex flex-col items-center"><div class="relative w-full bg-surface-container rounded-xl p-4 shadow-2xl flex flex-col items-center">${bolt("top-2.5 left-2.5", "rotate-12")}${bolt("top-2.5 right-2.5", "-rotate-45")}${bolt("bottom-2.5 left-2.5", "-rotate-[30deg]")}${bolt("bottom-2.5 right-2.5", "rotate-90")}
+<div class="flex items-center space-x-2 bg-surface-container-lowest px-3 py-0.5 rounded-full mb-3 shadow-inner"><span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span><span class="font-code-serial text-on-surface-variant text-[10px] tracking-widest uppercase">DISPOSITIF TACTIQUE MIL-STD-810H</span><span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span></div>
+<div class="relative w-full bg-surface-container-lowest rounded-lg py-3 px-2 flex flex-col items-center shadow-inner overflow-hidden mb-3"><div class="absolute inset-0 bg-[radial-gradient(#182029_1px,transparent_1px)] [background-size:16px_16px] opacity-40 pointer-events-none"></div><div class="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-primary/5 pointer-events-none"></div>
+<div class="flex items-baseline space-x-1 font-display-timer-mobile text-primary tracking-tighter drop-shadow-[0_0_12px_rgba(255,159,50,0.45)]"><span>00</span><span class="animate-pulse text-primary-container">:</span><span>00</span><span class="animate-pulse text-primary-container">:</span><span>00</span><span class="font-code-serial text-primary-container text-xs ml-1 font-bold">.00</span></div>
+<div class="w-full flex justify-between px-3 pt-1 text-[8px] font-label-sm text-outline tracking-widest uppercase"><span>CHRONO DETONATEUR</span><span class="text-error font-bold flex items-center gap-0.5"><span class="w-1 h-1 rounded-full bg-error inline-block animate-ping"></span>ARMÉ</span></div></div>
+<div class="text-center w-full px-2"><h1 class="font-headline-lg-mobile text-on-surface tracking-wider font-extrabold uppercase m-0 leading-none drop-shadow-md">ZERO <span class="text-primary-container drop-shadow-[0_0_8px_rgba(255,159,50,0.5)]">TIME</span></h1><p class="font-label-md text-primary tracking-widest uppercase mt-1 mb-0 text-[11px] font-semibold">Protocole de Désamorçage Coopératif</p></div>
+<div class="w-full bg-surface-container-high rounded p-2.5 mt-3 shadow-inner"><div class="flex items-center space-x-2 mb-1 text-primary-container"><span class="material-symbols-outlined text-[16px]">record_voice_over</span><span class="font-label-sm text-[10px] tracking-wider uppercase font-bold">Règles d'Engagement Tactiques</span></div><div class="font-body-sm text-secondary text-[11px] leading-tight space-y-0.5"><div class="flex items-center justify-between"><span class="text-on-surface-variant">Configuration :</span><span class="font-code-serial text-on-surface font-semibold text-[10px]">2 OPÉRATEURS REQUIS</span></div><div class="flex items-center justify-between"><span class="text-on-surface-variant">Canal de secours :</span><span class="font-code-serial text-on-surface font-semibold text-[10px]">LIAISON VOCALE DIRECTE</span></div><div class="flex items-center justify-between pt-1"><span class="text-[9px] text-outline font-label-sm">RÔLE 01: DÉMINEUR</span><span class="text-[9px] text-outline font-label-sm">RÔLE 02: TECHNICIEN</span></div></div></div>
+</div></section>
+<footer class="w-full flex flex-col space-y-2.5 pb-1">
+<div class="w-full bg-surface-container-low rounded-lg p-2 shadow-lg flex flex-col space-y-2"><div class="flex items-center justify-between px-1"><span class="font-label-sm text-on-surface-variant text-[10px] uppercase tracking-wider flex items-center gap-1"><span class="material-symbols-outlined text-[13px] text-primary">badge</span> Identifiant Agent</span><span class="font-code-serial text-[9px] text-outline">16 SIGNES MAX</span></div><div class="relative w-full h-12 bg-surface-container-lowest rounded flex items-center px-3 shadow-inner"><input class="w-full bg-transparent font-code-serial text-on-surface text-center tracking-[0.1em] text-sm focus:outline-none placeholder:text-outline/40 placeholder:tracking-normal font-bold" id="pseudo" maxlength="16" autocomplete="nickname" placeholder="TON PSEUDO" type="text"/></div></div>
+<button class="group relative w-full h-14 bg-gradient-to-r from-primary-container via-primary to-primary-container rounded-lg p-0.5 shadow-[0_4px_20px_rgba(255,159,50,0.35)] active:translate-y-0.5 transition-transform overflow-hidden cursor-pointer" id="btnCreateRoom" type="button"><div class="w-full h-full bg-gradient-to-b from-primary-container to-[#c9741b] rounded-[6px] px-4 flex items-center justify-between"><div class="flex items-center space-x-3"><div class="w-9 h-9 rounded bg-surface-container-lowest/30 flex items-center justify-center text-on-primary"><span class="material-symbols-outlined text-[22px] group-hover:scale-110 transition-transform">cell_tower</span></div><div class="flex flex-col text-left"><span class="font-headline-sm text-on-primary font-bold tracking-wider leading-none text-sm uppercase">Créer une Salle</span><span class="font-code-serial text-on-primary/80 text-[9px] tracking-normal leading-tight mt-0.5">INITIALISER LE POSTE MAÎTRE</span></div></div><div class="flex items-center space-x-1.5 bg-surface-container-lowest/40 px-2 py-1 rounded"><span class="w-2 h-2 rounded-full bg-on-primary animate-pulse"></span><span class="font-label-sm text-on-primary text-[10px] font-bold">HÔTE</span></div></div></button>
+<div class="w-full bg-surface-container-low rounded-lg p-2 shadow-lg flex flex-col space-y-2"><div class="flex items-center justify-between px-1"><span class="font-label-sm text-on-surface-variant text-[10px] uppercase tracking-wider flex items-center gap-1"><span class="material-symbols-outlined text-[13px] text-[#22c55e]">cable</span> Rejoindre une Opération</span><span class="font-code-serial text-[9px] text-outline">CODE 4 SIGNES</span></div><div class="flex items-center space-x-2"><div class="relative flex-1 h-12 bg-surface-container-lowest rounded flex items-center px-3 shadow-inner"><input class="w-full bg-transparent font-code-serial text-on-surface text-center tracking-[0.25em] text-sm uppercase focus:outline-none placeholder:text-outline/40 placeholder:tracking-normal font-bold" id="roomCodeInput" maxlength="4" autocapitalize="characters" autocomplete="off" placeholder="CODE EX: K9X2" type="text"/></div><button class="h-12 px-4 bg-gradient-to-b from-[#22c55e] to-[#15803d] rounded flex items-center justify-center space-x-1.5 shadow-[0_2px_12px_rgba(34,197,94,0.3)] active:translate-y-0.5 transition-transform cursor-pointer" id="btnJoinRoom" type="button"><span class="font-label-md text-surface-container-lowest font-extrabold uppercase text-xs">Entrer</span><span class="material-symbols-outlined text-surface-container-lowest text-[18px]">login</span></button></div></div>
+<div class="w-full bg-surface-container-lowest rounded px-3 py-1 flex items-center justify-between text-[9px] font-label-sm"><button class="flex items-center space-x-1.5 text-on-surface-variant" id="zt-version" type="button"><span class="w-1.5 h-1.5 rounded-full bg-[#22c55e]"></span><span id="zt-version-txt">BUILD v${APP_VERSION} · MAJ</span></button><span class="font-code-serial text-outline uppercase tracking-wider">SERVEUR SÉCURISÉ ACTIF</span></div>
+</footer></div>`);
+    var pseudo = $("pseudo"), code = $("roomCodeInput"), create = $("btnCreateRoom"), join = $("btnJoinRoom");
+    code.addEventListener("input", function () { code.value = code.value.toUpperCase(); });
+    create.onclick = function () {
       create.disabled = true;
       sb.rpc("zt_create_room", { p_pseudo: pseudo.value }).then(function (r) {
         create.disabled = false;
         if (r.error) return fail(r.error);
         enter(r.data);
       });
-    } });
-    var join = el("button", { text: "Rejoindre", onclick: function () {
+    };
+    join.onclick = function () {
       join.disabled = true;
       sb.rpc("zt_join_room", { p_code: code.value, p_pseudo: pseudo.value }).then(function (r) {
         join.disabled = false;
         if (r.error) return fail(r.error);
         enter(r.data);
       });
-    } });
-    app.appendChild(el("div", { class: "card" }, [
-      el("label", { for: "pseudo", text: "Pseudo" }), pseudo, create,
-      el("label", { for: "code", text: "Code de la salle" }), code, join
-    ]));
-    var ver = el("button", { id: "zt-version", text: "v" + APP_VERSION + " · toucher pour mettre à jour", onclick: function () {
-      ver.textContent = "Mise à jour…";
+    };
+    $("zt-version").onclick = function () {
+      $("zt-version-txt").textContent = "MISE À JOUR…";
       var done = function () { location.replace(location.pathname + "?u=" + Date.now()); };
       Promise.all([
         (navigator.serviceWorker ? navigator.serviceWorker.getRegistrations().then(function (rs) { return Promise.all(rs.map(function (x) { return x.unregister(); })); }) : null),
         (window.caches ? caches.keys().then(function (ks) { return Promise.all(ks.map(function (k) { return caches.delete(k); })); }) : null)
       ]).then(done, done);
-    } });
-    ver.style.cssText = "display:block;margin:18px auto 0;background:none;border:0;color:#6b7684;font:11px 'JetBrains Mono',monospace;min-height:0;padding:6px;width:auto";
-    app.appendChild(ver);
+    };
   }
 
   function roleLabel(r) { return r === "operator" ? "Opérateur" : r === "technician" ? "Technicien" : "—"; }
 
+  // ===== Écrans Stitch : salle d'attente, victoire, explosion =====
+  // Les classes des maquettes sont reprises telles quelles ; seuls primary/secondary/surface/on-surface/error
+  // (noms déjà pris par l'écran opérateur) sont convertis en couleurs exactes de la maquette.
+  var SC_HEX = { "primary": "#ffc691", "secondary": "#b8c9d6", "surface": "#0c141c", "on-surface": "#dbe3ef", "error": "#ffb4ab" };
+  function S(html) {
+    return html.replace(/class="([^"]*)"/g, function (m, cls) {
+      return 'class="' + cls.split(/\s+/).map(function (t) {
+        var x = /^((?:[a-z-]+:)*)(text|bg|border|ring|from|via|to|fill|stroke|shadow|outline|divide)-(primary|secondary|surface|on-surface|error)(\/[\d.]+)?$/.exec(t);
+        return x ? x[1] + x[2] + "-[" + SC_HEX[x[3]] + "]" + (x[4] || "") : t;
+      }).join(" ") + '"';
+    });
+  }
+  function escS(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function $(id) { return document.getElementById(id); }
+  function leaveRoom() { if (!window.confirm("Quitter la salle ?")) return; forget(); render(); }
+  function doReplay() {
+    sb.rpc("zt_replay", { p_code: session.code, p_token: session.token }).then(function (r) { if (r.error) return fail(r.error); view = r.data; resetGameFlags(); selectedWire = null; activePanel = 0; render(); });
+  }
+  var ROLE_FULL = { operator: "OPÉRATEUR (TERRAIN)", technician: "TECHNICIEN (MANUEL)" };
+  var BOLT = '<div class="w-1.5 h-0.5 bg-surface-container-lowest';
+
   function renderLobby() {
     clear();
-    header().forEach(function (n) { app.appendChild(n); });
-    app.appendChild(el("div", { class: "muted", text: "Code de la salle" }));
-    app.appendChild(el("div", { class: "code", text: view.code }));
-    var ul = el("ul", { class: "players" });
-    view.players.forEach(function (p) {
-      ul.appendChild(el("li", {}, [el("span", { text: p.pseudo }), el("span", { class: "tag", text: p.is_creator ? "créateur" : "" })]));
-    });
-    app.appendChild(ul);
-    if (view.players.length < 2) app.appendChild(el("div", { class: "muted", text: "En attente du deuxième joueur…" }));
-
-    if (view.is_creator) {
-      var mode = view.role_mode, cr = view.creator_role;
-      function setMode(m, role) {
-        sb.rpc("zt_set_role_mode", { p_code: view.code, p_token: session.token, p_mode: m, p_role: role || null }).then(function (r) { if (r.error) return fail(r.error); view = r.data; render(); });
-      }
-      var card = el("div", { class: "card" }, [
-        el("label", { text: "Attribution des rôles" }),
-        el("div", { class: "row" }, [
-          el("button", { class: mode === "choose" && cr === "operator" ? "on" : "", text: "Je suis opérateur", onclick: function () { setMode("choose", "operator"); } }),
-          el("button", { class: mode === "choose" && cr === "technician" ? "on" : "", text: "Je suis technicien", onclick: function () { setMode("choose", "technician"); } })
-        ]),
-        el("button", { class: mode === "random" ? "on" : "", text: "Tirage au sort", onclick: function () { setMode("random"); } })
-      ]);
-      app.appendChild(card);
-      var ready = view.players.length === 2 && (mode === "random" || !!cr);
-      app.appendChild(el("button", { class: "primary", text: "Lancer", disabled: ready ? null : "disabled", onclick: function () {
-        sb.rpc("zt_start", { p_code: view.code, p_token: session.token }).then(function (r) { if (r.error) return fail(r.error); view = r.data; render(); });
-      } }));
-      if (view.players.length === 1) {
-        function startSolo(role) {
-          sb.rpc("zt_start_solo", { p_code: view.code, p_token: session.token, p_role: role }).then(function (r) { if (r.error) return fail(r.error); view = r.data; resetGameFlags(); selectedWire = null; activePanel = 0; render(); });
-        }
-        app.appendChild(el("div", { class: "card" }, [
-          el("label", { text: "Mode test (seul, sans deuxième joueur)" }),
-          el("div", { class: "row" }, [
-            el("button", { text: "Tester en opérateur", onclick: function () { startSolo("operator"); } }),
-            el("button", { text: "Tester en technicien", onclick: function () { startSolo("technician"); } })
-          ])
-        ]));
-      }
-    } else {
-      app.appendChild(el("div", { class: "muted", text: "Le créateur choisit les rôles et lance la partie." }));
+    var players = view.players, n = players.length, mode = view.role_mode, cr = view.creator_role, isC = view.is_creator;
+    var ready = n === 2 && (mode === "random" || !!cr);
+    function roleOf(p) {
+      if (mode === "random") return "RÔLE : TIRAGE AU SORT";
+      if (!cr) return "RÔLE : À DÉFINIR";
+      var r = p.is_creator ? cr : (cr === "operator" ? "technician" : "operator");
+      return "RÔLE : " + ROLE_FULL[r];
     }
-    app.appendChild(el("button", { text: "Quitter", onclick: function () { forget(); render(); } }));
+    function iconOf(p) {
+      if (mode === "random" || !cr) return "person";
+      return (p.is_creator ? cr : (cr === "operator" ? "technician" : "operator")) === "operator" ? "shield_person" : "menu_book";
+    }
+    function slot(p, i) {
+      var host = !!p.is_creator;
+      return `<div class="bg-surface-container-lowest rounded p-2 flex items-center justify-between shadow-inner"><div class="flex items-center gap-2.5 min-w-0"><div class="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center ${host ? "text-primary" : "text-secondary"} shrink-0"><span class="material-symbols-outlined text-lg">${iconOf(p)}</span></div><div class="flex flex-col min-w-0"><div class="flex items-center gap-1.5"><span class="font-label-md text-label-md text-on-surface font-bold truncate">${escS(p.pseudo)}</span><span class="font-label-sm text-label-sm ${host ? "bg-primary-container/20 text-primary" : "bg-surface-bright text-on-surface-variant"} px-1 rounded uppercase tracking-wider text-[9px]">${host ? "HÔTE" : "BINÔME"}</span></div><span class="font-label-sm text-label-sm ${host ? "text-primary" : "text-secondary"} tracking-wide uppercase truncate">${roleOf(p)}</span></div></div><div class="flex items-center gap-1.5 shrink-0 pl-1"><span class="w-2.5 h-2.5 rounded-full bg-secondary shadow-[0_0_8px_rgba(184,201,214,0.6)]"></span><span class="font-label-sm text-label-sm text-secondary font-bold">${host ? "PRÊT" : "SYNCHRO"}</span></div></div>`;
+    }
+    var emptySlot = `<div class="bg-surface-container-lowest rounded p-2 flex items-center justify-between shadow-inner opacity-75"><div class="flex items-center gap-2.5 min-w-0"><div class="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center text-secondary shrink-0"><span class="material-symbols-outlined text-lg">person_search</span></div><div class="flex flex-col min-w-0"><span class="font-label-md text-label-md text-on-surface-variant font-bold truncate">EN ATTENTE DU BINÔME…</span><span class="font-label-sm text-label-sm text-secondary tracking-wide uppercase truncate">CANAL OUVERT</span></div></div><div class="flex items-center gap-1.5 shrink-0 pl-1"><span class="w-2.5 h-2.5 rounded-full bg-surface-bright animate-pulse"></span><span class="font-label-sm text-label-sm text-on-surface-variant font-bold">ATTENTE</span></div></div>`;
+    function sel(id, on, title, sub) {
+      return `<button class="role-selector min-h-[52px] p-2 rounded ${on ? "bg-surface-container-high" : "bg-surface-container-lowest opacity-75"} flex flex-col justify-between text-left shadow-inner transition-all" id="${id}" type="button"><div class="flex items-center justify-between w-full"><span class="font-label-sm text-label-sm ${on ? "text-primary" : "text-on-surface-variant"} uppercase font-bold tracking-wider">${title}</span><span class="radio-indicator w-2.5 h-2.5 rounded-full ${on ? "bg-primary shadow-[0_0_8px_rgba(255,159,50,0.8)]" : "bg-surface-bright"}"></span></div><span class="font-body-sm text-body-sm ${on ? "text-on-surface" : "text-on-surface-variant"} font-medium truncate mt-1">${sub}</span></button>`;
+    }
+    var manual = mode !== "random";
+    var roleRow = manual ? `<div class="grid grid-cols-2 gap-2">${sel("role-op", cr === "operator", "OPÉRATEUR", "Je vois la bombe")}${sel("role-tech", cr === "technician", "TECHNICIEN", "Je tiens le manuel")}</div>` : "";
+    var solo = (isC && n === 1) ? `<section class="relative bg-surface-container rounded-lg p-3 shadow-md flex flex-col gap-2"><div class="flex items-center justify-between px-3"><span class="font-label-sm text-label-sm text-on-surface-variant tracking-wider uppercase">MODE TEST // SOLO</span><span class="font-label-sm text-label-sm text-primary uppercase">SANS BINÔME</span></div><div class="grid grid-cols-2 gap-2">${sel("solo-op", false, "OPÉRATEUR", "Tester seul")}${sel("solo-tech", false, "TECHNICIEN", "Tester seul")}</div></section>` : "";
+    var msg, icon = "lock_open";
+    if (!isC) { msg = "EN ATTENTE DU LANCEMENT PAR L'HÔTE"; icon = "hourglass_top"; }
+    else if (n < 2) { msg = "EN ATTENTE DU BINÔME"; icon = "hourglass_top"; }
+    else if (!ready) { msg = "CHOISIS UN RÔLE"; icon = "lock"; }
+    else msg = "TOUS LES DÉMINEURS SONT PRÊTS";
+    var canLaunch = isC && ready;
+    app.innerHTML = S(`<div class="flex flex-col w-full min-h-[100dvh] justify-between gap-2 p-3 pt-safe pb-safe select-none">
+<header class="flex items-center justify-between bg-surface-container px-3 py-2 rounded-lg shadow-md"><div class="flex items-center gap-2 min-w-0"><div class="relative flex items-center justify-center w-3 h-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-container opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span></div><div class="flex flex-col min-w-0"><span class="font-label-sm text-label-sm text-primary tracking-widest uppercase truncate">SALLE D'ATTENTE // CANAL SÉCURISÉ</span><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight uppercase font-bold truncate">FRÉQUENCE TAC-${escS(view.code)}</span></div></div><button aria-label="Quitter le salon" class="w-10 h-10 flex items-center justify-center rounded bg-surface-container-high text-on-surface-variant hover:text-error active:scale-95 transition-all" id="btn-leave" type="button"><span class="material-symbols-outlined text-lg">close</span></button></header>
+<section class="relative bg-surface-container rounded-lg p-3 shadow-md flex flex-col justify-between overflow-hidden"><div class="absolute top-1.5 left-1.5 w-2.5 h-2.5 rounded-full bg-surface-bright flex items-center justify-center">${BOLT} rotate-45"></div></div><div class="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-surface-bright flex items-center justify-center">${BOLT} -rotate-45"></div></div><div class="absolute bottom-1.5 left-1.5 w-2.5 h-2.5 rounded-full bg-surface-bright flex items-center justify-center">${BOLT} -rotate-12"></div></div><div class="absolute bottom-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-surface-bright flex items-center justify-center">${BOLT} rotate-12"></div></div>
+<div class="flex items-center justify-between mb-1 px-3"><span class="font-label-sm text-label-sm text-on-surface-variant tracking-wider uppercase flex items-center gap-1.5"><span class="material-symbols-outlined text-xs text-primary">key</span>CODE ACCÈS OPÉRATION</span><span class="font-code-serial text-label-sm text-primary uppercase">SER-${escS(view.code)}</span></div>
+<div class="bg-surface-container-lowest rounded p-2 flex items-center justify-between shadow-inner"><div class="flex flex-col pl-2"><span class="font-label-sm text-label-sm text-on-surface-variant tracking-widest text-[9px] uppercase">LIAISON DÉCRYPTÉE</span><div class="flex items-center gap-2"><span class="font-display-timer-mobile text-display-timer-mobile text-primary tracking-widest drop-shadow-[0_0_12px_rgba(255,159,50,0.45)]" id="room-code">${escS(view.code)}</span></div></div><button class="min-h-[48px] px-3 bg-surface-container hover:bg-surface-bright active:bg-primary text-primary hover:text-on-primary-fixed rounded flex items-center gap-1.5 transition-all" id="copy-btn" type="button"><span class="material-symbols-outlined text-base" id="copy-icon">content_copy</span><span class="font-label-md text-label-md uppercase tracking-wider font-bold" id="copy-text">COPIER</span></button></div>
+<div class="mt-1.5 flex items-center justify-center gap-1 px-1"><span class="material-symbols-outlined text-xs text-secondary">record_voice_over</span><span class="font-label-sm text-label-sm text-secondary truncate">TRANSMETTRE CE CODE AU DÉMINEUR BINÔME</span></div></section>
+<section class="relative bg-surface-container rounded-lg p-3 shadow-md flex flex-col gap-2"><div class="absolute top-1.5 left-1.5 w-2.5 h-2.5 rounded-full bg-surface-bright flex items-center justify-center">${BOLT} rotate-90"></div></div><div class="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-surface-bright flex items-center justify-center">${BOLT}"></div></div>
+<div class="flex items-center justify-between px-3"><span class="font-label-sm text-label-sm text-on-surface-variant tracking-wider uppercase">EFFECTIF ENGAGÉ (${n}/2)</span><span class="font-label-sm text-label-sm text-secondary uppercase flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>${n === 2 ? "VOIE 2-WAY OK" : "VOIE 1-WAY"}</span></div>
+${players.map(slot).join("")}${n < 2 ? emptySlot : ""}</section>
+<section class="relative bg-surface-container rounded-lg p-3 shadow-md flex flex-col gap-2"><div class="absolute bottom-1.5 left-1.5 w-2.5 h-2.5 rounded-full bg-surface-bright flex items-center justify-center">${BOLT} rotate-45"></div></div><div class="absolute bottom-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-surface-bright flex items-center justify-center">${BOLT} -rotate-45"></div></div>
+<div class="flex items-center justify-between px-3"><span class="font-label-sm text-label-sm text-on-surface-variant tracking-wider uppercase">PARAMÈTRE D'ATTRIBUTION</span><span class="font-label-sm text-label-sm text-primary uppercase">AUTORITÉ HÔTE</span></div>
+<div class="grid grid-cols-2 gap-2">${sel("role-mode-manual", manual, "MANUEL", "Attribution Fixe")}${sel("role-mode-random", !manual, "ALÉATOIRE", "Tirage Au Sort")}</div>${roleRow}</section>
+${solo}
+<footer class="w-full flex flex-col gap-1.5 pt-1"><div class="flex items-center justify-center gap-1.5"><span class="material-symbols-outlined text-xs text-primary animate-pulse">${icon}</span><span class="font-label-sm text-label-sm text-primary tracking-widest uppercase font-semibold">${msg}</span></div>
+<button class="w-full min-h-[56px] bg-primary-container hover:bg-primary active:scale-[0.99] text-on-primary rounded-lg flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(255,159,50,0.45)] transition-all${canLaunch ? "" : " opacity-40"}" id="btn-launch" type="button"><span class="material-symbols-outlined text-2xl font-black">power_settings_new</span><span class="font-label-lg text-label-lg tracking-widest font-black uppercase">LANCER LA MISSION</span></button></footer>
+</div>`);
+    $("btn-leave").onclick = function () { forget(); render(); };
+    var cb = $("copy-btn");
+    cb.onclick = function () {
+      var done = function (ok) {
+        $("copy-text").textContent = ok ? "COPIÉ !" : view.code; $("copy-icon").textContent = ok ? "check" : "content_copy";
+        setTimeout(function () { var t = $("copy-text"); if (t) { t.textContent = "COPIER"; $("copy-icon").textContent = "content_copy"; } }, 1800);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(view.code).then(function () { done(true); }, function () { done(false); });
+      else done(false);
+    };
+    if (isC) {
+      var setMode = function (m, role) {
+        sb.rpc("zt_set_role_mode", { p_code: view.code, p_token: session.token, p_mode: m, p_role: role || null }).then(function (r) { if (r.error) return fail(r.error); view = r.data; render(); });
+      };
+      $("role-mode-manual").onclick = function () { setMode("choose", cr || "operator"); };
+      $("role-mode-random").onclick = function () { setMode("random"); };
+      if ($("role-op")) { $("role-op").onclick = function () { setMode("choose", "operator"); }; $("role-tech").onclick = function () { setMode("choose", "technician"); }; }
+      var startSolo = function (role) {
+        sb.rpc("zt_start_solo", { p_code: view.code, p_token: session.token, p_role: role }).then(function (r) { if (r.error) return fail(r.error); view = r.data; resetGameFlags(); selectedWire = null; activePanel = 0; render(); });
+      };
+      if ($("solo-op")) { $("solo-op").onclick = function () { startSolo("operator"); }; $("solo-tech").onclick = function () { startSolo("technician"); }; }
+      $("btn-launch").onclick = function () {
+        if (!canLaunch) return;
+        sb.rpc("zt_start", { p_code: view.code, p_token: session.token }).then(function (r) { if (r.error) return fail(r.error); view = r.data; render(); });
+      };
+    }
   }
 
   var COLORS = { red: "Rouge", blue: "Bleu", yellow: "Jaune", white: "Blanc", black: "Noir" };
@@ -200,7 +260,7 @@
     });
   }
   function buzz(p) { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} }
-  function resetGameFlags() { errFlash = null; alertFlash = null; seenEvent = undefined; alerted = {}; alertInit = false; tickSent = false; }
+  function resetGameFlags() { endFxKey = null; errFlash = null; alertFlash = null; seenEvent = undefined; alerted = {}; alertInit = false; tickSent = false; }
 
   function stopTimer() { if (timerId) { clearInterval(timerId); timerId = null; } }
   function fmt(ms) {
@@ -673,34 +733,126 @@
     app.appendChild(el("div", { class: "card" }, [el("div", { class: "muted", text: "Chargement…" })]));
   }
 
+  var endFxKey = null;
+  var audioCtx = null;
+  function playBoomSound() {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === "suspended") audioCtx.resume();
+      var now = audioCtx.currentTime, size = audioCtx.sampleRate * 1.2;
+      var buffer = audioCtx.createBuffer(1, size, audioCtx.sampleRate), data = buffer.getChannelData(0);
+      for (var i = 0; i < size; i++) data[i] = Math.random() * 2 - 1;
+      var noise = audioCtx.createBufferSource(); noise.buffer = buffer;
+      var filter = audioCtx.createBiquadFilter(); filter.type = "lowpass";
+      filter.frequency.setValueAtTime(800, now); filter.frequency.exponentialRampToValueAtTime(45, now + 1.1);
+      var osc = audioCtx.createOscillator(); osc.type = "sine";
+      osc.frequency.setValueAtTime(120, now); osc.frequency.exponentialRampToValueAtTime(28, now + 0.9);
+      var og = audioCtx.createGain(); og.gain.setValueAtTime(0.7, now); og.gain.exponentialRampToValueAtTime(0.001, now + 1.1);
+      var ng = audioCtx.createGain(); ng.gain.setValueAtTime(0.9, now); ng.gain.exponentialRampToValueAtTime(0.001, now + 0.85);
+      noise.connect(filter); filter.connect(ng); ng.connect(audioCtx.destination);
+      osc.connect(og); og.connect(audioCtx.destination);
+      noise.start(now); osc.start(now); noise.stop(now + 1.2); osc.stop(now + 1.2);
+    } catch (e) {}
+  }
+  function triggerDetonationFX() {
+    var rumble = $("screen-rumble-container"), flash = $("explosion-flash-layer"), r1 = $("shockwave-ring-1"), r2 = $("shockwave-ring-2");
+    if (!rumble) return;
+    rumble.classList.remove("shake-active"); flash.classList.remove("flash-active");
+    if (r1) r1.classList.remove("shockwave-active-1");
+    if (r2) r2.classList.remove("shockwave-active-2");
+    void rumble.offsetWidth;
+    rumble.classList.add("shake-active"); flash.classList.add("flash-active");
+    if (r1) r1.classList.add("shockwave-active-1");
+    if (r2) r2.classList.add("shockwave-active-2");
+    playBoomSound();
+    buzz([120, 40, 200, 60, 90]);
+  }
+
+  function debriefHeader(z, extra) {
+    return `<header class="fixed top-0 w-full ${z} bg-surface-container-low/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.4)] pt-safe"><div class="h-14 px-margin flex items-center justify-between"><div class="flex items-center gap-space-sm"><button aria-label="Retour" class="w-11 h-11 flex items-center justify-center text-on-surface hover:text-primary transition-colors focus:outline-none" id="btn-back"><span class="material-symbols-outlined text-[20px]">arrow_back</span></button><div class="flex flex-col"><span class="font-label-sm text-label-sm text-primary tracking-widest uppercase">SYS // LIVE-ENGAGE</span><h1 class="font-headline-sm text-headline-sm tracking-tight text-on-surface uppercase">Mission Debrief</h1></div></div><div class="flex items-center gap-space-sm"><div class="flex items-center gap-space-xs px-2 py-0.5 bg-surface-container rounded-sm"><span class="w-2 h-2 rounded-full bg-primary-container animate-ping"></span><span class="font-label-sm text-label-sm text-primary-fixed">ARMÉ</span></div>${extra}</div></div></header>`;
+  }
+
   function renderEnded() {
     stopTimer(); clear();
-    var e = view.end, win = e.outcome === "defused";
-    var lines = [];
+    var e = view.end, isOp = !(view.me && view.me.role === "technician");
+    var done = false;
+    function bind() {
+      var b = $("btn-back"); if (b) b.onclick = leaveRoom;
+      var rp = $("btn-replay"); if (rp) rp.onclick = function () { if (done) return; done = true; doReplay(); };
+    }
     if (e.outcome === "abandoned") {
-      app.appendChild(el("div", { class: "card end boom" }, [
-        el("div", { class: "code", style: "font-size:30px;letter-spacing:.03em;color:#FF9F32", text: "PARTIE ABANDONNÉE" })
-      ]));
-      app.appendChild(el("button", { class: "primary", text: "Rejouer", onclick: function () {
-        sb.rpc("zt_replay", { p_code: session.code, p_token: session.token }).then(function (r) { if (r.error) return fail(r.error); view = r.data; resetGameFlags(); selectedWire = null; activePanel = 0; render(); });
-      } }));
-      app.appendChild(el("button", { text: "Quitter", onclick: function () { forget(); render(); } }));
-      return;
+      app.innerHTML = S(`${debriefHeader("z-50", `<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div>`)}<main class="flex-1 flex flex-col relative w-full px-margin pt-14 pb-safe bg-surface"><div class="flex flex-col w-full max-w-md mx-auto space-y-3 pb-4 pt-3"><div class="relative bg-surface-container rounded-xl p-4 shadow-xl overflow-hidden flex flex-col items-center text-center"><div class="relative w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center shadow-[0_0_24px_rgba(255,159,50,0.35)]"><span class="material-symbols-outlined text-primary-container text-[36px]" style="font-variation-settings: 'FILL' 1;">flag</span></div><span class="font-label-sm text-label-sm text-primary-container tracking-widest uppercase mt-2">SYS_ORDNANCE // INTERROMPU</span><h2 class="font-headline-lg-mobile text-headline-lg-mobile text-primary-container uppercase tracking-tight mt-0.5">PARTIE ABANDONNÉE</h2></div><button class="relative w-full h-14 bg-primary-container hover:bg-primary active:scale-[0.98] rounded-xl flex items-center justify-center gap-2.5 shadow-[0_0_20px_rgba(255,159,50,0.35)] transition-all" id="btn-replay"><span class="material-symbols-outlined text-surface-container-lowest text-[22px] font-bold">replay</span><span class="font-label-lg text-label-lg tracking-wider text-surface-container-lowest font-bold uppercase">RÉENGAGER UNE PARTIE // REJOUER</span></button></div></main>`);
+      bind(); return;
     }
-    if (win) {
-      if (typeof e.remaining_ms === "number") lines.push("Temps restant : " + fmt(e.remaining_ms));
-      lines.push("Erreurs : " + e.errors + "/3");
-    } else {
-      lines.push(e.cause === "errors" ? "Cause : trois erreurs" : "Cause : temps écoulé");
-      lines.push("Panneaux résolus : " + e.solved + "/" + e.total);
+    var solved = e.solved || 0, total = e.total || 3, errs = e.errors || 0;
+    var hasTime = isOp && typeof e.remaining_ms === "number";
+    if (e.outcome === "defused") {
+      var t = fmtH(hasTime ? e.remaining_ms : 0);
+      var lamps = [0, 1, 2].map(function (i) {
+        return i < errs
+          ? `<div class="w-6 h-6 rounded bg-error-container/60 flex items-center justify-center shadow-[0_0_8px_rgba(255,180,171,0.5)]"><span class="material-symbols-outlined text-error text-[16px]" style="font-variation-settings: 'FILL' 1;">warning</span></div>`
+          : `<div class="w-6 h-6 rounded bg-surface-container-highest flex items-center justify-center"><span class="w-1.5 h-1.5 rounded-full bg-outline-variant"></span></div>`;
+      }).join("");
+      var mods = [1, 2, 3].map(function (i) {
+        return `<div class="bg-surface-container p-2 rounded-lg flex flex-col items-center justify-center text-center shadow-inner"><span class="font-label-sm text-label-sm text-secondary">MOD-0${i}</span><span class="font-code-serial text-body-sm text-emerald-400 font-semibold truncate w-full">${escS(view.code)}-${i}</span><span class="font-label-sm text-label-sm text-emerald-400 mt-0.5 flex items-center gap-0.5"><span class="material-symbols-outlined text-[12px]">done</span>CÂBLAGE</span></div>`;
+      }).join("");
+      var timeBlock = hasTime
+        ? `<div class="font-display-timer-mobile text-display-timer-mobile text-emerald-400 tracking-tight drop-shadow-[0_0_10px_rgba(52,211,153,0.45)]" id="timer-display">${t[0]}<span class="text-emerald-400/70 font-code-serial text-code-serial">${t[1]}</span></div>`
+        : `<div class="flex flex-col items-end" id="timer-sealed"><div class="bg-surface-container-highest px-2.5 py-1 rounded font-label-sm text-label-sm text-primary tracking-widest uppercase flex items-center gap-1 shadow-inner"><span class="material-symbols-outlined text-[14px]">lock</span><span>NON TRANSMIS</span></div><span class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Restriction Manuel Tech</span></div>`;
+      app.innerHTML = S(`${debriefHeader("z-50", `<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div>`)}<main class="flex-1 flex flex-col relative w-full px-margin pt-14 pb-safe bg-surface"><div class="flex flex-col w-full max-w-md mx-auto space-y-3 pb-4">
+<div class="relative bg-surface-container-high rounded-xl p-3 shadow-md overflow-hidden"><div class="absolute top-2 left-2 w-3.5 h-3.5 rounded-full bg-surface-container-highest flex items-center justify-center shadow-inner"><div class="w-2.5 h-0.5 bg-outline transform rotate-45"></div></div><div class="absolute top-2 right-2 w-3.5 h-3.5 rounded-full bg-surface-container-highest flex items-center justify-center shadow-inner"><div class="w-2.5 h-0.5 bg-outline -rotate-45"></div></div><div class="flex items-center justify-center gap-2 pl-3 pr-3 pt-0.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_10px_#34d399] animate-pulse"></span><span class="font-label-sm text-label-sm tracking-widest text-emerald-300 font-bold uppercase">SÉCURISÉ // DÉTONATION ANNULÉE</span><span class="material-symbols-outlined text-[16px] text-emerald-400" style="font-variation-settings: 'FILL' 1;">lock</span></div></div>
+<div class="relative bg-surface-container rounded-xl p-4 shadow-xl overflow-hidden flex flex-col items-center text-center"><div class="absolute top-2.5 left-2.5 w-3 h-3 rounded-full bg-surface-variant flex items-center justify-center shadow-inner"><div class="w-2 h-0.5 bg-outline transform rotate-12"></div></div><div class="absolute top-2.5 right-2.5 w-3 h-3 rounded-full bg-surface-variant flex items-center justify-center shadow-inner"><div class="w-2 h-0.5 bg-outline transform -rotate-45"></div></div><div class="absolute bottom-2.5 left-2.5 w-3 h-3 rounded-full bg-surface-variant flex items-center justify-center shadow-inner"><div class="w-2 h-0.5 bg-outline transform rotate-90"></div></div><div class="absolute bottom-2.5 right-2.5 w-3 h-3 rounded-full bg-surface-variant flex items-center justify-center shadow-inner"><div class="w-2 h-0.5 bg-outline"></div></div>
+<div class="relative my-1"><div class="absolute inset-0 rounded-full bg-emerald-500/20 blur-xl"></div><div class="relative w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center shadow-[0_0_24px_rgba(52,211,153,0.35)]"><span class="material-symbols-outlined text-emerald-400 text-[36px]" style="font-variation-settings: 'FILL' 1;">verified_user</span></div></div>
+<span class="font-label-sm text-label-sm text-emerald-400 tracking-widest uppercase mt-2">SYS_ORDNANCE // NEUTRALISÉ</span><h2 class="font-headline-lg-mobile text-headline-lg-mobile text-emerald-300 uppercase tracking-tight drop-shadow-[0_0_12px_rgba(52,211,153,0.5)] mt-0.5">BOMBE DÉSAMORCÉE</h2><div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/60 mt-1 shadow-sm"><span class="material-symbols-outlined text-emerald-400 text-[14px]">check_circle</span><span class="font-code-serial text-body-sm text-emerald-200 uppercase font-semibold">Toutes charges inhibées</span></div></div>
+<div class="grid grid-cols-1 gap-2.5">
+<div class="relative bg-surface-container-low rounded-xl p-3 shadow-md flex items-center justify-between" id="telemetry-timer"><div class="flex flex-col"><span class="font-label-sm text-label-sm text-on-surface-variant tracking-wider uppercase">TEMPS RESTANT</span><span class="font-body-sm text-body-sm text-secondary">Marge sécuritaire d'intervention</span></div>${timeBlock}</div>
+<div class="relative bg-surface-container-low rounded-xl p-3 shadow-md flex items-center justify-between"><div class="flex flex-col"><span class="font-label-sm text-label-sm text-on-surface-variant tracking-wider uppercase">INCIDENTS // ERREURS</span><span class="font-body-sm text-body-sm text-secondary">Tolérance seuil maximal : 3</span></div><div class="flex items-center gap-3"><div class="flex items-center gap-1.5 bg-surface-container-lowest px-2 py-1.5 rounded-lg shadow-inner">${lamps}</div><span class="font-headline-sm text-headline-sm text-on-surface">${errs}<span class="text-secondary font-body-sm">/3</span></span></div></div>
+<div class="relative bg-surface-container-low rounded-xl p-3 shadow-md"><div class="flex items-center justify-between mb-2"><div class="flex flex-col"><span class="font-label-sm text-label-sm text-on-surface-variant tracking-wider uppercase">MODULES DÉSACTIVÉS</span><span class="font-body-sm text-body-sm text-secondary">Désengagement total validé</span></div><div class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-label-sm text-label-sm font-bold">${solved} / ${total} COMPLETS</div></div><div class="grid grid-cols-3 gap-2">${mods}</div></div>
+</div>
+<div class="pt-1"><button class="relative w-full h-14 bg-emerald-500 hover:bg-emerald-400 active:scale-[0.98] rounded-xl flex items-center justify-center gap-2.5 shadow-[0_0_20px_rgba(52,211,153,0.35)] transition-all overflow-hidden group" id="btn-replay"><div class="absolute inset-0 bg-gradient-to-r from-emerald-600/40 via-emerald-400/20 to-emerald-600/40 pointer-events-none"></div><span class="material-symbols-outlined text-surface-container-lowest text-[22px] font-bold transition-transform group-hover:rotate-180 duration-500">replay</span><span class="font-label-lg text-label-lg tracking-wider text-surface-container-lowest font-bold uppercase">RÉENGAGER UNE PARTIE // REJOUER</span><div class="absolute top-1 left-2 w-1.5 h-1.5 rounded-full bg-emerald-700/60"></div><div class="absolute top-1 right-2 w-1.5 h-1.5 rounded-full bg-emerald-700/60"></div><div class="absolute bottom-1 left-2 w-1.5 h-1.5 rounded-full bg-emerald-700/60"></div><div class="absolute bottom-1 right-2 w-1.5 h-1.5 rounded-full bg-emerald-700/60"></div></button></div>
+</div></main>`);
+      bind(); buzz([40, 60, 40]); return;
     }
-    app.appendChild(el("div", { class: "card end " + (win ? "win" : "boom") }, [
-      el("div", { class: "code", style: "font-size:34px;letter-spacing:.05em;color:" + (win ? "#42C97A" : "#F04444"), text: win ? "BOMBE DÉSAMORCÉE" : "EXPLOSION" })
-    ].concat(lines.map(function (l) { return el("div", { class: "muted", style: "font-size:18px", text: l }); }))));
-    app.appendChild(el("button", { class: "primary", text: "Rejouer", onclick: function () {
-      sb.rpc("zt_replay", { p_code: session.code, p_token: session.token }).then(function (r) { if (r.error) return fail(r.error); view = r.data; resetGameFlags(); selectedWire = null; activePanel = 0; render(); });
-    } }));
-    app.appendChild(el("button", { text: "Quitter", onclick: function () { forget(); render(); } }));
+    // ---- Explosion ----
+    var timeout = e.cause !== "errors";
+    var seg = [];
+    for (var i = 0; i < total; i++) seg.push(i < solved ? `<div class="h-2 rounded-xs bg-primary-container shadow-[0_0_6px_#ff9f32]"></div>` : i === solved ? `<div class="h-2 rounded-xs bg-error animate-pulse shadow-[0_0_8px_#ffb4ab]"></div>` : `<div class="h-2 rounded-xs bg-surface-variant"></div>`);
+    var cause = timeout ? "CAUSE : TEMPS ÉCOULÉ (00:00.00)" : "CAUSE : 3 ERREURS CRITIQUES (COURT-CIRCUIT)";
+    var first = endFxKey !== session.code + ":" + (e.outcome || "") + ":" + solved + ":" + errs;
+    endFxKey = session.code + ":" + (e.outcome || "") + ":" + solved + ":" + errs;
+    var chrono = isOp
+      ? `<div class="flex flex-col mt-1" id="chrono-op-view"><span class="font-display-timer-mobile text-display-timer-mobile text-error font-black leading-tight tracking-tight">${timeout ? `00:00<span class="text-label-md text-tertiary">.00</span>` : `--:--`}</span><span class="font-label-sm text-label-sm text-error/80 uppercase text-[9px]">${timeout ? "DÉPASSEMENT TOTAL" : "COURT-CIRCUIT"}</span></div>`
+      : `<div class="flex flex-col items-center justify-center py-1" id="chrono-tech-view"><span class="material-symbols-outlined text-outline text-[20px] mb-0.5">lock</span><span class="font-label-sm text-[9px] text-center text-outline leading-tight font-bold uppercase tracking-tight">NON TRANSMIS // CONFIDENTIEL</span></div>`;
+    app.innerHTML = S(`<div class="fixed inset-0 z-50 pointer-events-none${first ? " flash-active" : ""} transition-opacity" id="explosion-flash-layer"></div>
+<div class="flex flex-col min-h-[100dvh] w-full relative${first ? " shake-active" : ""}" id="screen-rumble-container">
+${debriefHeader("z-40", `<button aria-label="Rejouer détonation" class="w-8 h-8 rounded-full bg-error-container/80 border border-error/50 flex items-center justify-center text-error hover:bg-error-container active:scale-95 transition-all" id="btn-fx" title="Rejouer l'onde de choc et détonation"><span class="material-symbols-outlined text-[18px]">electric_bolt</span></button>`)}
+<main class="flex-1 flex flex-col relative w-full px-margin pt-14 pb-safe bg-surface"><div class="flex flex-col w-full h-[calc(100dvh-3.5rem)] overflow-hidden relative justify-between py-space-sm select-none">
+<div class="absolute inset-0 pointer-events-none opacity-20 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-error-container via-surface-container-lowest to-transparent animate-pulse"></div>
+<div class="absolute inset-0 pointer-events-none opacity-10 bg-repeat bg-[radial-gradient(#ffb4ab_1px,transparent_1px)] [background-size:16px_16px]"></div>
+<div class="absolute inset-0 pointer-events-none overflow-hidden z-[5]" id="embers-container"><div class="absolute bottom-1/3 left-1/4 w-1.5 h-1.5 rounded-full bg-primary-container shadow-[0_0_8px_#ff9f32] ember-p1"></div><div class="absolute bottom-2/5 left-1/2 w-2 h-2 rounded-full bg-error shadow-[0_0_10px_#ffb4ab] ember-p2"></div><div class="absolute bottom-1/3 right-1/4 w-1 h-1 rounded-full bg-primary-fixed shadow-[0_0_6px_#ffc691] ember-p3"></div><div class="absolute bottom-1/4 left-1/3 w-1.5 h-1.5 rounded-full bg-tertiary-container shadow-[0_0_8px_#ff9992] ember-p4"></div><div class="absolute bottom-2/5 right-1/3 w-2 h-2 rounded-full bg-primary shadow-[0_0_12px_#ffb872] ember-p5"></div></div>
+<div class="relative w-full rounded-xl bg-surface-container-low shadow-[0_8px_30px_rgba(147,0,10,0.45)] px-space-md py-space-sm flex flex-col gap-1.5 z-10"><div class="flex items-center justify-between"><div class="flex items-center gap-space-xs"><span class="w-3.5 h-3.5 rounded-full bg-surface-variant flex items-center justify-center text-[10px] text-surface-bright font-mono shadow-inner">✕</span><div class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-error-container/60 animate-pulse"><span class="w-2 h-2 rounded-full bg-error shadow-[0_0_8px_#ffb4ab]"></span><span class="font-label-sm text-label-sm text-error uppercase tracking-wider font-bold">ALERTE ROUGE // SECTEUR 04</span></div></div><div class="flex items-center gap-2"><span class="font-code-serial text-label-sm text-outline tracking-widest uppercase">DISP-UID: #LZ-${escS(view.code)}</span><span class="w-3.5 h-3.5 rounded-full bg-surface-variant flex items-center justify-center text-[10px] text-surface-bright font-mono shadow-inner">✕</span></div></div>
+<div class="flex items-center justify-between bg-surface-container-lowest/80 px-space-sm py-1 rounded"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-error text-[18px] animate-spin" style="animation-duration: 3s;">warning</span><span class="font-label-sm text-label-sm text-tertiary uppercase tracking-tight">INTÉGRITÉ CHÂSSIS : COMPROMISE 0%</span></div><div class="flex items-center gap-1"><span class="w-1.5 h-3 bg-error rounded-xs animate-ping"></span><span class="w-1.5 h-3 bg-error rounded-xs"></span><span class="w-1.5 h-3 bg-error-container rounded-xs"></span></div></div></div>
+<div class="relative w-full my-auto flex flex-col items-center justify-center text-center px-space-sm z-10 cursor-pointer select-none" id="blast-zone" title="Cliquer pour rejouer l'explosion">
+<div class="absolute top-1/2 left-1/2 w-64 h-64 -translate-x-1/2 -translate-y-1/2 rounded-full border border-error/80 pointer-events-none${first ? " shockwave-active-1" : ""}" id="shockwave-ring-1"></div>
+<div class="absolute top-1/2 left-1/2 w-64 h-64 -translate-x-1/2 -translate-y-1/2 rounded-full border border-primary-container/60 pointer-events-none${first ? " shockwave-active-2" : ""}" id="shockwave-ring-2"></div>
+<div class="absolute w-56 h-56 rounded-full bg-gradient-to-r from-error/30 via-primary-container/20 to-transparent blur-2xl pointer-events-none animate-pulse"></div>
+<svg class="absolute inset-0 w-full h-full pointer-events-none opacity-30 text-error stroke-current" fill="none" viewBox="0 0 300 160"><path d="M10 80 L90 70 L140 95 L200 65 L290 85" stroke-dasharray="2 1" stroke-width="1.5"></path><path d="M140 95 L155 140 L170 160" stroke-width="1"></path><path d="M90 70 L75 20 L60 0" stroke-width="1"></path></svg>
+<div class="relative px-space-md py-space-xs rounded bg-surface-container-highest/70 backdrop-blur-sm mb-2 border border-error/30 hover:border-error transition-all"><div class="flex items-center justify-center gap-2"><span class="material-symbols-outlined text-error text-[20px] animate-bounce">local_fire_department</span><span class="font-label-md text-label-md text-primary-fixed tracking-[0.25em] uppercase font-bold">DÉTONATION BALISTIQUE</span><span class="material-symbols-outlined text-error text-[20px] animate-bounce">local_fire_department</span></div></div>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-error tracking-tighter uppercase drop-shadow-[0_0_30px_rgba(255,180,171,0.85)] font-black active:scale-95 transition-transform">EXPLOSION</h2>
+<p class="font-code-serial text-label-md text-tertiary tracking-wider uppercase mt-0.5">UNITÉ DÉTRUITE — ÉCHEC DU PROTOCOLE</p>
+<div class="mt-2 flex items-center justify-center"><button class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-error-container/40 border border-error/40 text-error text-[11px] font-label-sm font-bold uppercase tracking-wider hover:bg-error-container/70 active:scale-95 transition-all shadow-[0_0_12px_rgba(147,0,10,0.4)]" id="btn-fx2" type="button"><span class="material-symbols-outlined text-[14px] animate-spin" style="animation-duration: 6s;">bolt</span><span>REJOUER DÉTONATION</span></button></div>
+</div>
+<div class="relative w-full rounded-xl bg-surface-container-low shadow-xl p-space-sm flex flex-col gap-2 z-10"><div class="flex items-center justify-between pb-1 bg-surface-container-lowest px-2 py-1 rounded"><div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-error-container animate-pulse"></span><span class="font-label-sm text-label-sm text-on-surface-variant font-bold uppercase">RAPPORT NOIR // TACTICAL LOG</span></div></div>
+<div class="bg-surface-container p-space-sm rounded-lg flex items-center justify-between"><div class="flex flex-col min-w-0"><span class="font-label-sm text-label-sm text-outline tracking-wider uppercase">ORIGINE ÉCHEC</span><span class="font-code-serial text-label-md text-error font-bold uppercase truncate" id="cause-text">${cause}</span></div><div class="w-8 h-8 rounded bg-error-container/40 flex items-center justify-center text-error shrink-0"><span class="material-symbols-outlined text-[20px]" id="cause-icon">${timeout ? "timer_off" : "bolt"}</span></div></div>
+<div class="grid grid-cols-2 gap-2"><div class="bg-surface-container p-2.5 rounded-lg flex flex-col justify-between"><div class="flex items-center justify-between"><span class="font-label-sm text-label-sm text-outline uppercase">MODULES</span><span class="font-code-serial text-label-sm text-primary-container font-bold">${solved} / ${total}</span></div><div class="grid gap-1.5 mt-2" style="grid-template-columns:repeat(${total},minmax(0,1fr))">${seg.join("")}</div><span class="font-label-sm text-label-sm text-on-surface-variant text-[9px] mt-1 tracking-tight">${solved < total ? "MOD-0" + (solved + 1) + ": ÉCHEC DÉTONÉ" : "TOUS MODULES RÉSOLUS"}</span></div>
+<div class="bg-surface-container p-2.5 rounded-lg flex flex-col justify-between relative overflow-hidden"><span class="font-label-sm text-label-sm text-outline uppercase">CHRONO FINAL</span>${chrono}</div></div></div>
+<div class="w-full pt-space-xs z-10 pb-safe"><button class="w-full min-h-[52px] h-[52px] bg-gradient-to-r from-error-container via-primary-container to-error-container hover:brightness-110 active:scale-[0.98] transition-all rounded-lg flex items-center justify-center gap-space-sm px-space-md shadow-[0_0_20px_rgba(255,159,50,0.35)] text-on-primary font-code-serial text-label-lg font-bold uppercase tracking-wider" id="btn-replay"><span class="material-symbols-outlined text-[24px] text-on-primary animate-spin" style="animation-duration: 4s;">restart_alt</span><span>RÉINITIALISER &amp; RÉARMER</span><span class="material-symbols-outlined text-[20px] text-on-primary">chevron_right</span></button><div class="text-center mt-1"><span class="font-label-sm text-label-sm text-outline tracking-widest text-[9px] uppercase">SYSTÈME BALISTIQUE // ORDONNANCE PROTOCOL V4.2</span></div></div>
+</div></main></div>`);
+    bind();
+    $("btn-fx").onclick = triggerDetonationFX;
+    $("btn-fx2").onclick = function (ev) { ev.stopPropagation(); triggerDetonationFX(); };
+    $("blast-zone").onclick = triggerDetonationFX;
+    if (first) { playBoomSound(); buzz([120, 40, 200, 60, 90]); }
   }
 
   var holdUntil = 0, holdTimer = null;
@@ -747,6 +899,7 @@
     var isTech = !!(session && view && view.status === "playing" && view.me && view.me.role === "technician" && view.manual);
     document.body.classList.toggle("tech", isTech);
     document.body.classList.toggle("workbench-bg", isTech);
+    document.body.classList.toggle("scr", !(session && view) || view.status === "lobby" || view.status === "ended" || view.status === "abandoned");
     soloChip();
     if (!session || !view) { stopTimer(); return renderHome(); }
     if (view.status === "lobby") { stopTimer(); resetGameFlags(); return renderLobby(); }

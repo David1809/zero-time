@@ -1003,3 +1003,29 @@ body.tech #tabBar::-webkit-scrollbar{display:none}
       z-index: 25 !important;
       border-bottom-color: #f4ecdf !important;
     }
+
+
+/* ===== Écrans salle d'attente / victoire / explosion : maquettes Stitch ===== */
+body.scr{position:fixed;inset:0;width:100%;margin:0;padding:0;overflow-x:hidden;overflow-y:auto;background-color:#0c141c;color:#dbe3ef;font-family:Chivo,sans-serif;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
+html:has(body.scr){overscroll-behavior:none;height:100%}
+body.scr #app{max-width:none;padding:0;gap:0;display:block;min-height:0}
+body.scr #toast{bottom:auto;top:60px}
+body.scr ::-webkit-scrollbar{display:none}
+:where(body.scr) *,:where(body.scr) ::before,:where(body.scr) ::after{border:0 solid #e5e7eb;box-sizing:border-box}
+:where(body.scr) svg{display:block}
+:where(body.scr) button{background:transparent;padding:0;min-height:0;border-radius:0;font:inherit;color:inherit;cursor:pointer}
+:where(body.scr) h1,:where(body.scr) h2,:where(body.scr) p{margin:0;font-size:inherit;font-weight:inherit;letter-spacing:normal;text-align:inherit}
+body.scr .pt-safe{padding-top:env(safe-area-inset-top,0px)}
+body.scr .pb-safe{padding-bottom:env(safe-area-inset-bottom,0px)}
+@keyframes screen-rumble{0%{transform:translate(0,0) rotate(0deg)}4%{transform:translate(-14px,12px) rotate(-1.5deg) scale(1.02)}8%{transform:translate(16px,-14px) rotate(1.8deg) scale(1.025)}12%{transform:translate(-18px,-10px) rotate(-1.2deg)}16%{transform:translate(15px,14px) rotate(1deg)}20%{transform:translate(-12px,8px) rotate(-.8deg)}25%{transform:translate(10px,-11px) rotate(.6deg)}30%{transform:translate(-9px,7px) rotate(-.5deg)}35%{transform:translate(8px,-6px) rotate(.4deg)}42%{transform:translate(-6px,5px) rotate(-.3deg)}50%{transform:translate(5px,-4px) rotate(.2deg)}60%{transform:translate(-3px,3px) rotate(-.1deg)}72%{transform:translate(2px,-2px) rotate(0deg)}85%{transform:translate(-1px,1px) rotate(0deg)}100%{transform:translate(0,0) rotate(0deg)}}
+@keyframes shockwave-expand{0%{transform:translate(-50%,-50%) scale(.1);opacity:.95;border-width:8px}40%{opacity:.8;border-width:5px}100%{transform:translate(-50%,-50%) scale(3.2);opacity:0;border-width:1px}}
+@keyframes explosion-flash{0%{opacity:.95;background-color:#fff}15%{opacity:.85;background-color:#ff9f32}35%{opacity:.4;background-color:#93000a}100%{opacity:0;background-color:transparent;pointer-events:none}}
+@keyframes ember-drift-1{0%{transform:translateY(0) translateX(0) scale(1);opacity:.9}50%{transform:translateY(-70px) translateX(25px) scale(1.3);opacity:.6}100%{transform:translateY(-160px) translateX(-20px) scale(.4);opacity:0}}
+@keyframes ember-drift-2{0%{transform:translateY(0) translateX(0) scale(1.2);opacity:1}60%{transform:translateY(-90px) translateX(-35px) scale(.9);opacity:.5}100%{transform:translateY(-200px) translateX(30px) scale(.2);opacity:0}}
+@keyframes ember-drift-3{0%{transform:translateY(0) translateX(0) scale(.8);opacity:.8}40%{transform:translateY(-50px) translateX(15px) scale(1.1);opacity:.4}100%{transform:translateY(-130px) translateX(45px) scale(.3);opacity:0}}
+.shake-active{animation:screen-rumble 1.25s cubic-bezier(.36,.07,.19,.97) both}
+.flash-active{animation:explosion-flash .9s cubic-bezier(.1,.9,.2,1) forwards}
+.shockwave-active-1{animation:shockwave-expand 1.1s cubic-bezier(.15,.8,.35,1) forwards}
+.shockwave-active-2{animation:shockwave-expand 1.4s .18s cubic-bezier(.15,.8,.35,1) forwards}
+.ember-p1{animation:ember-drift-1 2.8s infinite ease-out}.ember-p2{animation:ember-drift-2 3.4s infinite ease-out .4s}.ember-p3{animation:ember-drift-3 2.5s infinite ease-out .9s}.ember-p4{animation:ember-drift-1 3.1s infinite ease-out 1.5s}.ember-p5{animation:ember-drift-2 2.9s infinite ease-out 1.1s}
+@media (prefers-reduced-motion:reduce){.shake-active{animation:none!important}.flash-active{animation:none!important;opacity:0!important}}
