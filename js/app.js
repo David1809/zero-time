@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.52";
+  var APP_VERSION = "1.0.53";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -501,7 +501,7 @@ ${solo}
       });
       timerId = setInterval(function () {
         var ms = Math.max(0, pinEnds - (Date.now() + offsetMs));
-        if (pinApi && !view.paused) pinApi.setTime(fmtH(ms)[0], ms <= 20000);
+        if (pinApi && !view.paused) pinApi.setTime(fmtH(ms)[0], ms <= 20000, ms);
         if (ms <= 0 && !view.paused) expire();
       }, 100);
       pinApi.reset(); // active l'affichage
@@ -512,7 +512,7 @@ ${solo}
     if (solved) pinApi.lock(true); else if (!pinBusy) pinApi.lock(!!paused);
     pinApi.setErrors(g.errors);
     if (paused) pinApi.setTime(fmtH(paused.remaining_ms || 0)[0], false);
-    else pinApi.setTime(fmtH(Math.max(0, endsAt - (Date.now() + offsetMs)))[0], endsAt - (Date.now() + offsetMs) <= 20000);
+    else { var rm = Math.max(0, endsAt - (Date.now() + offsetMs)); pinApi.setTime(fmtH(rm)[0], rm <= 20000, rm); }
     if (solved && !openedSolved && !backTimer) backTimer = setTimeout(function () { backTimer = null; if (opScreen === "mod") goHub(); }, 1600);
   }
 

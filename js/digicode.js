@@ -67,6 +67,7 @@
     "@keyframes ztdb{0%,49%{opacity:0}50%,100%{opacity:1}}",
     ".ztd .ledoff.blink{animation:ztdb 1.2s steps(1,end) infinite}",
     "@keyframes ztdp{0%,100%{opacity:.8}50%{opacity:1}}",
+    ".ztd .ledred.blink{animation:ztdb 1s steps(1,end) infinite}",
     ".ztd .ledok{animation:ztdp 2.4s ease-in-out infinite}",
     ".ztd .lbl{font-family:ZTDJB,ui-monospace,monospace;font-weight:700;fill:#00ffaa;filter:drop-shadow(0 0 5px rgba(0,255,170,.85)) drop-shadow(0 0 14px rgba(0,255,170,.45))}",
     ".ztd .lbl.al{fill:#ff3333;filter:drop-shadow(0 0 6px rgba(255,51,51,.95)) drop-shadow(0 0 16px rgba(255,51,51,.6));animation:ztdal .65s ease-in-out infinite alternate}",
@@ -100,6 +101,7 @@
     var lampOffB = [];
     LAMP_B.forEach(function (x) { lampOffB.push(el("image", { href: base + "digicode2-lampe-b-off.png", x: x - 38, y: LAMP_Y - 38, width: 76, height: 76, opacity: 0 }, L)); });
     var ledOff = el("image", { "class": "ledoff blink", href: base + "digicode2-led-off.png", x: 750, y: 195, width: 80, height: 80, opacity: 0 }, L);
+    var ledRed = el("image", { "class": "ledred", href: base + "digicode2-led-rouge.png", x: 750, y: 195, width: 80, height: 80, opacity: 0 }, L);
     var ledOk = el("image", { "class": "ledok", href: base + "digicode2-led-vert.png", x: 750, y: 195, width: 80, height: 80, opacity: 0 }, L);
     var lblClean = el("image", { href: base + "digicode2-libelle.jpg", x: 826, y: 212, width: 140, height: 50, opacity: 0 }, L);
     var lbl = el("text", { "class": "lbl", x: 833, y: 249, "font-size": 41, opacity: 0 }, L); lbl.textContent = "00:00";
@@ -169,21 +171,29 @@
     }
     function renderStatus() {
       var done = S.status === "done";
-      ledOff.setAttribute("opacity", done ? 0 : 1); ledOff.setAttribute("class", "ledoff" + (done ? "" : " blink"));
-      ledOk.setAttribute("opacity", done ? 1 : 0);
       renderTime(); renderScrews();
     }
     function renderTime() {
       var on = S.active && S.time !== "";
       lblClean.setAttribute("opacity", on ? 1 : 0); lbl.setAttribute("opacity", on ? 1 : 0);
       lbl.textContent = S.time; lbl.setAttribute("class", "lbl" + (S.alarm ? " al" : ""));
+      var done = S.status === "done", red = S.active && S.alarm && !done;
+      // LED : verte en temps normal / quand le module est résolu ; rouge clignotante sous 20 s,
+      // de plus en plus vite vers 0 (période ~1 s à 20 s, ~0,14 s à 0)
+      ledOk.style.display = red ? "none" : ""; ledOk.setAttribute("opacity", S.active ? 1 : 0);
+      ledOff.setAttribute("opacity", red ? 1 : 0); ledOff.setAttribute("class", "ledoff");
+      if (red) {
+        var per = Math.round((0.14 + 0.86 * Math.min(1, Math.max(0, (S.ms || 0) / 20000))) * 25) / 25;
+        ledRed.setAttribute("opacity", 1); ledRed.setAttribute("class", "ledred blink");
+        if (ledRed._per !== per) { ledRed._per = per; ledRed.style.animationDuration = per + "s"; }
+      } else { ledRed.setAttribute("opacity", 0); ledRed.setAttribute("class", "ledred"); }
     }
     function renderScrews() { scr.forEach(function (g, i) { g.setAttribute("opacity", S.active && i < S.errors ? 1 : 0); }); }
     function renderAll() {
       var vis = S.active ? 1 : 0;
       cleanD.setAttribute("opacity", vis); cleanH.setAttribute("opacity", vis);
       gDisp.style.display = vis ? "" : "none"; gHist.style.display = vis ? "" : "none";
-      if (!vis) { lampOff.concat(lampOffB).forEach(function (e) { e.setAttribute("opacity", 0); }); ledOff.setAttribute("opacity", 0); ledOk.setAttribute("opacity", 0); lblClean.setAttribute("opacity", 0); lbl.setAttribute("opacity", 0); scr.forEach(function (g) { g.setAttribute("opacity", 0); }); return; }
+      if (!vis) { lampOff.concat(lampOffB).forEach(function (e) { e.setAttribute("opacity", 0); }); ledOff.setAttribute("opacity", 0); ledOk.setAttribute("opacity", 0); ledRed.setAttribute("opacity", 0); lblClean.setAttribute("opacity", 0); lbl.setAttribute("opacity", 0); scr.forEach(function (g) { g.setAttribute("opacity", 0); }); return; }
       renderDisplay(); renderHistory(); renderLamps(); renderStatus();
       box.classList.toggle("locked", S.locked);
     }
@@ -215,7 +225,7 @@
       press: press,
       activate: activate,
       setLamps: function (o) { if (o.red != null) S.red = o.red; if (o.blue != null) S.blue = o.blue; if (S.active) renderLamps(); },
-      setTime: function (t, alarm) { S.time = t; S.alarm = !!alarm; if (S.active) renderTime(); },
+      setTime: function (t, alarm, ms) { S.time = t; S.alarm = !!alarm; S.ms = ms; if (S.active) renderTime(); },
       setErrors: function (n) { S.errors = n; if (S.active) renderScrews(); },
       setStatus: function (s) { S.status = s; if (S.active) renderStatus(); },
       lock: function (v) { S.locked = !!v; if (S.active) renderAll(); },
