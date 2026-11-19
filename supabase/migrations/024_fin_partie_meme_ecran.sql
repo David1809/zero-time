@@ -1,0 +1,1 @@
+-- 024 : view_for envoie remaining_ms (désamorçage) à tous les joueurs. Rollback : remettre 'me.role = operator and' dans la branche ended.

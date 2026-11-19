@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.59";
+  var APP_VERSION = "1.0.60";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -980,7 +980,7 @@ ${solo}
       bind(); return;
     }
     var solved = e.solved || 0, total = e.total || 3, errs = e.errors || 0;
-    var hasTime = isOp && typeof e.remaining_ms === "number";
+    var hasTime = typeof e.remaining_ms === "number";
     if (e.outcome === "defused") {
       var t = fmtH(hasTime ? e.remaining_ms : 0);
       var lamps = [0, 1, 2].map(function (i) {
@@ -1015,7 +1015,7 @@ ${solo}
     var cause = timeout ? "CAUSE : TEMPS ÉCOULÉ (00:00.00)" : "CAUSE : 3 ERREURS CRITIQUES (COURT-CIRCUIT)";
     var first = endFxKey !== session.code + ":" + (e.outcome || "") + ":" + solved + ":" + errs;
     endFxKey = session.code + ":" + (e.outcome || "") + ":" + solved + ":" + errs;
-    var chrono = isOp
+    var chrono = true
       ? `<div class="flex flex-col mt-1" id="chrono-op-view"><span class="font-display-timer-mobile text-display-timer-mobile text-error font-black leading-tight tracking-tight">${timeout ? `00:00<span class="text-label-md text-tertiary">.00</span>` : `--:--`}</span><span class="font-label-sm text-label-sm text-error/80 uppercase text-[9px]">${timeout ? "DÉPASSEMENT TOTAL" : "COURT-CIRCUIT"}</span></div>`
       : `<div class="flex flex-col items-center justify-center py-1" id="chrono-tech-view"><span class="material-symbols-outlined text-outline text-[20px] mb-0.5">lock</span><span class="font-label-sm text-[9px] text-center text-outline leading-tight font-bold uppercase tracking-tight">NON TRANSMIS // CONFIDENTIEL</span></div>`;
     app.innerHTML = S(`<div class="fixed inset-0 z-50 pointer-events-none${first ? " flash-active" : ""} transition-opacity" id="explosion-flash-layer"></div>
