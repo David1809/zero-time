@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.47";
+  var APP_VERSION = "1.0.48";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -464,7 +464,7 @@ ${solo}
     var last = panel.attempts && panel.attempts.length ? panel.attempts[panel.attempts.length - 1] : null;
     if (!pinApi || !document.getElementById("ztpin")) {
       stopTimer(); clear();
-      app.innerHTML = '<div id="ztpin"><div id="ztpin-bar"><button id="ztpin-back" type="button">← BOMBE</button><span id="ztpin-err"></span><span id="ztpin-t">00:00</span></div><div id="ztpin-ui"></div><div id="ztpin-turn"><b>↻</b>REMETS LE TÉLÉPHONE<br>EN MODE PORTRAIT</div></div>';
+      app.innerHTML = '<div id="ztpin"><div id="ztpin-bar"><button id="ztpin-back" type="button">← BOMBE</button></div><div id="ztpin-ui"></div><div id="ztpin-turn"><b>↻</b>REMETS LE TÉLÉPHONE<br>EN MODE PORTRAIT</div></div>';
       pinApi = ZTDigicode.mount(document.getElementById("ztpin-ui"), { len: 4 });
       document.getElementById("ztpin-back").onclick = goHub;
       pinApi.on("submit", function (code) {
@@ -483,8 +483,8 @@ ${solo}
         });
       });
       timerId = setInterval(function () {
-        var ms = Math.max(0, pinEnds - (Date.now() + offsetMs)), f = fmtH(ms), t = document.getElementById("ztpin-t");
-        if (t && !view.paused) { t.textContent = f[0]; t.className = ms <= 20000 ? "al" : ""; }
+        var ms = Math.max(0, pinEnds - (Date.now() + offsetMs));
+        if (pinApi && !view.paused) pinApi.setTime(fmtH(ms)[0], ms <= 20000);
         if (ms <= 0 && !view.paused) expire();
       }, 100);
       pinApi.reset(); // active l'affichage
@@ -493,8 +493,9 @@ ${solo}
     pinApi.setLamps({ red: panel.reds, blue: panel.blues });
     pinApi.setStatus(solved ? "done" : "todo");
     if (solved) pinApi.lock(true); else if (!pinBusy) pinApi.lock(!!paused);
-    var er = document.getElementById("ztpin-err"); if (er) er.textContent = "ERREURS " + g.errors + "/3" + (paused ? " · ⏸ " + String(paused.pseudo || "").toUpperCase() : "");
-    if (paused) { var t0 = document.getElementById("ztpin-t"); if (t0) t0.textContent = fmtH(paused.remaining_ms || 0)[0]; }
+    pinApi.setErrors(g.errors);
+    if (paused) pinApi.setTime(fmtH(paused.remaining_ms || 0)[0], false);
+    else pinApi.setTime(fmtH(Math.max(0, endsAt - (Date.now() + offsetMs)))[0], endsAt - (Date.now() + offsetMs) <= 20000);
     if (solved && !openedSolved && !backTimer) backTimer = setTimeout(function () { backTimer = null; if (opScreen === "mod") goHub(); }, 1600);
   }
 

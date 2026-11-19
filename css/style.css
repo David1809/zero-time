@@ -1037,12 +1037,12 @@ body.op #tactical-rack{overflow:hidden}
 
 /* Module Digicode (portrait) */
 #ztpin{position:fixed;inset:0;background:#0b0c0e;display:flex;flex-direction:column;z-index:30;-webkit-user-select:none;user-select:none}
-#ztpin-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:calc(env(safe-area-inset-top,0px) + 6px) 10px 6px;min-height:46px;font:700 12px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.06em;color:#9bb1c5}
-#ztpin-back{min-height:0;height:34px;padding:0 12px;font:700 13px "JetBrains Mono",ui-monospace,monospace;background:#1a1e24;border:1px solid #373f4a;color:#ff9f32;border-radius:8px;letter-spacing:.06em}
+#ztpin-bar{display:flex;align-items:center;justify-content:flex-start;gap:8px;padding:calc(env(safe-area-inset-top,0px) + 4px) 10px 4px;min-height:40px;font:700 12px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.06em;color:#9bb1c5}
+#ztpin-back{min-height:0;height:32px;padding:0 12px;font:700 13px "JetBrains Mono",ui-monospace,monospace;background:#1a1e24;border:1px solid #373f4a;color:#ff9f32;border-radius:8px;letter-spacing:.06em}
 #ztpin-t{font:700 20px "JetBrains Mono",ui-monospace,monospace;color:#00ffaa}
 #ztpin-t.al{color:#ff3333}
 #ztpin-ui{flex:1;min-height:0;display:flex;justify-content:center;align-items:flex-start;overflow:hidden}
-#ztpin-ui .ztd{width:min(100vw,calc((100dvh - 56px) * 1080 / 1916));flex:none}
+#ztpin-ui .ztd{width:min(100vw,calc((100dvh - 52px) * 1080 / 1916));flex:none}
 #ztpin-turn{position:absolute;inset:0;background:#000;color:#f3f5f5;z-index:20;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;text-align:center;font:700 18px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.1em}
 #ztpin-turn b{font-size:44px;color:#ff9f32}
 @media (orientation:landscape){#ztpin-turn{display:flex}}

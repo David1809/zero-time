@@ -68,7 +68,10 @@
     ".ztd .ledoff.blink{animation:ztdb 1.2s steps(1,end) infinite}",
     "@keyframes ztdp{0%,100%{opacity:.8}50%{opacity:1}}",
     ".ztd .ledok{animation:ztdp 2.4s ease-in-out infinite}",
-    ".ztd .lbl{font-family:ZTDBarlow,'Barlow Condensed',Oswald,sans-serif;font-weight:600;letter-spacing:.04em}",
+    ".ztd .lbl{font-family:ZTDJB,ui-monospace,monospace;font-weight:700;fill:#00ffaa;filter:drop-shadow(0 0 5px rgba(0,255,170,.85)) drop-shadow(0 0 14px rgba(0,255,170,.45))}",
+    ".ztd .lbl.al{fill:#ff3333;filter:drop-shadow(0 0 6px rgba(255,51,51,.95)) drop-shadow(0 0 16px rgba(255,51,51,.6));animation:ztdal .65s ease-in-out infinite alternate}",
+    "@keyframes ztdal{0%{opacity:.8}100%{opacity:1}}",
+    ".ztd .scr{mix-blend-mode:screen}",
     ".ztd .hd{font-family:ZTDBarlow,'Barlow Condensed',Oswald,sans-serif;font-weight:600;fill:#e9ddc6;text-anchor:middle}",
     "@keyframes ztdsh{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}",
     ".ztd.shake{animation:ztdsh .35s}"
@@ -79,7 +82,7 @@
     var base = opts.base || "assets/digicode/", LEN = opts.len || 4, demo = !!opts.demo;
     if (!document.getElementById("ztd-css")) {
       var st = document.createElement("style"); st.id = "ztd-css";
-      st.textContent = "@font-face{font-family:ZTDBarlow;src:url(" + base + "barlow-600.woff2) format('woff2');font-weight:600;font-display:block}\n" + CSS;
+      st.textContent = "@font-face{font-family:ZTDJB;src:url(" + (opts.timeFont || base + "../hub/jetbrains-700.woff2") + ") format('woff2');font-weight:700;font-display:block}\n@font-face{font-family:ZTDBarlow;src:url(" + base + "barlow-600.woff2) format('woff2');font-weight:600;font-display:block}\n" + CSS;
       document.head.appendChild(st);
     }
     root.innerHTML = "";
@@ -100,8 +103,18 @@
     var ledOff = el("image", { "class": "ledoff blink", href: base + "digicode2-led-off.png", x: 750, y: 195, width: 80, height: 80, opacity: 0 }, L);
     var ledOk = el("image", { "class": "ledok", href: base + "digicode2-led-vert.png", x: 750, y: 195, width: 80, height: 80, opacity: 0 }, L);
     var lblClean = el("image", { href: base + "digicode2-libelle.jpg", x: 826, y: 212, width: 140, height: 50, opacity: 0 }, L);
-    var lbl = el("text", { "class": "lbl", x: 836, y: 251, "font-size": 44, fill: "#00ffaa", opacity: 0 }, L); lbl.textContent = "RÉSOLU";
-    lbl.style.filter = "drop-shadow(0 0 6px rgba(0,255,170,.7))";
+    var lbl = el("text", { "class": "lbl", x: 833, y: 249, "font-size": 41, opacity: 0 }, L); lbl.textContent = "00:00";
+    // vis du boîtier : s'allument en rouge en diagonale à chaque erreur (1 haut-gauche, 2 bas-droite, 3 haut-droite)
+    var SCREWS = [[105, 190], [980, 1728], [980, 190], [105, 1728]];
+    var gScr = el("g", {}, L), scr = [];
+    SCREWS.forEach(function (c) {
+      var g = el("g", { "class": "scr", opacity: 0 }, gScr);
+      el("circle", { cx: c[0], cy: c[1], r: 62, fill: "url(#ztdsg)" }, g);
+      el("circle", { cx: c[0], cy: c[1], r: 29, fill: "#ff2a1f", opacity: .55 }, g);
+      scr.push(g);
+    });
+    var defs = el("defs", {}, svg), rg = el("radialGradient", { id: "ztdsg" }, defs);
+    el("stop", { offset: 0, "stop-color": "#ff2a1f", "stop-opacity": .9 }, rg); el("stop", { offset: .45, "stop-color": "#ff2a1f", "stop-opacity": .4 }, rg); el("stop", { offset: 1, "stop-color": "#ff2a1f", "stop-opacity": 0 }, rg);
 
     // --- touches
     var keys = {};
@@ -115,7 +128,7 @@
     });
 
     // --- état
-    var S = { buf: "", hist: null, red: 4, blue: 4, status: "todo", locked: false, active: !demo, flash: "" };
+    var S = { buf: "", hist: null, red: 4, blue: 4, status: "todo", locked: false, active: !demo, flash: "", errors: 0, time: "", alarm: false };
     var handlers = {};
     function emit(n, a) { (handlers[n] || []).forEach(function (f) { f(a); }); }
 
@@ -158,13 +171,19 @@
       var done = S.status === "done";
       ledOff.setAttribute("opacity", done ? 0 : 1); ledOff.setAttribute("class", "ledoff" + (done ? "" : " blink"));
       ledOk.setAttribute("opacity", done ? 1 : 0);
-      lblClean.setAttribute("opacity", done ? 1 : 0); lbl.setAttribute("opacity", done ? 1 : 0);
+      renderTime(); renderScrews();
     }
+    function renderTime() {
+      var on = S.active && S.time !== "";
+      lblClean.setAttribute("opacity", on ? 1 : 0); lbl.setAttribute("opacity", on ? 1 : 0);
+      lbl.textContent = S.time; lbl.setAttribute("class", "lbl" + (S.alarm ? " al" : ""));
+    }
+    function renderScrews() { scr.forEach(function (g, i) { g.setAttribute("opacity", S.active && i < S.errors ? 1 : 0); }); }
     function renderAll() {
       var vis = S.active ? 1 : 0;
       cleanD.setAttribute("opacity", vis); cleanH.setAttribute("opacity", vis);
       gDisp.style.display = vis ? "" : "none"; gHist.style.display = vis ? "" : "none";
-      if (!vis) { lampOff.concat(lampOffB).forEach(function (e) { e.setAttribute("opacity", 0); }); ledOff.setAttribute("opacity", 0); ledOk.setAttribute("opacity", 0); lblClean.setAttribute("opacity", 0); lbl.setAttribute("opacity", 0); return; }
+      if (!vis) { lampOff.concat(lampOffB).forEach(function (e) { e.setAttribute("opacity", 0); }); ledOff.setAttribute("opacity", 0); ledOk.setAttribute("opacity", 0); lblClean.setAttribute("opacity", 0); lbl.setAttribute("opacity", 0); scr.forEach(function (g) { g.setAttribute("opacity", 0); }); return; }
       renderDisplay(); renderHistory(); renderLamps(); renderStatus();
       box.classList.toggle("locked", S.locked);
     }
@@ -196,6 +215,8 @@
       press: press,
       activate: activate,
       setLamps: function (o) { if (o.red != null) S.red = o.red; if (o.blue != null) S.blue = o.blue; if (S.active) renderLamps(); },
+      setTime: function (t, alarm) { S.time = t; S.alarm = !!alarm; if (S.active) renderTime(); },
+      setErrors: function (n) { S.errors = n; if (S.active) renderScrews(); },
       setStatus: function (s) { S.status = s; if (S.active) renderStatus(); },
       lock: function (v) { S.locked = !!v; if (S.active) renderAll(); },
       /* résultat d'une tentative : { verdicts:"xogx", solved:bool } */
