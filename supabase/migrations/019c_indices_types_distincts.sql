@@ -1,0 +1,3 @@
+-- 019c : dans un tableau de lettres, chaque ligne a un type d'indice différent (plus de leurres identiques ni contradictoires entre eux).
+-- Remplace zt.make_pin_info (voir l'application sur la base : migration 019c_indices_types_distincts).
+-- Principe : types des vrais indices retirés de la liste, leurres = types restants mélangés, valeurs tirées d'un faux code cohérent.
