@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.51";
+  var APP_VERSION = "1.0.52";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -420,6 +420,23 @@ ${solo}
   function expire() { if (tickSent) return; tickSent = true; sb.rpc("zt_tick", { p_code: session.code, p_token: session.token }).then(function (r) { if (!r.error) { view = r.data; render(); } }); }
 
   // --- Bombe globale (paysage) : choix du module ---
+  // Tour rouge (30 dernières secondes) sur la bombe et le digicode, identique au coupe-fils
+  var vigEl = null;
+  setInterval(function () {
+    var on = false;
+    try {
+      on = !!(view && view.status === "playing" && !view.paused && pinEnds &&
+        (document.getElementById("zthub") || document.getElementById("ztpin")) &&
+        pinEnds - (Date.now() + offsetMs) <= 30000);
+    } catch (e) {}
+    if (on && !vigEl) {
+      vigEl = document.createElement("div");
+      vigEl.className = "alarm-vignette-overlay fixed inset-0 pointer-events-none z-40";
+      vigEl.style.animationDuration = ".6s";
+      document.body.appendChild(vigEl);
+    } else if (!on && vigEl) { vigEl.remove(); vigEl = null; }
+  }, 200);
+
   function renderHub(g) {
     stopTimer(); syncClock(g); consumeEvent(g);
     var endsAt = new Date(g.ends_at).getTime();
