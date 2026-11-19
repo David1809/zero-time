@@ -1048,3 +1048,6 @@ body.op #tactical-rack{overflow:hidden}
 @media (orientation:landscape){#ztpin-turn{display:flex}}
 
 .zt-back{min-height:0;height:32px;padding:0 12px;font:700 13px "JetBrains Mono",ui-monospace,monospace;background:#1a1e24;border:1px solid #373f4a;color:#ff9f32;border-radius:8px;letter-spacing:.06em;width:auto}
+
+.zt-bar{display:flex;align-items:center;justify-content:flex-start;gap:8px;padding:calc(env(safe-area-inset-top,0px) + 4px) 10px 4px;min-height:40px;position:relative;z-index:50;background:#0d0f12}
+.zt-bar #zt-hub-back{min-height:0;height:32px;width:auto;padding:0 12px;font:700 13px "JetBrains Mono",ui-monospace,monospace;background:#1a1e24;border:1px solid #373f4a;color:#ff9f32;border-radius:8px;letter-spacing:.06em;flex:none;white-space:nowrap}
