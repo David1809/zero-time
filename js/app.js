@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.54";
+  var APP_VERSION = "1.0.55";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -474,7 +474,7 @@ ${solo}
       });
     }
     pinEnds = endsAt;
-    hubApi.update({ mods: mods, errors: g.errors, paused: pz, frozenMs: view.paused && view.paused.remaining_ms || 0 });
+    hubApi.update({ serial: (g.panels[0] || {}).serial, mods: mods, errors: g.errors, paused: pz, frozenMs: view.paused && view.paused.remaining_ms || 0 });
   }
 
   // --- Module Digicode (portrait) ---
@@ -843,7 +843,7 @@ ${solo}
       var P = m.pin;
       return techHead(k) + '<ol class="space-y-3 font-hand text-lg text-inkBlue">' + P.rules.map(function (r, i) {
         return '<li class="' + (i % 2 === 0 ? "bg-amber-50/40 p-1.5 rounded border border-dashed border-amber-900/20" : "p-1.5 rounded") + '"><span class="font-notes font-bold text-inkBlue text-base bg-amber-200/60 px-1.5 rounded">' + escH(String(r.n).split(".").pop()) + "</span> " + escH(r.t) + "</li>";
-      }).join("") + '</ol><div class="mt-3 p-2 rounded border border-slate-400/40 bg-slate-200/40 font-hand text-base text-inkBlue space-y-1"><div class="font-notes text-xs font-bold text-inkRed uppercase tracking-wider">Lecture de l\'historique</div>' + P.verdicts.map(function (t) { return "<div>" + escH(t) + "</div>"; }).join("") + '</div><p class="mt-3 font-notes text-xs text-inkRed font-bold">' + escH(P.penalties) + "</p>";
+      }).join("") + '</ol>' + (m.pin_clues && m.pin_clues.length ? '<div class="mt-3 p-2 rounded border border-amber-900/30 bg-amber-50/60 font-hand text-base text-inkBlue"><div class="font-notes text-xs font-bold text-inkRed uppercase tracking-wider mb-1">Tableau des lettres (cette partie)</div>' + m.pin_clues.map(function (c) { return '<div class="flex gap-2 items-baseline py-0.5 border-b border-dotted border-inkBlue/30"><span class="font-typewriter font-black text-xl text-inkRed w-6 text-center">' + escH(c.l) + '</span><span>' + escH(c.t) + '</span></div>'; }).join("") + (m.solo_serial ? '<div class="mt-1 font-notes text-xs text-slate-600">Mode solo : numéro de série = ' + escH(m.solo_serial) + '</div>' : '') + '</div>' : '') + '<div class="mt-3 p-2 rounded border border-slate-400/40 bg-slate-200/40 font-hand text-base text-inkBlue space-y-1"><div class="font-notes text-xs font-bold text-inkRed uppercase tracking-wider">Lecture de l\'historique</div>' + P.verdicts.map(function (t) { return "<div>" + escH(t) + "</div>"; }).join("") + '</div><p class="mt-3 font-notes text-xs text-inkRed font-bold">' + escH(P.penalties) + "</p>";
     }
     if (k === "lecture") {
       var L = ["Étape A : Annoncer le module", "Étape B : Relever le numéro de série", "Étape C : Lister les couleurs"];

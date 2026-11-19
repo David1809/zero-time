@@ -27,6 +27,7 @@
 @media (orientation:portrait){#zthub{inset:auto;top:0;left:100vw;width:100dvh;height:100vw;transform:rotate(90deg);transform-origin:top left}
 #zthub #stage{width:min(100dvh,calc(100vw*1918/1080))}
 body:has(#zthub) #toast{top:50% !important;bottom:auto !important;left:auto !important;right:0 !important;max-width:80dvh;transform:translateY(-50%) translateX(-6px) rotate(90deg) !important;transform-origin:center right;z-index:40}}
+#zthub #fx .sn{font-family:"ZTOrb",ui-monospace,monospace;font-weight:700;font-size:36px;fill:#f2b32a;filter:drop-shadow(0 0 4px rgba(242,179,42,.45))}
 #zthub #fx .et{font-family:"ZTOrb",ui-monospace,monospace;font-weight:400;font-size:30px;fill:#a9acae}
 #zthub #fx .en{font-family:"ZTOrb",ui-monospace,monospace;font-weight:700;font-size:34px;fill:#5b5c60;text-anchor:middle}
 #zthub #fx .lk{font-family:"ZTOrb",ui-monospace,monospace;font-weight:700;font-size:25px;fill:#80858b;text-anchor:middle;letter-spacing:.06em}
@@ -103,6 +104,7 @@ body:has(#zthub) #toast{top:50% !important;bottom:auto !important;left:auto !imp
     root.innerHTML =
       '<div id="zthub"><div id="stage"><img src="assets/hub/bombe.jpg" alt="Bombe : Alimentation, Détonateur, Digicode, Horloge" draggable="false">' +
       '<svg id="fx" viewBox="0 0 1918 1080" aria-hidden="true">' + DEFS +
+      '<rect x="532" y="74" width="250" height="42" rx="3" fill="#1b1b1b" style="filter:blur(2px)"/><text id="sn" class="sn" x="540" y="108">--------</text>' +
       '<rect x="752" y="294" width="436" height="102" rx="6" fill="#090405" style="filter:blur(3px)"/>' +
       '<text class="dig" id="dg" x="972" y="383"><tspan id="dm">00:00</tspan><tspan class="ms" id="dms" dx="8">.00</tspan></text>' +
       '<g id="errg"><rect x="915" y="426" width="280" height="82" fill="#050505" style="filter:blur(2px)"/><rect x="756" y="466" width="150" height="40" fill="#050505" style="filter:blur(2px)"/><text id="errt" x="762" y="494" class="et">[0/3]</text><g id="errb"></g></g>' +
@@ -197,7 +199,7 @@ body:has(#zthub) #toast{top:50% !important;bottom:auto !important;left:auto !imp
     var iv = setInterval(tick, 40);
     var api = {
       update: function (s) {
-        S.mods = s.mods || S.mods; S.paused = s.paused || null; S.frozenMs = s.frozenMs || 0;
+        if (s.serial) $("#sn").textContent = s.serial; S.mods = s.mods || S.mods; S.paused = s.paused || null; S.frozenMs = s.frozenMs || 0;
         leds(); errs(s.errors || 0);
         var pb = $("#hubpause"); pb.classList.toggle("on", !!S.paused);
         if (S.paused) { $("#hpt").textContent = "⏸ EN ATTENTE DE " + String(S.paused.pseudo || "").toUpperCase(); $("#hpa").style.display = S.paused.can_abandon ? "" : "none"; }
