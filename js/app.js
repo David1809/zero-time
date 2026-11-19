@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.56";
+  var APP_VERSION = "1.0.57";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -810,7 +810,7 @@ ${solo}
     if (circle) return '<li class="flex items-start gap-2.5 ' + bg + '"><span class="font-notes font-bold text-inkBlue text-base bg-amber-200/60 w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5">' + n + '</span><div class="leading-snug"><span>' + cond + "</span>" + act + "</div></li>";
     return '<li class="' + bg + '"><span class="font-notes font-bold text-inkBlue text-base bg-amber-200/60 px-1.5 rounded">' + n + "</span> <span>" + cond + "</span>" + act + "</li>";
   }
-  var TECH_ORDER = ["lecture", "w3", "w4", "w5", "pin"];
+  var TECH_ORDER = ["lecture", "w3", "w4", "w5", "w6", "w7", "w8", "pin"];
   var TECH_META = {
     lecture: { tab: "📌 Lire un panneau", title: "Section 02 — Lire un Panneau", sub: "Protocole de communication avec l'opérateur", pg: "p. 02", ind: "Page 2 / 8 — Lire un panneau" },
     w3: { tab: "Alimentation", title: "Section 03 — Alimentation", sub: "Configuration compacte à 3 connexions", pg: "p. 03", ind: "Page 3 / 8 — Alimentation" },
@@ -851,7 +851,7 @@ ${solo}
         return '<div class="bg-amber-100/40 p-2.5 rounded border border-amber-800/30"><span class="font-notes text-xs font-bold text-inkRed uppercase tracking-wider block">' + L[i % 3] + '</span><p class="mt-1">' + escH(t) + "</p></div>";
       }).join("") + "</div>";
     }
-    var items = [["lecture", "📌", "Lire un panneau", "(protocole série, comptage)", "p. 02"], ["w3", "⚡", "Alimentation", "(combinaisons de base)", "p. 03"], ["w4", "⚡", "Horloge", "(série pair/impair & règles)", "p. 04"], ["w5", "⚡", "Détonateur", "(harnais complexe à 5 brins)", "p. 05"], ["pin", "🔢", "Digicode", "(voyants rouges/bleus, essais)", "p. 09"]];
+    var items = [["lecture", "📌", "Lire un panneau", "(protocole série, comptage)", "p. 02"], ["w3", "⚡", "Alimentation", "(combinaisons de base)", "p. 03"], ["w4", "⚡", "Horloge", "(série pair/impair & règles)", "p. 04"], ["w5", "⚡", "Détonateur", "(harnais complexe à 5 brins)", "p. 05"], ["w6", "⚡", "Capteur", "(faisceau à 6 brins)", "p. 06"], ["w7", "⚡", "Relais", "(faisceau à 7 brins)", "p. 07"], ["w8", "⚡", "Charge", "(harnais à 8 brins)", "p. 08"], ["pin", "🔢", "Digicode", "(voyants rouges/bleus, essais)", "p. 09"]];
     return techHead("index") +
       '<div class="mb-4 bg-amber-50/70 p-2.5 rounded border border-amber-900/30 shadow-inner"><label class="block font-notes text-xs text-slate-700 font-bold mb-1">🔍 Recherche de mot-clé ou module :</label><div class="relative"><input type="text" id="indexSearchInput" placeholder="Ex: 4 fils, série, pair..." class="w-full bg-transparent border-b-2 border-inkBlue text-inkBlue font-hand text-xl px-1 py-0.5 focus:outline-none focus:border-inkRed placeholder-slate-400"/><span class="absolute right-1 top-1 text-xs text-slate-400 font-notes italic">écrire ici</span></div></div>' +
       '<ul id="indexList" class="space-y-2.5 font-hand text-lg text-inkBlue">' + items.map(function (x) {
