@@ -6,7 +6,8 @@
  */
 (function () {
   "use strict";
-  var NAME = { alim: "Alimentation", deto: "Détonateur", digi: "Digicode", hor: "Horloge" };
+  var NAME = { alim: "Alimentation", digi: "Digicode" };
+  var LOCKED = { deto: "Détonateur", hor: "Horloge" };
   var CSS = `
 @font-face{font-family:"ZTOrb";src:url(assets/hub/jetbrains-400.woff2) format("woff2");font-weight:400;font-display:block}
 @font-face{font-family:"ZTOrb";src:url(assets/hub/jetbrains-700.woff2) format("woff2");font-weight:700;font-display:block}
@@ -28,6 +29,7 @@
 body:has(#zthub) #toast{top:50% !important;bottom:auto !important;left:auto !important;right:0 !important;max-width:80dvh;transform:translateY(-50%) translateX(-6px) rotate(90deg) !important;transform-origin:center right;z-index:40}}
 #zthub #fx .et{font-family:"ZTOrb",ui-monospace,monospace;font-weight:400;font-size:30px;fill:#a9acae}
 #zthub #fx .en{font-family:"ZTOrb",ui-monospace,monospace;font-weight:700;font-size:34px;fill:#5b5c60;text-anchor:middle}
+#zthub #fx .lk{font-family:"ZTOrb",ui-monospace,monospace;font-weight:700;font-size:25px;fill:#80858b;text-anchor:middle;letter-spacing:.06em}
 #zthub #hubpause{position:absolute;left:50%;top:6px;transform:translateX(-50%);z-index:12;display:none;align-items:center;gap:10px;background:rgba(38,31,20,.94);border:1px solid #6b4e20;color:#ffcf7a;border-radius:8px;padding:6px 12px;font:700 13px "ZTOrb",monospace;letter-spacing:.06em;white-space:nowrap}
 #zthub #hubpause.on{display:flex}
 #zthub #hubpause button{min-height:0;height:28px;padding:0 10px;font:700 12px "ZTOrb",monospace;border:1px solid #ff6b6b;background:transparent;color:#ff9a9a;border-radius:6px}
@@ -101,7 +103,8 @@ body:has(#zthub) #toast{top:50% !important;bottom:auto !important;left:auto !imp
       '<rect x="752" y="294" width="436" height="102" rx="6" fill="#090405" style="filter:blur(3px)"/>' +
       '<text class="dig" id="dg" x="972" y="383"><tspan id="dm">00:00</tspan><tspan class="ms" id="dms" dx="8">.00</tspan></text>' +
       '<g id="errg"><rect x="915" y="426" width="280" height="82" fill="#050505" style="filter:blur(2px)"/><rect x="756" y="466" width="150" height="40" fill="#050505" style="filter:blur(2px)"/><text id="errt" x="762" y="494" class="et">[0/3]</text><g id="errb"></g></g>' +
-      '<image id="detoimg" href="assets/hub/deto-todo.jpg" x="300" y="503" width="310" height="210"/>' +
+      '<g class="lockpl"><rect x="323" y="222" width="272" height="126" rx="7" fill="#0d0e10" stroke="#2b2d31" stroke-width="2"/><rect x="445" y="352" width="150" height="44" rx="4" fill="#17191c"/><path d="M416 284 v-14 a14 14 0 0 1 28 0 v14" fill="none" stroke="#6d7177" stroke-width="5"/><rect x="411" y="284" width="38" height="30" rx="4" fill="#6d7177"/><circle cx="430" cy="299" r="4" fill="#0d0e10"/><text x="583" y="385" class="lk" style="text-anchor:end;font-size:21px">VERROUILLÉ</text></g>'.replace(/<g class="lockpl">/, '<g class="lockpl" id="lk-deto" transform="translate(0 298)">') +
+      '<g class="lockpl"><rect x="1359" y="222" width="272" height="126" rx="7" fill="#0d0e10" stroke="#2b2d31" stroke-width="2"/><rect x="1481" y="352" width="150" height="44" rx="4" fill="#17191c"/><path d="M1452 284 v-14 a14 14 0 0 1 28 0 v14" fill="none" stroke="#6d7177" stroke-width="5"/><rect x="1447" y="284" width="38" height="30" rx="4" fill="#6d7177"/><circle cx="1466" cy="299" r="4" fill="#0d0e10"/><text x="1619" y="385" class="lk" style="text-anchor:end;font-size:21px">VERROUILLÉ</text></g>'.replace(/<g class="lockpl">/, '<g class="lockpl" id="lk-hor" transform="translate(0 298)">') +
       ledSvg("alim", 597, 183) + ledSvg("deto", 597, 481) + ledSvg("digi", 1632, 183, true) + ledSvg("hor", 1634, 481) +
       '<g id="armb" class="lock">'+
       '<rect x="728" y="756" width="120" height="154" rx="14" fill="#131313"/>'+
@@ -119,10 +122,10 @@ body:has(#zthub) #toast{top:50% !important;bottom:auto !important;left:auto !imp
       '</g>' +
       '<circle class="a1" cx="1036" cy="238" r="26" fill="url(#offR)"/><ellipse class="a4" cx="1049" cy="96" rx="22" ry="26" fill="url(#offY)"/></svg>' +
       '<button class="z" data-t="todo" data-n="Alimentation" data-id="alim" style="left:13.608%;top:13.241%;width:19.604%;height:26.389%" aria-label="Alimentation"></button>'+
-      '<button class="z" data-t="done" data-n="Détonateur" data-id="deto" style="left:13.608%;top:40.741%;width:19.604%;height:25.741%" aria-label="Détonateur"></button>'+
+      '<button class="z" data-t="locked" data-n="Détonateur" data-id="deto" style="left:13.608%;top:40.741%;width:19.604%;height:25.741%" aria-label="Détonateur"></button>'+
       '<button class="z" data-t="free" data-n="" style="left:13.608%;top:67.870%;width:19.604%;height:20.093%" aria-label="free"></button>'+
       '<button class="z" data-t="todo" data-n="Digicode" data-id="digi" style="left:68.352%;top:13.241%;width:18.665%;height:26.389%" aria-label="Digicode"></button>'+
-      '<button class="z" data-t="todo" data-n="Horloge" data-id="hor" style="left:68.352%;top:40.741%;width:18.665%;height:25.741%" aria-label="Horloge"></button>'+
+      '<button class="z" data-t="locked" data-n="Horloge" data-id="hor" style="left:68.352%;top:40.741%;width:18.665%;height:25.741%" aria-label="Horloge"></button>'+
       '<button class="z" data-t="free" data-n="" style="left:68.352%;top:67.870%;width:18.665%;height:20.093%" aria-label="free"></button>'+
       '<button class="z" data-t="chrono" data-n="" style="left:36.705%;top:16.204%;width:27.894%;height:31.944%" aria-label="chrono"></button>'+
       '<button class="z" data-t="arm" data-n="" style="left:37.643%;top:70.185%;width:6.778%;height:13.889%;border-radius:50%" aria-label="arm"></button>'+
@@ -141,10 +144,10 @@ body:has(#zthub) #toast{top:50% !important;bottom:auto !important;left:auto !imp
       var left = nleft(), open = left === 0, a = $("#armb"), e = $("#es");
       a.classList.toggle("lock", !open); a.classList.toggle("open", open); e.classList.toggle("lock", !open); e.classList.toggle("open", open);
       $("#at1").textContent = open ? "DÉVERROUILLÉ" : "VERROUILLÉ";
-      $("#at2").textContent = open ? "APPUYER SUR ARRÊT" : (4 - left) + "/4 MODULES NEUTRALISÉS";
+      $("#at2").textContent = open ? "APPUYER SUR ARRÊT" : (2 - left) + "/2 MODULES NEUTRALISÉS";
     }
     function leds() { Object.keys(NAME).forEach(function (k) { var g = $("#led-" + k), d = S.mods[k] && S.mods[k].done; g.classList.remove("red", "green"); g.classList.add(d ? "green" : "red"); });
-      $("#detoimg").style.display = S.mods.deto && S.mods.deto.done ? "none" : ""; armUI(); }
+      Object.keys(LOCKED).forEach(function (k) { var g = $("#led-" + k); g.classList.remove("red", "green"); }); armUI(); }
     function errs(n) {
       $("#errt").textContent = "[" + n + "/3]";
       var h = "";
@@ -177,6 +180,7 @@ body:has(#zthub) #toast{top:50% !important;bottom:auto !important;left:auto !imp
         var t = z.dataset.t;
         if (t === "todo" || t === "done") { buzz(15); o.onOpen && o.onOpen(z.dataset.id); }
         else if (t === "free") { buzz(10); say("Emplacement libre"); }
+        else if (t === "locked") { buzz(10); say("Module verrouillé : bientôt disponible"); }
         else if (t === "arm") {
           var l = nleft();
           if (l > 0) { buzz([30, 40, 30]); stage.classList.remove("sh"); void stage.offsetWidth; stage.classList.add("sh"); say("Verrouillé : " + l + " module" + (l > 1 ? "s" : "") + " à traiter"); }
