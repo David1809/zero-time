@@ -20,11 +20,12 @@
 #zthub #stage.sh{animation:zthsh .35s}
 #zthub #turn{position:absolute;inset:0;background:#000;color:#f3f5f5;z-index:20;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;text-align:center;font:700 18px "ZTOrb",monospace;letter-spacing:.1em}
 #zthub #turn b{font-size:44px;color:#ff9f32}
-@media (orientation:portrait){#zthub:not(.rot) #turn{display:flex}}
+
 #zthub #turn button{min-height:0;height:46px;padding:0 18px;margin:4px 0 0;font:700 14px "ZTOrb",monospace;letter-spacing:.06em;border-radius:8px;border:1px solid #ff9f32;background:transparent;color:#ff9f32}
 #zthub #turn button.b2{border-color:#555;color:#aab}
-#zthub.rot{inset:auto;top:0;left:100vw;width:100dvh;height:100vw;transform:rotate(90deg);transform-origin:top left}
-#zthub.rot #stage{width:min(100dvh,calc(100vw*1918/1080))}
+@media (orientation:portrait){#zthub{inset:auto;top:0;left:100vw;width:100dvh;height:100vw;transform:rotate(90deg);transform-origin:top left}
+#zthub #stage{width:min(100dvh,calc(100vw*1918/1080))}
+body:has(#zthub) #toast{top:50% !important;bottom:auto !important;left:auto !important;right:0 !important;max-width:80dvh;transform:translateY(-50%) translateX(-6px) rotate(90deg) !important;transform-origin:center right;z-index:40}}
 #zthub #fx .et{font-family:"ZTOrb",ui-monospace,monospace;font-weight:400;font-size:30px;fill:#a9acae}
 #zthub #fx .en{font-family:"ZTOrb",ui-monospace,monospace;font-weight:700;font-size:34px;fill:#5b5c60;text-anchor:middle}
 #zthub #hubpause{position:absolute;left:50%;top:6px;transform:translateX(-50%);z-index:12;display:none;align-items:center;gap:10px;background:rgba(38,31,20,.94);border:1px solid #6b4e20;color:#ffcf7a;border-radius:8px;padding:6px 12px;font:700 13px "ZTOrb",monospace;letter-spacing:.06em;white-space:nowrap}
@@ -127,15 +128,9 @@
       '<button class="z" data-t="arm" data-n="" style="left:37.643%;top:70.185%;width:6.778%;height:13.889%;border-radius:50%" aria-label="arm"></button>'+
       '' +
       '</div><div id="hubpause"><span id="hpt"></span><button id="hpa" type="button">ABANDONNER</button></div>' +
-      '<div id="turn"><b>↻</b>TOURNE TON TÉLÉPHONE<br>EN MODE PAYSAGE<button id="trl" type="button">PASSER EN PAYSAGE</button><button id="trr" class="b2" type="button">AFFICHER EN TRAVERS</button></div></div>';
+      '</div>';
     var $ = function (s) { return root.querySelector(s); };
-    var hubEl = $("#zthub"); if (window.__ztRot) hubEl.classList.add("rot");
-    $("#trl").onclick = function () {
-      var d = document.documentElement, fs = d.requestFullscreen ? d.requestFullscreen() : null;
-      var go = function () { try { var pr = screen.orientation.lock("landscape"); if (pr && pr.catch) pr.catch(function () {}); } catch (e) {} };
-      if (fs && fs.then) fs.then(go, go); else go();
-    };
-    $("#trr").onclick = function () { window.__ztRot = true; hubEl.classList.add("rot"); };
+
     var stage = $("#stage"), fx = $("#fx"), dm = $("#dm"), dms = $("#dms"), dg = $("#dg");
     var S = { mods: {}, paused: null, frozenMs: 0, over: false, expired: false };
     var tt = null, toastEl = null;

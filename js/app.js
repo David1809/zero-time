@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.45";
+  var APP_VERSION = "1.0.46";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -579,7 +579,7 @@ ${solo}
       (paused ? '<span class="ml-2.5 px-1.5 py-0.5 rounded bg-black/60 border border-slate-700 text-[8px] font-code-serial text-slate-400 uppercase tracking-widest">FIGÉ</span>' : "") + '</div>' +
       '<div class="mt-0.5 pt-1 border-t border-[#182029] grid grid-cols-2 gap-2 items-center relative z-15">' +
       '<div class="flex flex-col gap-0.5"><div class="flex items-center gap-1"><span class="material-symbols-outlined text-error text-[11px]">warning</span><span class="font-label-sm text-[7.5px] font-bold tracking-wider text-error uppercase">ERREURS ' + g.errors + '/3</span></div><div class="flex items-center gap-1.5">' + diodes + '</div></div>' +
-      '<div class="flex flex-col items-end gap-0.5"><div class="flex items-center gap-1 ' + (mode === "ok" ? "text-[#00ffaa]" : "text-secondary") + '"><span class="font-label-sm text-[7.5px] font-bold tracking-wider uppercase">MODULES VALIDÉS ' + solved + '/' + g.panels.length + '</span><span class="material-symbols-outlined text-[11px]">grid_view</span></div><div class="flex items-center gap-1 w-20 h-3 bg-[#0e1216] p-0.5 rounded border border-[#28323d] shadow-inner">' + crans + '</div></div>' +
+      '<div></div>' +
       '</div></div></section>';
 
     // --- sélection des 3 modules (cadrans encastrés)
@@ -684,13 +684,13 @@ ${solo}
         '<div class="p-1 rounded-xl bg-gradient-to-b from-[#282e36] to-[#1a1f25] border border-[#363f4b] shadow-xl relative overflow-hidden">' + SCR_PUSH + '<button class="push-trigger-heavy w-full min-h-[44px] rounded-lg text-[#261100] font-headline-sm text-[14px] font-black tracking-widest uppercase flex items-center justify-center gap-2 select-none transition-all duration-150 relative z-20' + (selectedWire ? "" : " opacity-40 pointer-events-none grayscale cursor-not-allowed") + '"' + (selectedWire ? "" : " disabled") + ' id="cut-wire-button" type="button"><span class="material-symbols-outlined text-[20px]">content_cut</span><span>COUPER CE FIL</span><span class="material-symbols-outlined text-[17px]">bolt</span></button></div></section>';
     }
 
-    var hsel = g.panels.map(function (p, idx) { return p.kind === "pin" ? "" : idx === activePanel
+    var hsel = g.panels.map(function (p, idx) { return p.kind === "pin" || idx !== activePanel ? "" : idx === activePanel
       ? '<span class="px-2 py-0.5 rounded bg-[#272e37] text-[8px] font-code-serial font-bold text-primary border border-primary/40 shadow-sm">' + MOD_NAME[p.wires.length].toUpperCase() + '</span>'
       : '<span class="px-1.5 py-0.5 rounded text-[8px] font-code-serial font-semibold text-slate-400">' + MOD_NAME[p.wires.length].slice(0, 3).toUpperCase() + '</span>'; }).join("");
     app.innerHTML =
       ((mode === "err" || (!paused && remNow <= 30000)) ? '<div class="alarm-vignette-overlay fixed inset-0 pointer-events-none z-40"' + (remNow <= 30000 && !showErr ? ' style="animation-duration:.6s"' : "") + '></div>' : "") +
       '<header class="fixed top-0 left-0 right-0 z-50 pt-safe bg-[#20252c]/95 border-b border-[#353d47] backdrop-blur-md shadow-[0_4px_16px_rgba(0,0,0,0.6)]"><div class="h-11 px-3 flex items-center justify-between max-w-md mx-auto">' +
-      '<div class="flex items-center gap-2"><button id="zt-hub-back" type="button" aria-label="Retour à la bombe" class="w-7 h-7 min-h-0 p-0 flex items-center justify-center rounded bg-[#1a1e24] border border-[#373f4a] text-secondary shadow-inner"><span class="material-symbols-outlined text-[17px]">arrow_back</span></button><div class="flex flex-col"><div class="flex items-center gap-1.5">' + topLed + '</div><span class="font-headline-sm text-[13px] font-bold tracking-tight text-white flex items-center gap-1.5">BAIE CÂBLAGE <span class="text-[9.5px] text-secondary font-code-serial font-normal">[MOD-0' + (activePanel + 1) + ']</span></span></div></div>' +
+      '<div class="flex items-center gap-2"><button id="zt-hub-back" type="button" aria-label="Retour à la bombe" class="w-7 h-7 min-h-0 p-0 flex items-center justify-center rounded bg-[#1a1e24] border border-[#373f4a] text-secondary shadow-inner"><span class="material-symbols-outlined text-[17px]">arrow_back</span></button><div class="flex flex-col"><div class="flex items-center gap-1.5">' + topLed + '</div><span class="font-headline-sm text-[13px] font-bold tracking-tight text-white flex items-center gap-1.5">MODULE <span class="text-[9.5px] text-secondary font-code-serial font-normal">[MOD-0' + (activePanel + 1) + ']</span></span></div></div>' +
       '<div class="flex items-center gap-2"><div class="flex items-center p-0.5 rounded bg-[#14181e] border border-[#2f3640]">' + hsel + '</div><div class="h-[22px] flex items-center">' + badge + '</div></div></div></header>' +
       '<main class="flex-1 w-full max-w-md mx-auto px-2 pb-safe flex flex-col justify-between gap-1 overflow-hidden relative z-30" id="tactical-rack">' + errBanner + tele + module + cmd + '</main>';
 
@@ -1060,8 +1060,6 @@ ${debriefHeader("z-40", `<button aria-label="Rejouer détonation" class="w-8 h-8
     document.body.classList.toggle("tech", isTech);
     document.body.classList.toggle("workbench-bg", isTech);
     document.body.classList.toggle("scr", !(session && view) || view.status === "lobby" || view.status === "ended" || view.status === "abandoned");
-    var wantO = (isOp && opScreen === "hub") ? "land" : "port";
-    if (wantO !== lastOrient) { lastOrient = wantO; setOrient(wantO); }
     soloChip();
     if (!session || !view) { stopTimer(); return renderHome(); }
     if (view.status === "lobby") { stopTimer(); resetGameFlags(); return renderLobby(); }
