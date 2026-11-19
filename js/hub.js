@@ -143,7 +143,7 @@ body:has(#zthub) #toast{top:50% !important;bottom:auto !important;left:auto !imp
     var S = { mods: {}, paused: null, frozenMs: 0, over: false, expired: false };
     var tt = null, toastEl = null;
     function buzz(n) { try { navigator.vibrate && navigator.vibrate(n); } catch (e) {} }
-    function say(m) { if (o.notice) o.notice(m); }
+    function say(m) { /* pas de pop-up : le retour est la vibration et la secousse */ }
     function nleft() { return Object.keys(NAME).filter(function (k) { return !(S.mods[k] && S.mods[k].done); }).length; }
     function armUI() {
       var left = nleft(), open = left === 0, a = $("#armb"), e = $("#es");
