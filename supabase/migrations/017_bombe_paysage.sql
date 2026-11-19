@@ -290,3 +290,7 @@ begin
   end if;
   return v;
 end $function$;
+
+-- 4 modules par partie : la contrainte de position (1..3) est élargie à 1..6 (6 compartiments).
+alter table zt.room_panels drop constraint if exists room_panels_pos_check;
+alter table zt.room_panels add constraint room_panels_pos_check check (pos >= 1 and pos <= 6);
