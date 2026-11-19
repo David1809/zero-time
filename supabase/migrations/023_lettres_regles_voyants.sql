@@ -1,0 +1,3 @@
+-- 023 : numéro de série = 6 lettres + 2 chiffres. Chaque partie : 2 lettres d'indice sur le code, 1 lettre = règle du voyant ROUGE (pairs/impairs), 1 lettre = règle du voyant BLEU (>= seuil 3..7), sans règle par défaut.
+-- Colonne zt.rooms.lamp_rules ; fonctions gen_serial, pin_lamps2, pin_lamp, make_pin_info, manual_pin ; view_for utilise pin_lamps2(c.pin, r.lamp_rules).
+-- Retour : 022 (voyants selon chiffres du numéro de série) puis 019b (pairs / >= 6).
