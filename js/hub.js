@@ -57,6 +57,9 @@ body:has(#zthub) #toast{top:50% !important;bottom:auto !important;left:auto !imp
 #zthub .led.red.alt .lr{animation:blg2 1.2s steps(1,end) infinite}
 #zthub .led.green .lg{animation:pu2 2.4s ease-in-out infinite}
 #zthub #fx.fast .led.red .lr{animation-duration:.5s}
+#zthub #fx.al30 .led.green .lg{display:none}
+#zthub #fx.al30 .led.red .lr,#zthub #fx.al30 .led.green .lr{display:inline;animation:blg var(--p,1s) steps(1,end) infinite}
+#zthub #fx.al30 .led.red.alt .lr,#zthub #fx.al30 .led.green.alt .lr{animation-name:blg2}
 @keyframes pu2{0%,100%{opacity:.7}50%{opacity:1}}
 #zthub #fx .at{font-family:"ZTOrb",ui-monospace,monospace;font-weight:400;font-size:26px;fill:#a9acae;letter-spacing:.03em}
 #zthub #fx .bt{font-family:"ZTOrb",ui-monospace,monospace;font-weight:700;text-anchor:middle}
@@ -163,7 +166,9 @@ body:has(#zthub) #toast{top:50% !important;bottom:auto !important;left:auto !imp
       var sec = Math.floor(ms / 1000), cs = Math.floor((ms % 1000) / 10);
       dm.textContent = ("0" + Math.floor(sec / 60)).slice(-2) + ":" + ("0" + (sec % 60)).slice(-2);
       dms.textContent = "." + ("0" + cs).slice(-2);
-      dg.classList.toggle("al", ms <= 20000); fx.classList.toggle("fast", ms <= 30000);
+      var al = ms <= 30000;
+      dg.classList.toggle("al", al); fx.classList.toggle("fast", al); fx.classList.toggle("al30", al);
+      if (al) { var per = Math.round((0.14 + 0.86 * Math.min(1, ms / 30000)) * 25) / 25; if (fx._per !== per) { fx._per = per; fx.style.setProperty("--p", per + "s"); } }
     }
     function tick() {
       if (S.paused) { show(S.frozenMs); return; }

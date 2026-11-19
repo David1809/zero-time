@@ -178,12 +178,12 @@
       lblClean.setAttribute("opacity", on ? 1 : 0); lbl.setAttribute("opacity", on ? 1 : 0);
       lbl.textContent = S.time; lbl.setAttribute("class", "lbl" + (S.alarm ? " al" : ""));
       var done = S.status === "done", red = S.active && S.alarm && !done;
-      // LED : verte en temps normal / quand le module est résolu ; rouge clignotante sous 20 s,
-      // de plus en plus vite vers 0 (période ~1 s à 20 s, ~0,14 s à 0)
+      // LED : verte en temps normal / quand le module est résolu ; rouge clignotante sous 30 s,
+      // de plus en plus vite vers 0 (période ~1 s à 30 s, ~0,14 s à 0)
       ledOk.style.display = red ? "none" : ""; ledOk.setAttribute("opacity", S.active ? 1 : 0);
       ledOff.setAttribute("opacity", red ? 1 : 0); ledOff.setAttribute("class", "ledoff");
       if (red) {
-        var per = Math.round((0.14 + 0.86 * Math.min(1, Math.max(0, (S.ms || 0) / 20000))) * 25) / 25;
+        var per = Math.round((0.14 + 0.86 * Math.min(1, Math.max(0, (S.ms || 0) / 30000))) * 25) / 25;
         ledRed.setAttribute("opacity", 1); ledRed.setAttribute("class", "ledred blink");
         if (ledRed._per !== per) { ledRed._per = per; ledRed.style.animationDuration = per + "s"; }
       } else { ledRed.setAttribute("opacity", 0); ledRed.setAttribute("class", "ledred"); }

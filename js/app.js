@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.53";
+  var APP_VERSION = "1.0.54";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -429,6 +429,10 @@ ${solo}
         (document.getElementById("zthub") || document.getElementById("ztpin")) &&
         pinEnds - (Date.now() + offsetMs) <= 30000);
     } catch (e) {}
+    var op = !!(document.getElementById("zthub") || document.getElementById("ztpin") || document.getElementById("tactical-rack"));
+    var al = !!(op && view && view.status === "playing" && !view.paused && pinEnds && pinEnds - (Date.now() + offsetMs) <= 30000);
+    document.body.classList.toggle("zt-al30", al);
+    if (al) document.body.style.setProperty("--zp", (Math.round((0.14 + 0.86 * Math.min(1, (pinEnds - (Date.now() + offsetMs)) / 30000)) * 25) / 25) + "s");
     if (on && !vigEl) {
       vigEl = document.createElement("div");
       vigEl.className = "alarm-vignette-overlay fixed inset-0 pointer-events-none z-40";
@@ -501,7 +505,7 @@ ${solo}
       });
       timerId = setInterval(function () {
         var ms = Math.max(0, pinEnds - (Date.now() + offsetMs));
-        if (pinApi && !view.paused) pinApi.setTime(fmtH(ms)[0], ms <= 20000, ms);
+        if (pinApi && !view.paused) pinApi.setTime(fmtH(ms)[0], ms <= 30000, ms);
         if (ms <= 0 && !view.paused) expire();
       }, 100);
       pinApi.reset(); // active l'affichage
@@ -512,14 +516,14 @@ ${solo}
     if (solved) pinApi.lock(true); else if (!pinBusy) pinApi.lock(!!paused);
     pinApi.setErrors(g.errors);
     if (paused) pinApi.setTime(fmtH(paused.remaining_ms || 0)[0], false);
-    else { var rm = Math.max(0, endsAt - (Date.now() + offsetMs)); pinApi.setTime(fmtH(rm)[0], rm <= 20000, rm); }
+    else { var rm = Math.max(0, endsAt - (Date.now() + offsetMs)); pinApi.setTime(fmtH(rm)[0], rm <= 30000, rm); }
     if (solved && !openedSolved && !backTimer) backTimer = setTimeout(function () { backTimer = null; if (opScreen === "mod") goHub(); }, 1600);
   }
 
   function renderOperator() {
     var g = view.game;
     syncClock(g);
-    var endsAt = new Date(g.ends_at).getTime();
+    var endsAt = new Date(g.ends_at).getTime(); pinEnds = endsAt;
     if (opScreen === "hub") return renderHub(g);
     if ((g.panels[activePanel] || {}).kind === "pin") return renderPin(g, g.panels[activePanel]);
     var wirePanels = g.panels.filter(function (p) { return p.kind !== "pin"; });
@@ -742,7 +746,7 @@ ${solo}
     var timerMain = document.getElementById("chrono-display"), timerMs = document.getElementById("chrono-ms");
     function paint(ms) {
       var f = fmtH(ms); timerMain.textContent = f[0]; timerMs.textContent = f[1];
-      var cls = paused ? "timer-neon-paused" : (ms > 20000 ? "timer-neon-green" : "timer-neon-alert");
+      var cls = paused ? "timer-neon-paused" : (ms > 30000 ? "timer-neon-green" : "timer-neon-alert");
       [timerMain, timerMs].forEach(function (e) {
         if (e.getAttribute("data-t") !== cls) { e.classList.remove("timer-neon-green", "timer-neon-warning", "timer-neon-alert", "timer-neon-paused"); e.classList.add(cls); e.setAttribute("data-t", cls); }
       });
