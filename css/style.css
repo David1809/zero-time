@@ -1055,3 +1055,38 @@ body.op #tactical-rack{overflow:hidden}
 /* 30 dernières secondes (opérateur) : voyants verts du coupe-fils -> rouges clignotants de plus en plus vite */
 @keyframes zt-ledbl{0%,49%{opacity:1}50%,100%{opacity:.12}}
 body.zt-al30 .w-1\.5.h-1\.5.rounded-full[class*="bg-[#00ffaa]"]:not(.zt-keep){background:#ff3333!important;box-shadow:0 0 7px #ff3333!important;animation:zt-ledbl var(--zp,1s) steps(1,end) infinite!important}
+
+/* ===== Ligne artistique « digicode » appliquée à l'écran opérateur (câblage) ===== */
+@font-face{font-family:ZTWBarlow;src:url(../assets/digicode/barlow-600.woff2) format("woff2");font-weight:600;font-display:swap}
+body.op section.rugged-chassis{
+  background:linear-gradient(180deg,#14161a 0%,#0e1013 100%);
+  border-radius:10px;padding:15px 15px 13px;
+  box-shadow:0 8px 22px -6px #000,0 0 0 1px #050506;
+}
+body.op section.rugged-chassis::before{display:none}
+body.op section.rugged-chassis::after{
+  content:"";position:absolute;inset:-2px;z-index:15;pointer-events:none;
+  border:36px solid transparent;
+  border-image:url(../assets/wire/frame.png) 200 / 36px / 0 stretch;
+}
+body.op section.rugged-chassis>.screw-cross{display:none}
+body.op .bay-chassis-inner{
+  background:#07080a;border-radius:6px;
+  box-shadow:inset 0 0 0 2px #17181b,inset 0 0 22px #000,0 0 0 2px #55585d,0 0 0 3px #101114,0 1px 0 3px rgba(255,255,255,.08);
+}
+.zt-mh{display:flex;align-items:center;justify-content:space-between;padding:0 6px;margin-top:-1px}
+.zt-plate{display:flex;align-items:center;gap:10px;padding:4px 12px 3px;border-radius:3px;
+  background:linear-gradient(180deg,#6e7075,#54575c 45%,#46484d);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -1px 0 rgba(0,0,0,.6),0 1px 2px #000,0 0 0 1px #202226}
+.zt-plate-t{font-family:ZTWBarlow,'Barlow Condensed',Oswald,sans-serif;font-weight:600;font-size:17px;letter-spacing:.07em;line-height:1;color:#17181a;text-shadow:0 1px 0 rgba(255,255,255,.25)}
+.zt-hz{width:34px;height:15px;background:repeating-linear-gradient(115deg,#17181a 0 5px,transparent 5px 10px);opacity:.9}
+.zt-st{display:flex;align-items:center;gap:7px;font-family:ZTWBarlow,'Barlow Condensed',Oswald,sans-serif;font-weight:600;font-size:15px;letter-spacing:.06em;color:#e9ddc6}
+.zt-st b{width:17px;height:17px;border-radius:50%;display:block;
+  background:radial-gradient(circle at 35% 30%,#ff9d96,#e0201a 45%,#7d0b08 100%);
+  box-shadow:0 0 0 2px #2a2b2e,0 0 10px 2px rgba(255,40,30,.65),inset 0 1px 1px rgba(255,255,255,.5)}
+.zt-st-todo b{animation:zt-ledbl 1.2s steps(1,end) infinite}
+.zt-st-pz b{animation:none;opacity:.55}
+.zt-st-ok{color:#00ffaa;text-shadow:0 0 7px rgba(0,255,170,.7)}
+.zt-st-ok b{background:radial-gradient(circle at 35% 30%,#b9ffe6,#00d98f 45%,#006b46 100%);box-shadow:0 0 0 2px #2a2b2e,0 0 10px 2px rgba(0,255,170,.6),inset 0 1px 1px rgba(255,255,255,.5)}
+body.zt-al30 .zt-st-todo b{animation:zt-ledbl var(--zp,1s) steps(1,end) infinite}
+body.op .push-trigger-heavy,body.op .push-trigger-suspended,body.op .push-trigger-secured{font-family:ZTWBarlow,'Barlow Condensed',Oswald,sans-serif!important;font-weight:600;letter-spacing:.08em;font-size:17px}

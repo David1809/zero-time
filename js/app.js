@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.61";
+  var APP_VERSION = "1.0.62";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -690,11 +690,10 @@ ${solo}
       }
     });
 
-    var modHead = isSolved
-      ? '<div class="px-4 flex items-center justify-between"><div class="flex items-center gap-2"><div class="w-7 h-7 rounded bg-[#10291f] border border-[#00ffaa]/60 flex items-center justify-center text-[#00ffaa] shadow-[0_0_8px_rgba(0,255,170,0.35)]"><span class="material-symbols-outlined text-[17px] font-bold">check</span></div><div class="flex flex-col"><span class="font-label-sm text-[7.5px] tracking-widest text-[#00ffaa] uppercase font-bold">RÉSOLU ✓</span><span class="font-headline-sm text-[12px] font-bold text-white tracking-wide">' + MOD_NAME[n].toUpperCase() + '</span></div></div>' +
-        '<div class="px-2.5 py-1 rounded-md bg-gradient-to-r from-[#122e22] via-[#1a3d2e] to-[#122e22] border border-[#00ffaa]/70 shadow-[0_0_12px_rgba(0,255,170,0.35)] flex items-center gap-1.5"><span class="material-symbols-outlined text-[#00ffaa] text-[14px] font-bold">verified</span><div class="flex flex-col items-end"><span class="font-code-serial text-[9.5px] font-black tracking-wider text-[#00ffaa] leading-tight">RÉSOLU ✓</span></div></div></div>'
-      : '<div class="px-6 flex items-center justify-between"><div class="flex items-center gap-1.5"><div class="w-6 h-6 rounded bg-[#20262e] border border-[#3b4552] flex items-center justify-center ' + (paused ? "text-secondary" : "text-primary") + ' shadow-inner"><span class="material-symbols-outlined text-[15px]">cable</span></div><div class="flex flex-col"><span class="font-label-sm text-[7px] tracking-widest text-slate-300 uppercase">HARNESS</span><span class="font-headline-sm text-[11px] font-bold text-white tracking-wide">' + MOD_NAME[n].toUpperCase() + '</span></div></div>' +
-        '</div>';
+    var modHead = '<div class="zt-mh"><div class="zt-plate"><span class="zt-plate-t">' + MOD_NAME[n].toUpperCase() + '</span><i class="zt-hz"></i></div>' +
+      (isSolved
+        ? '<div class="zt-st zt-st-ok"><b class="zt-keep"></b><span>RÉSOLU</span></div>'
+        : '<div class="zt-st zt-st-todo' + (paused ? " zt-st-pz" : "") + '"><b></b><span>À FAIRE</span></div>') + '</div>';
     var resolvedBar = isSolved ? '<div class="absolute top-2 inset-x-12 z-40 resolved-badge-bar rounded-md px-3 py-1 flex items-center justify-between pointer-events-none"><div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-[#00ffaa] shadow-[0_0_6px_#00ffaa] animate-ping"></span><span class="font-code-serial text-[9px] font-bold text-[#00ffaa] tracking-widest uppercase">CIRCUIT DÉSAMORCÉ AVEC SUCCÈS</span></div><span class="font-code-serial text-[8.5px] text-[#a4e6c3] tracking-widest font-semibold">STATUS: SECURE</span></div>' : "";
     var veil = paused ? '<div class="absolute inset-0 pointer-events-none z-25 bg-[#090d12]/30 backdrop-contrast-90"></div>' : "";
     var colCls = locked ? "flex flex-col justify-between py-0.5 z-30 pointer-events-none opacity-85" : "flex flex-col justify-between py-0.5 z-30 pointer-events-auto";
