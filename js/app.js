@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.57";
+  var APP_VERSION = "1.0.58";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -173,6 +173,7 @@
   var ROLE_FULL = { operator: "OPÉRATEUR (TERRAIN)", technician: "TECHNICIEN (MANUEL)" };
   var BOLT = '<div class="w-1.5 h-0.5 bg-surface-container-lowest';
 
+  function fmtDur(sec) { return ("0" + Math.floor(sec / 60)).slice(-2) + ":" + ("0" + (sec % 60)).slice(-2); }
   function renderLobby() {
     clear();
     var players = view.players, n = players.length, mode = view.role_mode, cr = view.creator_role, isC = view.is_creator;
@@ -218,6 +219,8 @@ ${players.map(slot).join("")}${n < 4 ? emptySlot : ""}</section>
 <section class="relative bg-surface-container rounded-lg p-3 shadow-md flex flex-col gap-2"><div class="absolute bottom-1.5 left-1.5 w-2.5 h-2.5 rounded-full bg-surface-bright flex items-center justify-center">${BOLT} rotate-45"></div></div><div class="absolute bottom-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-surface-bright flex items-center justify-center">${BOLT} -rotate-45"></div></div>
 <div class="flex items-center justify-between px-3"><span class="font-label-sm text-label-sm text-on-surface-variant tracking-wider uppercase">PARAMÈTRE D'ATTRIBUTION</span><span class="font-label-sm text-label-sm text-primary uppercase">AUTORITÉ HÔTE</span></div>
 <div class="grid grid-cols-2 gap-2">${sel("role-mode-manual", manual, "MANUEL", "Attribution Fixe")}${sel("role-mode-random", !manual, "ALÉATOIRE", "Tirage Au Sort")}</div>${roleRow}</section>
+<section class="relative bg-surface-container rounded-lg p-3 shadow-md flex flex-col gap-2"><div class="flex items-center justify-between px-3"><span class="font-label-sm text-label-sm text-on-surface-variant tracking-wider uppercase">DURÉE DU COMPTE À REBOURS</span><span class="font-label-sm text-label-sm text-primary uppercase">AUTORITÉ HÔTE</span></div>
+<div class="flex items-center justify-between gap-2"><button class="min-h-[52px] w-16 rounded bg-surface-container-lowest text-primary font-display-timer-mobile text-2xl shadow-inner${isC ? "" : " opacity-30"}" id="dur-minus" type="button"${isC ? "" : " disabled"}>−</button><div class="flex-1 text-center font-display-timer-mobile text-display-timer-mobile text-primary tracking-widest" id="dur-val">${fmtDur(view.duration_s || 120)}</div><button class="min-h-[52px] w-16 rounded bg-surface-container-lowest text-primary font-display-timer-mobile text-2xl shadow-inner${isC ? "" : " opacity-30"}" id="dur-plus" type="button"${isC ? "" : " disabled"}>+</button></div></section>
 ${solo}
 <footer class="w-full flex flex-col gap-1.5 pt-1"><div class="flex items-center justify-center gap-1.5"><span class="material-symbols-outlined text-xs text-primary animate-pulse">${icon}</span><span class="font-label-sm text-label-sm text-primary tracking-widest uppercase font-semibold">${msg}</span></div>
 <button class="w-full min-h-[56px] bg-primary-container hover:bg-primary active:scale-[0.99] text-on-primary rounded-lg flex items-center justify-center gap-3 shadow-[0_0_20px_rgba(255,159,50,0.45)] transition-all${canLaunch ? "" : " opacity-40"}" id="btn-launch" type="button"><span class="material-symbols-outlined text-2xl font-black">power_settings_new</span><span class="font-label-lg text-label-lg tracking-widest font-black uppercase">LANCER LA MISSION</span></button></footer>
@@ -239,6 +242,12 @@ ${solo}
       $("role-mode-manual").onclick = function () { setMode("choose", cr || "operator"); };
       $("role-mode-random").onclick = function () { setMode("random"); };
       if ($("role-op")) { $("role-op").onclick = function () { setMode("choose", "operator"); }; $("role-tech").onclick = function () { setMode("choose", "technician"); }; }
+      var setDur = function (sec) {
+        sec = Math.max(30, Math.min(600, sec));
+        sb.rpc("zt_set_duration", { p_code: view.code, p_token: session.token, p_seconds: sec }).then(function (r) { if (r.error) return fail(r.error); view = r.data; render(); });
+      };
+      $("dur-minus").onclick = function () { setDur((view.duration_s || 120) - 15); };
+      $("dur-plus").onclick = function () { setDur((view.duration_s || 120) + 15); };
       var startSolo = function (role) {
         sb.rpc("zt_start_solo", { p_code: view.code, p_token: session.token, p_role: role }).then(function (r) { if (r.error) return fail(r.error); view = r.data; resetGameFlags(); selectedWire = null; activePanel = 0; render(); });
       };

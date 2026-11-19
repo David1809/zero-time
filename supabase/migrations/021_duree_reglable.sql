@@ -1,0 +1,3 @@
+-- 021 : durée du compte à rebours réglable par l'hôte dans le salon (30 s à 10 min, pas de 15 s ; défaut 2 min).
+-- Colonne zt.rooms.duration_s ; RPC public.zt_set_duration ; zt_start / zt_start_solo utilisent make_interval(secs => r.duration_s) ; view_for expose duration_s.
+-- Retour : remettre interval '120 seconds' dans zt_start / zt_start_solo (la colonne peut rester).
