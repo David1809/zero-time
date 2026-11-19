@@ -1159,3 +1159,8 @@ body.op .push-trigger-heavy,body.op .push-trigger-suspended,body.op .push-trigge
 .zh-or{margin:0}.zh-ver{margin:0 auto}
 /* ancien accueil restauré : on retire l'ajustement plein hauteur du nouveau design */
 body.scr #app>.flex.flex-col.w-full.min-h-full{min-height:100dvh}
+/* champs : pas de fond blanc d'autofill / sélection Chrome */
+input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active{
+  -webkit-box-shadow:0 0 0 1000px #030302 inset!important;box-shadow:0 0 0 1000px #030302 inset!important;
+  -webkit-text-fill-color:#e8e0d0!important;caret-color:#e0a03c;transition:background-color 99999s}
+input{background-clip:padding-box}
