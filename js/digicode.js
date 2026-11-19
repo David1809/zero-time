@@ -71,8 +71,7 @@
     ".ztd .lbl{font-family:ZTDJB,ui-monospace,monospace;font-weight:700;fill:#00ffaa;filter:drop-shadow(0 0 5px rgba(0,255,170,.85)) drop-shadow(0 0 14px rgba(0,255,170,.45))}",
     ".ztd .lbl.al{fill:#ff3333;filter:drop-shadow(0 0 6px rgba(255,51,51,.95)) drop-shadow(0 0 16px rgba(255,51,51,.6));animation:ztdal .65s ease-in-out infinite alternate}",
     "@keyframes ztdal{0%{opacity:.8}100%{opacity:1}}",
-    ".ztd .scr{mix-blend-mode:screen}",
-    ".ztd .hd{font-family:ZTDBarlow,'Barlow Condensed',Oswald,sans-serif;font-weight:600;fill:#e9ddc6;text-anchor:middle}",
+        ".ztd .hd{font-family:ZTDBarlow,'Barlow Condensed',Oswald,sans-serif;font-weight:600;fill:#e9ddc6;text-anchor:middle}",
     "@keyframes ztdsh{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}",
     ".ztd.shake{animation:ztdsh .35s}"
   ].join("\n");
@@ -104,17 +103,18 @@
     var ledOk = el("image", { "class": "ledok", href: base + "digicode2-led-vert.png", x: 750, y: 195, width: 80, height: 80, opacity: 0 }, L);
     var lblClean = el("image", { href: base + "digicode2-libelle.jpg", x: 826, y: 212, width: 140, height: 50, opacity: 0 }, L);
     var lbl = el("text", { "class": "lbl", x: 833, y: 249, "font-size": 41, opacity: 0 }, L); lbl.textContent = "00:00";
-    // vis du boîtier : s'allument en rouge en diagonale à chaque erreur (1 haut-gauche, 2 bas-droite, 3 haut-droite)
-    var SCREWS = [[105, 190], [980, 1728], [980, 190], [105, 1728]];
+    // les 3 barres noires en diagonale de la plaque s'allument en rouge, une par erreur (de gauche à droite)
+    var BARS = ["561,201 589,201 535,270 509,270", "606,201 635,201 581,270 554,270", "652,201 682,201 627,270 600,270"];
     var gScr = el("g", {}, L), scr = [];
-    SCREWS.forEach(function (c) {
-      var g = el("g", { "class": "scr", opacity: 0 }, gScr);
-      el("circle", { cx: c[0], cy: c[1], r: 62, fill: "url(#ztdsg)" }, g);
-      el("circle", { cx: c[0], cy: c[1], r: 29, fill: "#ff2a1f", opacity: .55 }, g);
+    var defs = el("defs", {}, svg), bf = el("filter", { id: "ztdbl", x: "-40%", y: "-40%", width: "180%", height: "180%" }, defs);
+    el("feGaussianBlur", { stdDeviation: 7 }, bf);
+    BARS.forEach(function (pt) {
+      var g = el("g", { opacity: 0 }, gScr);
+      el("polygon", { points: pt, fill: "#ff2a1f", opacity: .75, filter: "url(#ztdbl)" }, g);
+      el("polygon", { points: pt, fill: "#d9140d" }, g);
+      el("polygon", { points: pt, fill: "#ff7a66", opacity: .35, transform: "translate(-3 0) scale(1 1)" }, g);
       scr.push(g);
     });
-    var defs = el("defs", {}, svg), rg = el("radialGradient", { id: "ztdsg" }, defs);
-    el("stop", { offset: 0, "stop-color": "#ff2a1f", "stop-opacity": .9 }, rg); el("stop", { offset: .45, "stop-color": "#ff2a1f", "stop-opacity": .4 }, rg); el("stop", { offset: 1, "stop-color": "#ff2a1f", "stop-opacity": 0 }, rg);
 
     // --- touches
     var keys = {};
