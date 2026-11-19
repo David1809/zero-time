@@ -1157,3 +1157,5 @@ body.op .push-trigger-heavy,body.op .push-trigger-suspended,body.op .push-trigge
 .zh-create{margin-top:0;padding-top:min(18px,2dvh);padding-bottom:calc(min(18px,2dvh) + 9px)}
 .zh-ico{width:min(57px,6.4dvh);height:min(57px,6.4dvh)}
 .zh-or{margin:0}.zh-ver{margin:0 auto}
+/* ancien accueil restauré : on retire l'ajustement plein hauteur du nouveau design */
+body.scr #app>.flex.flex-col.w-full.min-h-full{min-height:100dvh}
