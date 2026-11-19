@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050607">
+<title>ZERO TIME — test module Digicode</title>
+<style>
+html,body{margin:0;height:100%;background:#050607;overflow:hidden;-webkit-tap-highlight-color:transparent;font-family:ui-monospace,"JetBrains Mono",monospace}
+#stage{position:absolute;left:50%;top:50%;width:min(100vw,calc(100vh*900/1664));aspect-ratio:900/1664;transform:translate(-50%,-50%)}
+#stage>img{display:block;width:100%;height:100%;user-select:none;-webkit-user-drag:none}
+#fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.z{position:absolute;border:0;padding:0;background:transparent;border-radius:6%;cursor:pointer;outline:0}
+.z[data-k=disp]{cursor:default}
+.z.on{background:rgba(255,255,255,.14)}
+.z[data-k=ok].on{background:rgba(255,160,20,.22)}
+@keyframes sh{0%,100%{transform:translate(-50%,-50%)}20%{transform:translate(calc(-50% - 7px),-50%)}40%{transform:translate(calc(-50% + 7px),-50%)}60%{transform:translate(calc(-50% - 5px),-50%)}80%{transform:translate(calc(-50% + 5px),-50%)}}
+#stage.sh{animation:sh .35s}
+#dg{opacity:0} #dg.on{opacity:1}
+#dg .lit{fill:#ff9f1a;filter:drop-shadow(0 0 5px rgba(255,150,20,.75))}
+#dg.ok .lit{fill:#00ffaa;filter:drop-shadow(0 0 6px rgba(0,255,170,.8))}
+#dg.bad .lit{fill:#ff3333;filter:drop-shadow(0 0 6px rgba(255,51,51,.9))}
+#dg .gh{fill:#ff9f1a;opacity:.09}
+.led{opacity:0;transition:opacity .15s} .led.on{opacity:1}
+#toast{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);background:rgba(10,14,18,.94);color:#f3f5f5;border:1px solid #ff9f32;border-radius:8px;padding:8px 14px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:5;max-width:92vw;text-align:center}
+#toast.on{opacity:1}
+#end{position:fixed;inset:0;z-index:15;display:none;align-items:center;justify-content:center;flex-direction:column;gap:18px;text-align:center;color:#fff;background:#2a0000}
+#end.on{display:flex} #end.boom.on{animation:fl .5s 3}
+@keyframes fl{0%,100%{background:#2a0000}50%{background:#b00000}}
+#end.win{background:#031a0e}
+#end h2{margin:0;font-size:34px;letter-spacing:.18em;color:#ff4b43} #end.win h2{color:#00ffaa}
+#end button{height:48px;padding:0 26px;border:0;border-radius:8px;background:#ff9f32;color:#101820;font-family:inherit;font-size:15px;font-weight:700;letter-spacing:.06em;cursor:pointer}
+</style></head><body>
+<div id="stage">
+<img src="digicode.jpg" alt="Module Digicode : clavier, afficheur à 4 chiffres, 3 voyants d'erreur, touche Entrée" draggable="false">
+<svg id="fx" viewBox="0 0 900 1664" aria-hidden="true">
+<image id="clean" href="digicode-afficheur.jpg" x="415" y="305" width="350" height="150" style="opacity:0"/>
+<g id="dg"></g>
+<image class="led" id="led2" href="digicode-led.png" x="140" y="335" width="80" height="80"/>
+<image class="led" id="led3" href="digicode-led.png" x="140" y="417" width="80" height="80"/>
+<rect id="flash" x="395" y="265" width="380" height="230" rx="14" fill="#ff2a1f" opacity="0"/>
+</svg>
+<button class="z" data-k="1" style="left:20.889%;top:37.861%;width:18.000%;height:9.014%" aria-label="Touche 1"></button>
+<button class="z" data-k="2" style="left:42.000%;top:37.861%;width:18.000%;height:9.014%" aria-label="Touche 2"></button>
+<button class="z" data-k="3" style="left:62.778%;top:37.861%;width:18.111%;height:9.014%" aria-label="Touche 3"></button>
+<button class="z" data-k="4" style="left:20.889%;top:48.377%;width:18.000%;height:8.834%" aria-label="Touche 4"></button>
+<button class="z" data-k="5" style="left:42.000%;top:48.377%;width:18.000%;height:8.834%" aria-label="Touche 5"></button>
+<button class="z" data-k="6" style="left:62.778%;top:48.377%;width:18.111%;height:8.834%" aria-label="Touche 6"></button>
+<button class="z" data-k="7" style="left:20.889%;top:58.774%;width:18.000%;height:8.834%" aria-label="Touche 7"></button>
+<button class="z" data-k="8" style="left:42.000%;top:58.774%;width:18.000%;height:8.834%" aria-label="Touche 8"></button>
+<button class="z" data-k="9" style="left:62.778%;top:58.774%;width:18.111%;height:8.834%" aria-label="Touche 9"></button>
+<button class="z" data-k="0" style="left:42.000%;top:69.111%;width:18.000%;height:9.014%" aria-label="Touche 0"></button>
+<button class="z" data-k="del" style="left:20.222%;top:69.111%;width:18.889%;height:9.014%" aria-label="Effacer"></button>
+<button class="z" data-k="ok" style="left:25.556%;top:84.255%;width:54.444%;height:12.200%" aria-label="Entrée"></button>
+<button class="z" data-k="disp" style="left:43.889%;top:15.925%;width:42.222%;height:13.822%" aria-label="Afficheur"></button>
+</div>
+<div id="end"><h2 id="et">EXPLOSION</h2><div id="es"></div><button id="again" type="button">REJOUER</button></div>
+<div id="toast" role="status"></div>
+<script>
+(function(){
+var Q=new URLSearchParams(location.search);
+var SEG={0:"abcdef",1:"bc",2:"abdeg",3:"abcdg",4:"bcfg",5:"acdfg",6:"acdefg",7:"abc",8:"abcdefg",9:"abcdfg","-":"g"};
+var w=52,h=111,t=13;
+function hx(cx,cy,L){var a=L/2,b=t/2;return [[cx-a,cy],[cx-a+b,cy-b],[cx+a-b,cy-b],[cx+a,cy],[cx+a-b,cy+b],[cx-a+b,cy+b]]}
+function vx(cx,cy,L){var a=L/2,b=t/2;return [[cx,cy-a],[cx+b,cy-a+b],[cx+b,cy+a-b],[cx,cy+a],[cx-b,cy+a-b],[cx-b,cy-a+b]]}
+var G={a:hx(26,6.5,46),g:hx(26,55.5,46),d:hx(26,104.5,46),f:vx(6.5,30.5,46),b:vx(45.5,30.5,46),e:vx(6.5,80.5,46),c:vx(45.5,80.5,46)};
+function pts(p){return p.map(function(q){return q[0].toFixed(1)+","+q[1].toFixed(1)}).join(" ")}
+var NS="http://www.w3.org/2000/svg",dg=document.getElementById("dg");
+var cells=[];
+for(var i=0;i<4;i++){
+  var g=document.createElementNS(NS,"g");
+  g.setAttribute("transform","translate("+(437+76.5*i)+" 325) matrix(1 0 -0.14 1 15.5 0)");
+  var o={};
+  "abcdefg".split("").forEach(function(s){
+    var gh=document.createElementNS(NS,"polygon");gh.setAttribute("points",pts(G[s]));gh.setAttribute("class","gh");g.appendChild(gh);
+    var p=document.createElementNS(NS,"polygon");p.setAttribute("points",pts(G[s]));p.setAttribute("class","lit");p.style.opacity=0;g.appendChild(p);o[s]=p;
+  });
+  dg.appendChild(g);cells.push(o);
+}
+function draw(str){
+  for(var i=0;i<4;i++){var ch=str[i]||"-",on=SEG[ch]||"";
+    for(var s in cells[i])cells[i][s].style.opacity=(on.indexOf(s)>=0)?(str[i]?1:.35):0}
+}
+var stage=document.getElementById("stage"),toast=document.getElementById("toast"),tt,buf="",errors=1,done=false,over=false,touched=false;
+var code=(Q.get("code")||"").replace(/\D/g,"");
+if(code.length!==4){var d="0123456789".split("");for(var i=d.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var x=d[i];d[i]=d[j];d[j]=x}code=d.slice(0,4).join("")}
+function say(m,ms){toast.textContent=m;toast.classList.add("on");clearTimeout(tt);tt=setTimeout(function(){toast.classList.remove("on")},ms||2200)}
+function buzz(n){try{navigator.vibrate&&navigator.vibrate(n)}catch(e){}}
+function show(){
+  var D=document.getElementById("dg");
+  if(!touched){touched=true;document.getElementById("clean").style.opacity=1;D.classList.add("on")}
+  draw(buf);
+}
+function setLed(n,on){document.getElementById("led"+n).classList.toggle("on",on)}
+function reset(){buf="";errors=1;done=false;over=false;setLed(2,false);setLed(3,false);var D=document.getElementById("dg");D.classList.remove("ok","bad");
+  document.getElementById("end").className="";if(touched)draw("")}
+function evalCode(){
+  var bien=0,mal=0;for(var i=0;i<4;i++){if(buf[i]===code[i])bien++;else if(code.indexOf(buf[i])>=0)mal++}
+  return [bien,mal];
+}
+function press(k){
+  if(over)return;
+  if(done){return}
+  if(k==="del"){buf=buf.slice(0,-1);show();return}
+  if(k==="ok"){
+    if(buf.length<4){buzz([30,40,30]);stage.classList.remove("sh");void stage.offsetWidth;stage.classList.add("sh");say("Saisis 4 chiffres");return}
+    if(buf===code){done=true;document.getElementById("dg").classList.add("ok");buzz([40,30,40]);say("MODULE RÉSOLU");
+      setTimeout(function(){var e=document.getElementById("end");document.getElementById("et").textContent="MODULE RÉSOLU";document.getElementById("es").textContent="Code : "+code;e.className="on win"},1200);return}
+    var r=evalCode();errors++;
+    var D=document.getElementById("dg");D.classList.add("bad");var f=document.getElementById("flash");f.setAttribute("opacity",".35");
+    setTimeout(function(){f.setAttribute("opacity","0");D.classList.remove("bad")},500);
+    setLed(errors,true);buzz([80,40,80]);
+    if(errors>=3){over=true;say("ERREUR 3/3",1500);setTimeout(function(){var e=document.getElementById("end");document.getElementById("et").textContent="EXPLOSION";document.getElementById("es").textContent="Trois erreurs.";e.className="on boom";buzz([200,80,200,80,400])},700)}
+    else say("ERREUR "+errors+"/3 · −"+(errors===2?"30":"20")+" s · "+r[0]+" bien placé"+(r[0]>1?"s":"")+", "+r[1]+" mal placé"+(r[1]>1?"s":""),3200);
+    buf="";setTimeout(function(){if(!over)draw("")},500);return;
+  }
+  if(k==="disp")return;
+  if(buf.length<4){buf+=k;buzz(10)}
+  show();
+}
+document.getElementById("again").onclick=reset;
+[].forEach.call(document.querySelectorAll(".z"),function(z){
+  function on(){if(z.dataset.k!=="disp")z.classList.add("on")}function off(){z.classList.remove("on")}
+  z.addEventListener("touchstart",on,{passive:true});z.addEventListener("touchend",off);z.addEventListener("touchcancel",off);
+  z.addEventListener("mousedown",on);z.addEventListener("mouseup",off);z.addEventListener("mouseleave",off);
+  z.addEventListener("click",function(){press(z.dataset.k)});
+});
+document.addEventListener("keydown",function(e){if(/^[0-9]$/.test(e.key))press(e.key);else if(e.key==="Enter")press("ok");else if(e.key==="Backspace")press("del")});
+if(Q.get("type")){Q.get("type").split("").forEach(press);if(Q.has("go"))press("ok")}
+say(Q.has("show")?"Code de test : "+code:"Code de test : 4 chiffres différents",3500);
+})();
+</script></body></html>
