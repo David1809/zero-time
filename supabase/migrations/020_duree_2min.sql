@@ -1,0 +1,2 @@
+-- 020 : durée de la partie passée de 45 s à 2 min (zt_start et zt_start_solo : interval '120 seconds').
+-- Retour : remettre interval '45 seconds' dans ces deux fonctions.
