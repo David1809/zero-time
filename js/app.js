@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.49";
+  var APP_VERSION = "1.0.50";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -697,7 +697,7 @@ ${solo}
     app.innerHTML =
       ((mode === "err" || (!paused && remNow <= 30000)) ? '<div class="alarm-vignette-overlay fixed inset-0 pointer-events-none z-40"' + (remNow <= 30000 && !showErr ? ' style="animation-duration:.6s"' : "") + '></div>' : "") +
       '<header class="fixed top-0 left-0 right-0 z-50 pt-safe bg-[#20252c]/95 border-b border-[#353d47] backdrop-blur-md shadow-[0_4px_16px_rgba(0,0,0,0.6)]"><div class="h-11 px-3 flex items-center justify-between max-w-md mx-auto">' +
-      '<div class="flex items-center gap-2"><button id="zt-hub-back" type="button" aria-label="Retour à la bombe" class="w-7 h-7 min-h-0 p-0 flex items-center justify-center rounded bg-[#1a1e24] border border-[#373f4a] text-secondary shadow-inner"><span class="material-symbols-outlined text-[17px]">arrow_back</span></button><div class="flex flex-col"><div class="flex items-center gap-1.5">' + topLed + '</div><span class="font-headline-sm text-[13px] font-bold tracking-tight text-white flex items-center gap-1.5">BAIE CÂBLAGE <span class="text-[9.5px] text-secondary font-code-serial font-normal">[MOD-0' + (activePanel + 1) + ']</span></span></div></div>' +
+      '<div class="flex items-center gap-2"><button id="zt-hub-back" type="button" aria-label="Retour à la bombe" class="zt-back">← BOMBE</button><div class="flex flex-col"><div class="flex items-center gap-1.5">' + topLed + '</div><span class="font-headline-sm text-[13px] font-bold tracking-tight text-white flex items-center gap-1.5">BAIE CÂBLAGE <span class="text-[9.5px] text-secondary font-code-serial font-normal">[MOD-0' + (activePanel + 1) + ']</span></span></div></div>' +
       '<div class="flex items-center gap-2"><div class="flex items-center p-0.5 rounded bg-[#14181e] border border-[#2f3640]">' + hsel + '</div><div class="h-[22px] flex items-center">' + badge + '</div></div></div></header>' +
       '<main class="flex-1 w-full max-w-md mx-auto px-2 pb-safe flex flex-col justify-between gap-1 overflow-hidden relative z-30" id="tactical-rack">' + errBanner + tele + select + module + cmd + '</main>';
 
