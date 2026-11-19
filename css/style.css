@@ -1144,3 +1144,16 @@ body.op .push-trigger-heavy,body.op .push-trigger-suspended,body.op .push-trigge
 .zh .zh-in{border-radius:9px!important;border:1px solid #241f16!important;background:#030302!important}
 .zh-code::placeholder{font-size:14px!important;letter-spacing:.1em!important}
 .zh-ct b{font-size:19px!important;letter-spacing:.1em!important}
+/* accueil : tout tient dans l'écran, quelle que soit la hauteur */
+.zh{height:100dvh;min-height:0;display:flex;flex-direction:column;padding-bottom:max(env(safe-area-inset-bottom),8px)}
+.zh-main{flex:1;min-height:0;width:100%;justify-content:space-evenly}
+.zh-tag{padding:7px 12px;font-size:11px}
+.zh-logo{margin-top:0}.zh-dial{width:auto;height:min(31dvh,70vw)}
+.zh-title{font-size:min(19vw,9dvh);margin-top:0}
+.zh-sub{margin:1dvh 0 1.5dvh;font-size:min(5.4vw,2.6dvh)}
+.zh-card{padding:min(14px,1.6dvh) 14px}
+.zh-lbl{margin:0 4px min(12px,1.4dvh)}
+.zh .zh-in,.zh-go{height:min(66px,7.4dvh)}
+.zh-create{margin-top:0;padding-top:min(18px,2dvh);padding-bottom:calc(min(18px,2dvh) + 9px)}
+.zh-ico{width:min(57px,6.4dvh);height:min(57px,6.4dvh)}
+.zh-or{margin:0}.zh-ver{margin:0 auto}

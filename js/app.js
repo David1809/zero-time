@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.63";
+  var APP_VERSION = "1.0.64";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -1081,6 +1081,19 @@ ${debriefHeader("z-40", `<button aria-label="Rejouer détonation" class="w-8 h-8
     box.appendChild(b); box.appendChild(st);
     document.body.appendChild(box);
   }
+  // Plein écran : au premier toucher, si l'appli n'est pas déjà installée en plein écran
+  (function () {
+    var tried = false;
+    function fs() {
+      if (tried) return; tried = true;
+      try {
+        if (window.matchMedia("(display-mode: fullscreen)").matches || document.fullscreenElement) return;
+        var el = document.documentElement, rq = el.requestFullscreen || el.webkitRequestFullscreen;
+        if (rq) { var p = rq.call(el, { navigationUI: "hide" }); if (p && p.catch) p.catch(function () {}); }
+      } catch (e) {}
+    }
+    document.addEventListener("pointerup", fs, { once: true, passive: true });
+  })();
   document.addEventListener("touchmove", function (e) { if (document.body.classList.contains("op")) e.preventDefault(); }, { passive: false });
   function doRender() {
     var isOp = !!(session && view && view.status === "playing" && view.me && view.me.role === "operator" && view.game);
