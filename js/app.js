@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.43";
+  var APP_VERSION = "1.0.44";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -26,6 +26,7 @@
     panneau_inconnu: "Panneau inconnu.",
     abandon_indisponible: "Abandon impossible pour le moment.",
     mode_solo_indisponible: "Mode solo indisponible : un autre joueur est dans la salle.",
+    modules_restants: "Il reste des modules à neutraliser.",
     partie_non_en_cours: "Aucune partie en cours."
   };
 
@@ -251,6 +252,7 @@ ${solo}
 
   var COLORS = { red: "Rouge", blue: "Bleu", yellow: "Jaune", white: "Blanc", black: "Noir" };
   var activePanel = 0, selectedWire = null, manualTab = "w4";
+  var opScreen = "hub", hubApi = null, pinApi = null, pinBusy = false, openedSolved = false, backTimer = null, lastOrient = null, pinEnds = 0, pinBuf = "";
   var timerId = null, offsetMs = 0, bestOff = null;
   var errFlash = null, alertFlash = null;
   var seenEvent, alerted = {}, alertInit = false, tickSent = false, cutting = false;
@@ -262,7 +264,7 @@ ${solo}
     });
   }
   function buzz(p) { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} }
-  function resetGameFlags() { techTouched = false; endFxKey = null; errFlash = null; alertFlash = null; seenEvent = undefined; alerted = {}; alertInit = false; tickSent = false; }
+  function resetGameFlags() { techTouched = false; endFxKey = null; errFlash = null; alertFlash = null; seenEvent = undefined; alerted = {}; alertInit = false; tickSent = false; opScreen = "hub"; openedSolved = false; pinBusy = false; pinBuf = ""; if (backTimer) { clearTimeout(backTimer); backTimer = null; } dropFx(); }
 
   function stopTimer() { if (timerId) { clearInterval(timerId); timerId = null; } }
   function fmt(ms) {
@@ -386,18 +388,118 @@ ${solo}
   var SCR_PUSH = "";
   var lastCut = null; // fil qui vient d'être coupé (pour l'animation de recul)
 
-  function renderOperator() {
-    var g = view.game;
-    // Décalage horloge serveur/local : mesuré UNE seule fois à la réception de cette vue (sinon un simple
-    // clic relit un ancien server_now et le temps « remonte »), puis lissé : on garde le meilleur échantillon
-    // (celui où la latence réseau est la plus faible).
+  // Décalage horloge serveur/local : mesuré UNE seule fois à la réception de cette vue (sinon un simple
+  // clic relit un ancien server_now et le temps « remonte »), puis lissé : on garde le meilleur échantillon
+  // (celui où la latence réseau est la plus faible).
+  function syncClock(g) {
     if (g._off === undefined) {
       var smp = new Date(g.server_now).getTime() - Date.now();
       bestOff = bestOff === null ? smp : Math.max(smp, bestOff - 20);
       g._off = bestOff;
     }
     offsetMs = g._off;
+  }
+  function setOrient(m) {
+    try {
+      var so = window.screen && screen.orientation; if (!so || !so.lock) return;
+      var pr = so.lock(m === "land" ? "landscape" : "portrait"); if (pr && pr.catch) pr.catch(function () {});
+    } catch (e) {}
+  }
+  function dropFx() { stopTimer(); if (hubApi) { hubApi.destroy(); hubApi = null; } pinApi = null; }
+  function goHub() { if (pinApi) pinBuf = pinApi.getState().buf; if (backTimer) { clearTimeout(backTimer); backTimer = null; } opScreen = "hub"; selectedWire = null; render(); }
+  function panelId(p) { return p.kind === "pin" ? "digi" : ({ 3: "alim", 4: "hor", 5: "deto" })[p.wires.length]; }
+  function consumeEvent(g) {
+    var ev = g.event;
+    if (seenEvent === undefined) { seenEvent = ev ? ev.id : null; return; }
+    if (ev && ev.id !== seenEvent) {
+      seenEvent = ev.id;
+      if (ev.type === "error") { buzz([250]); toast(ev.penalty ? "ERREUR " + ev.n + "/3 · −" + ev.penalty + " s" : "ERREUR " + ev.n + "/3 · EXPLOSION"); }
+      else buzz([80]);
+    }
+  }
+  function expire() { if (tickSent) return; tickSent = true; sb.rpc("zt_tick", { p_code: session.code, p_token: session.token }).then(function (r) { if (!r.error) { view = r.data; render(); } }); }
+
+  // --- Bombe globale (paysage) : choix du module ---
+  function renderHub(g) {
+    stopTimer(); syncClock(g); consumeEvent(g);
     var endsAt = new Date(g.ends_at).getTime();
+    var mods = {}, idx = {};
+    g.panels.forEach(function (p, i) { var id = panelId(p); if (id) { mods[id] = { done: p.state === "solved" }; idx[id] = i; } });
+    var pz = view.paused ? { pseudo: view.paused.pseudo, can_abandon: view.paused.can_abandon } : null;
+    if (!hubApi || !document.getElementById("zthub")) {
+      hubApi = ZTHub.mount(app, {
+        remaining: function () { return pinEnds - (Date.now() + offsetMs); },
+        notice: function (m) { toast(m); },
+        onOpen: function (id) {
+          var i = idx[id]; if (i === undefined) return;
+          var pn = view.game.panels[i];
+          activePanel = i; openedSolved = pn.state === "solved"; selectedWire = null; opScreen = "mod"; render();
+        },
+        onDisarm: function (done) {
+          sb.rpc("zt_disarm", { p_code: session.code, p_token: session.token, p_action: uuid() }).then(function (r) {
+            if (r.error) { done(); return fail(r.error); }
+            view = r.data; render();
+          });
+        },
+        onExpire: expire,
+        onAbandon: function () {
+          if (!window.confirm("ATTENTION : voulez-vous vraiment abandonner la mission de déminage en cours ?")) return;
+          sb.rpc("zt_abandon", { p_code: session.code, p_token: session.token }).then(function (r) { if (r.error) return fail(r.error); view = r.data; render(); });
+        }
+      });
+    }
+    pinEnds = endsAt;
+    hubApi.update({ mods: mods, errors: g.errors, paused: pz, frozenMs: view.paused && view.paused.remaining_ms || 0 });
+  }
+
+  // --- Module Digicode (portrait) ---
+  function renderPin(g, panel) {
+    syncClock(g); consumeEvent(g);
+    var endsAt = new Date(g.ends_at).getTime(); pinEnds = endsAt;
+    var paused = view.paused, solved = panel.state === "solved";
+    var last = panel.attempts && panel.attempts.length ? panel.attempts[panel.attempts.length - 1] : null;
+    if (!pinApi || !document.getElementById("ztpin")) {
+      stopTimer(); clear();
+      app.innerHTML = '<div id="ztpin"><div id="ztpin-bar"><button id="ztpin-back" type="button">← BOMBE</button><span id="ztpin-err"></span><span id="ztpin-t">00:00</span></div><div id="ztpin-ui"></div><div id="ztpin-turn"><b>↻</b>REMETS LE TÉLÉPHONE<br>EN MODE PORTRAIT</div></div>';
+      pinApi = ZTDigicode.mount(document.getElementById("ztpin-ui"), { len: 4 });
+      document.getElementById("ztpin-back").onclick = goHub;
+      pinApi.on("submit", function (code) {
+        if (pinBusy || view.paused) return;
+        pinBusy = true; pinApi.lock(true);
+        var pn = view.game.panels[activePanel];
+        sb.rpc("zt_pin_try", { p_code: session.code, p_token: session.token, p_action: uuid(), p_pos: pn.pos, p_digits: code }).then(function (r) {
+          pinBusy = false;
+          if (r.error) { pinApi.lock(false); return fail(r.error); }
+          view = r.data;
+          if (view.status !== "playing") return render();
+          var np = view.game.panels[activePanel], la = np.attempts[np.attempts.length - 1];
+          pinApi.result({ verdicts: la ? la.verdict : "xxxx", solved: np.state === "solved" });
+          if (np.state !== "solved") pinApi.lock(false);
+          render();
+        });
+      });
+      timerId = setInterval(function () {
+        var ms = Math.max(0, pinEnds - (Date.now() + offsetMs)), f = fmtH(ms), t = document.getElementById("ztpin-t");
+        if (t && !view.paused) { t.textContent = f[0]; t.className = ms <= 20000 ? "al" : ""; }
+        if (ms <= 0 && !view.paused) expire();
+      }, 100);
+      pinApi.reset(); // active l'affichage
+      pinApi.setState({ buf: pinBuf, hist: last ? { digits: last.digits, verdicts: last.verdict } : null });
+    }
+    pinApi.setLamps({ red: panel.reds, blue: panel.blues });
+    pinApi.setStatus(solved ? "done" : "todo");
+    if (solved) pinApi.lock(true); else if (!pinBusy) pinApi.lock(!!paused);
+    var er = document.getElementById("ztpin-err"); if (er) er.textContent = "ERREURS " + g.errors + "/3" + (paused ? " · ⏸ " + String(paused.pseudo || "").toUpperCase() : "");
+    if (paused) { var t0 = document.getElementById("ztpin-t"); if (t0) t0.textContent = fmtH(paused.remaining_ms || 0)[0]; }
+    if (solved && !openedSolved && !backTimer) backTimer = setTimeout(function () { backTimer = null; if (opScreen === "mod") goHub(); }, 1600);
+  }
+
+  function renderOperator() {
+    var g = view.game;
+    syncClock(g);
+    var endsAt = new Date(g.ends_at).getTime();
+    if (opScreen === "hub") return renderHub(g);
+    if ((g.panels[activePanel] || {}).kind === "pin") return renderPin(g, g.panels[activePanel]);
     var solved = g.panels.filter(function (p) { return p.state === "solved"; }).length;
     var panel = g.panels[activePanel] || g.panels[0];
     var paused = view.paused;
@@ -477,11 +579,11 @@ ${solo}
       (paused ? '<span class="ml-2.5 px-1.5 py-0.5 rounded bg-black/60 border border-slate-700 text-[8px] font-code-serial text-slate-400 uppercase tracking-widest">FIGÉ</span>' : "") + '</div>' +
       '<div class="mt-0.5 pt-1 border-t border-[#182029] grid grid-cols-2 gap-2 items-center relative z-15">' +
       '<div class="flex flex-col gap-0.5"><div class="flex items-center gap-1"><span class="material-symbols-outlined text-error text-[11px]">warning</span><span class="font-label-sm text-[7.5px] font-bold tracking-wider text-error uppercase">ERREURS ' + g.errors + '/3</span></div><div class="flex items-center gap-1.5">' + diodes + '</div></div>' +
-      '<div class="flex flex-col items-end gap-0.5"><div class="flex items-center gap-1 ' + (mode === "ok" ? "text-[#00ffaa]" : "text-secondary") + '"><span class="font-label-sm text-[7.5px] font-bold tracking-wider uppercase">MODULES VALIDÉS ' + solved + '/3</span><span class="material-symbols-outlined text-[11px]">grid_view</span></div><div class="flex items-center gap-1 w-20 h-3 bg-[#0e1216] p-0.5 rounded border border-[#28323d] shadow-inner">' + crans + '</div></div>' +
+      '<div class="flex flex-col items-end gap-0.5"><div class="flex items-center gap-1 ' + (mode === "ok" ? "text-[#00ffaa]" : "text-secondary") + '"><span class="font-label-sm text-[7.5px] font-bold tracking-wider uppercase">MODULES VALIDÉS ' + solved + '/' + g.panels.length + '</span><span class="material-symbols-outlined text-[11px]">grid_view</span></div><div class="flex items-center gap-1 w-20 h-3 bg-[#0e1216] p-0.5 rounded border border-[#28323d] shadow-inner">' + crans + '</div></div>' +
       '</div></div></section>';
 
     // --- sélection des 3 modules (cadrans encastrés)
-    var cells = g.panels.map(function (p, idx) {
+    var cells = g.panels.filter(function (p) { return p.kind !== "pin"; }).map(function (p, idx) {
       var on = idx === activePanel, ok = p.state === "solved", w = p.wires.length;
       var cls, led, ico, nameCls, wCls, bar;
       if (on) {
@@ -582,15 +684,15 @@ ${solo}
         '<div class="p-1 rounded-xl bg-gradient-to-b from-[#282e36] to-[#1a1f25] border border-[#363f4b] shadow-xl relative overflow-hidden">' + SCR_PUSH + '<button class="push-trigger-heavy w-full min-h-[44px] rounded-lg text-[#261100] font-headline-sm text-[14px] font-black tracking-widest uppercase flex items-center justify-center gap-2 select-none transition-all duration-150 relative z-20' + (selectedWire ? "" : " opacity-40 pointer-events-none grayscale cursor-not-allowed") + '"' + (selectedWire ? "" : " disabled") + ' id="cut-wire-button" type="button"><span class="material-symbols-outlined text-[20px]">content_cut</span><span>COUPER CE FIL</span><span class="material-symbols-outlined text-[17px]">bolt</span></button></div></section>';
     }
 
-    var hsel = g.panels.map(function (p, idx) { return idx === activePanel
+    var hsel = g.panels.map(function (p, idx) { return p.kind === "pin" ? "" : idx === activePanel
       ? '<span class="px-2 py-0.5 rounded bg-[#272e37] text-[8px] font-code-serial font-bold text-primary border border-primary/40 shadow-sm">' + MOD_NAME[p.wires.length].toUpperCase() + '</span>'
       : '<span class="px-1.5 py-0.5 rounded text-[8px] font-code-serial font-semibold text-slate-400">' + MOD_NAME[p.wires.length].slice(0, 3).toUpperCase() + '</span>'; }).join("");
     app.innerHTML =
       ((mode === "err" || (!paused && remNow <= 30000)) ? '<div class="alarm-vignette-overlay fixed inset-0 pointer-events-none z-40"' + (remNow <= 30000 && !showErr ? ' style="animation-duration:.6s"' : "") + '></div>' : "") +
       '<header class="fixed top-0 left-0 right-0 z-50 pt-safe bg-[#20252c]/95 border-b border-[#353d47] backdrop-blur-md shadow-[0_4px_16px_rgba(0,0,0,0.6)]"><div class="h-11 px-3 flex items-center justify-between max-w-md mx-auto">' +
-      '<div class="flex items-center gap-2"><div aria-hidden="true" class="w-7 h-7 flex items-center justify-center rounded bg-[#1a1e24] border border-[#373f4a] text-secondary shadow-inner"><span class="material-symbols-outlined text-[17px]">arrow_back</span></div><div class="flex flex-col"><div class="flex items-center gap-1.5">' + topLed + '</div><span class="font-headline-sm text-[13px] font-bold tracking-tight text-white flex items-center gap-1.5">BAIE CÂBLAGE <span class="text-[9.5px] text-secondary font-code-serial font-normal">[MOD-0' + (activePanel + 1) + ']</span></span></div></div>' +
+      '<div class="flex items-center gap-2"><button id="zt-hub-back" type="button" aria-label="Retour à la bombe" class="w-7 h-7 min-h-0 p-0 flex items-center justify-center rounded bg-[#1a1e24] border border-[#373f4a] text-secondary shadow-inner"><span class="material-symbols-outlined text-[17px]">arrow_back</span></button><div class="flex flex-col"><div class="flex items-center gap-1.5">' + topLed + '</div><span class="font-headline-sm text-[13px] font-bold tracking-tight text-white flex items-center gap-1.5">BAIE CÂBLAGE <span class="text-[9.5px] text-secondary font-code-serial font-normal">[MOD-0' + (activePanel + 1) + ']</span></span></div></div>' +
       '<div class="flex items-center gap-2"><div class="flex items-center p-0.5 rounded bg-[#14181e] border border-[#2f3640]">' + hsel + '</div><div class="h-[22px] flex items-center">' + badge + '</div></div></div></header>' +
-      '<main class="flex-1 w-full max-w-md mx-auto px-2 pb-safe flex flex-col justify-between gap-1 overflow-hidden relative z-30" id="tactical-rack">' + errBanner + tele + select + module + cmd + '</main>';
+      '<main class="flex-1 w-full max-w-md mx-auto px-2 pb-safe flex flex-col justify-between gap-1 overflow-hidden relative z-30" id="tactical-rack">' + errBanner + tele + module + cmd + '</main>';
 
     // Valeurs dynamiques (texte pur)
     var se = document.getElementById("zt-serial"); if (se) se.textContent = panel.serial;
@@ -599,6 +701,8 @@ ${solo}
     lastCut = null;
 
     // Interactions
+    var hb = document.getElementById("zt-hub-back"); if (hb) hb.onclick = goHub;
+    if (isSolved && !openedSolved && !backTimer) backTimer = setTimeout(function () { backTimer = null; if (opScreen === "mod") goHub(); }, 1600);
     Array.prototype.forEach.call(app.querySelectorAll("[data-panel]"), function (b) {
       b.onclick = function () { activePanel = +b.getAttribute("data-panel"); selectedWire = null; render(); };
     });
@@ -680,7 +784,7 @@ ${solo}
     if (circle) return '<li class="flex items-start gap-2.5 ' + bg + '"><span class="font-notes font-bold text-inkBlue text-base bg-amber-200/60 w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5">' + n + '</span><div class="leading-snug"><span>' + cond + "</span>" + act + "</div></li>";
     return '<li class="' + bg + '"><span class="font-notes font-bold text-inkBlue text-base bg-amber-200/60 px-1.5 rounded">' + n + "</span> <span>" + cond + "</span>" + act + "</li>";
   }
-  var TECH_ORDER = ["lecture", "w3", "w4", "w5", "w6", "w7", "w8"];
+  var TECH_ORDER = ["lecture", "w3", "w4", "w5", "pin"];
   var TECH_META = {
     lecture: { tab: "📌 Lire un panneau", title: "Section 02 — Lire un Panneau", sub: "Protocole de communication avec l'opérateur", pg: "p. 02", ind: "Page 2 / 8 — Lire un panneau" },
     w3: { tab: "Alimentation", title: "Section 03 — Alimentation", sub: "Configuration compacte à 3 connexions", pg: "p. 03", ind: "Page 3 / 8 — Alimentation" },
@@ -689,6 +793,7 @@ ${solo}
     w6: { tab: "Capteur", title: "Section 06 — Capteur", sub: "Faisceau étendu à 6 connexions", pg: "p. 06", ind: "Page 6 / 8 — Capteur" },
     w7: { tab: "Relais", title: "Section 07 — Relais", sub: "Faisceau dense à 7 connexions", pg: "p. 07", ind: "Page 7 / 8 — Relais" },
     w8: { tab: "Charge", title: "Section 08 — Charge", sub: "Harnais maximal à 8 connexions", pg: "p. 08", ind: "Page 8 / 8 — Charge" },
+    pin: { tab: "Digicode", title: "Section 09 — Digicode", sub: "Module à code de 4 chiffres : voyants et historique des essais", pg: "p. 09", ind: "Page 9 / 9 — Digicode" },
     index: { tab: "", title: "Sommaire du Manuel", sub: "Index rapide des modules de déminage", pg: "INDEX", ind: "Sommaire général" }
   };
   var techQuery = "", techTouched = false;
@@ -697,7 +802,7 @@ ${solo}
     return '<div class="border-b-2 border-inkBlue/30 pb-2 mb-3 flex items-baseline justify-between"><div><div class="font-hand text-3xl font-bold text-inkBlue tracking-wide flex items-center gap-2"><span>' + m.title + "</span>" + (extra || "") + '</div><p class="font-notes text-xs text-slate-600 italic">' + m.sub + '</p></div><div class="font-typewriter text-xs text-slate-500 font-bold">' + m.pg + "</div></div>";
   }
   function techPageHtml(k, m) {
-    if (/^w[3-8]$/.test(k) && !m[k]) {
+    if ((/^w[3-8]$/.test(k) || k === "pin") && !m[k]) {
       return techHead(k) + '<div class="mt-6 p-4 rounded border-2 border-dashed border-inkRed/50 bg-red-50/40 text-center font-hand text-xl text-inkRed leading-snug">🔒 Cette page est chez un autre technicien.<br><span class="text-base text-slate-700">Demande-lui de te lire ses règles : annonce le nombre de fils et les couleurs.</span></div>';
     }
     if (k === "w4") {
@@ -708,26 +813,32 @@ ${solo}
     if (k === "w3" || k === "w5" || k === "w6" || k === "w7" || k === "w8") {
       return techHead(k) + '<ol class="space-y-' + (k === "w5" ? "2.5" : "3") + ' font-hand text-lg text-inkBlue">' + m[k].map(function (r, i) { return ruleLi(r, i, false); }).join("") + "</ol>";
     }
+    if (k === "pin") {
+      var P = m.pin;
+      return techHead(k) + '<ol class="space-y-3 font-hand text-lg text-inkBlue">' + P.rules.map(function (r, i) {
+        return '<li class="' + (i % 2 === 0 ? "bg-amber-50/40 p-1.5 rounded border border-dashed border-amber-900/20" : "p-1.5 rounded") + '"><span class="font-notes font-bold text-inkBlue text-base bg-amber-200/60 px-1.5 rounded">' + escH(String(r.n).split(".").pop()) + "</span> " + escH(r.t) + "</li>";
+      }).join("") + '</ol><div class="mt-3 p-2 rounded border border-slate-400/40 bg-slate-200/40 font-hand text-base text-inkBlue space-y-1"><div class="font-notes text-xs font-bold text-inkRed uppercase tracking-wider">Lecture de l\'historique</div>' + P.verdicts.map(function (t) { return "<div>" + escH(t) + "</div>"; }).join("") + '</div><p class="mt-3 font-notes text-xs text-inkRed font-bold">' + escH(P.penalties) + "</p>";
+    }
     if (k === "lecture") {
       var L = ["Étape A : Annoncer le module", "Étape B : Relever le numéro de série", "Étape C : Lister les couleurs"];
       return techHead(k) + '<div class="space-y-3 font-hand text-lg text-inkBlue leading-snug">' + m.read.map(function (t, i) {
         return '<div class="bg-amber-100/40 p-2.5 rounded border border-amber-800/30"><span class="font-notes text-xs font-bold text-inkRed uppercase tracking-wider block">' + L[i % 3] + '</span><p class="mt-1">' + escH(t) + "</p></div>";
       }).join("") + "</div>";
     }
-    var items = [["lecture", "📌", "Lire un panneau", "(protocole série, comptage)", "p. 02"], ["w3", "⚡", "Alimentation", "(combinaisons de base)", "p. 03"], ["w4", "⚡", "Horloge", "(série pair/impair & règles)", "p. 04"], ["w5", "⚡", "Détonateur", "(harnais complexe à 5 brins)", "p. 05"], ["w6", "⚡", "Capteur", "(faisceau étendu)", "p. 06"], ["w7", "⚡", "Relais", "(faisceau dense)", "p. 07"], ["w8", "⚡", "Charge", "(harnais maximal)", "p. 08"]];
+    var items = [["lecture", "📌", "Lire un panneau", "(protocole série, comptage)", "p. 02"], ["w3", "⚡", "Alimentation", "(combinaisons de base)", "p. 03"], ["w4", "⚡", "Horloge", "(série pair/impair & règles)", "p. 04"], ["w5", "⚡", "Détonateur", "(harnais complexe à 5 brins)", "p. 05"], ["pin", "🔢", "Digicode", "(voyants rouges/bleus, essais)", "p. 09"]];
     return techHead("index") +
       '<div class="mb-4 bg-amber-50/70 p-2.5 rounded border border-amber-900/30 shadow-inner"><label class="block font-notes text-xs text-slate-700 font-bold mb-1">🔍 Recherche de mot-clé ou module :</label><div class="relative"><input type="text" id="indexSearchInput" placeholder="Ex: 4 fils, série, pair..." class="w-full bg-transparent border-b-2 border-inkBlue text-inkBlue font-hand text-xl px-1 py-0.5 focus:outline-none focus:border-inkRed placeholder-slate-400"/><span class="absolute right-1 top-1 text-xs text-slate-400 font-notes italic">écrire ici</span></div></div>' +
       '<ul id="indexList" class="space-y-2.5 font-hand text-lg text-inkBlue">' + items.map(function (x) {
-        var lk = /^w[3-8]$/.test(x[0]) && !m[x[0]];
+        var lk = (/^w[3-8]$/.test(x[0]) || x[0] === "pin") && !m[x[0]];
         return '<li class="index-item flex items-center justify-between border-b border-dotted border-inkBlue/40 pb-1 cursor-pointer' + (lk ? " opacity-50" : "") + '" data-go="' + x[0] + '"><span class="flex items-center gap-2"><span>' + (lk ? "🔒" : x[1]) + "</span> <b>" + x[2] + '</b> <span class="font-notes text-xs text-slate-500">' + (lk ? "(chez un autre technicien)" : x[3]) + '</span></span><span class="font-typewriter text-sm font-bold text-inkBlue">' + x[4] + "</span></li>";
       }).join("") + '<li class="index-item flex items-center justify-between border-b border-dotted border-inkBlue/40 pb-1 opacity-50"><span class="flex items-center gap-2"><span>🔒</span> Module Clavier & Symboles</span><span class="font-typewriter text-sm text-slate-400">p. 09</span></li></ul>';
   }
 
   function renderTechnician() {
     stopTimer();
-    var m = view.manual; if (m.pages && !m["w" + manualTab.slice(1)] && /^w[3-8]$/.test(manualTab) && !techTouched) { manualTab = "w" + m.pages[0]; }
+    var m = view.manual; if (m.pages && !m[manualTab] && (/^w[3-8]$/.test(manualTab) || manualTab === "pin") && !techTouched) { manualTab = m.pages[0] === 9 ? "pin" : "w" + m.pages[0]; }
     var k = TECH_META[manualTab] ? manualTab : "w4", meta = TECH_META[k], paused = view.paused;
-    var lock = function (t) { return /^w[3-8]$/.test(t) && !m[t]; };
+    var lock = function (t) { return (/^w[3-8]$/.test(t) || t === "pin") && !m[t]; };
     var tabs = TECH_ORDER.filter(function (t) { return t === k || !lock(t); }).map(function (t) {
       var lab = TECH_META[t].tab + (lock(t) ? " 🔒" : "");
       return t === k
@@ -746,7 +857,7 @@ ${solo}
       '<div class="border-t border-amber-900/20 bg-[#ede4d4] px-4 py-2 flex items-center justify-between text-xs font-notes text-inkBlue"><button id="btnPrev" class="flex items-center gap-1 font-bold text-inkBlue active:scale-95 transition-transform"><span>⟵</span> <span>Précédent</span></button><div class="flex items-center gap-1 font-typewriter text-[11px] text-slate-600 bg-amber-200/50 px-2 py-0.5 rounded border border-amber-800/30"><span>' + meta.ind + '</span></div><button id="btnNext" class="flex items-center gap-1 font-bold text-inkBlue active:scale-95 transition-transform"><span>Suivant</span> <span>⟶</span></button></div></div>';
 
     function go(t) { manualTab = t; techTouched = true; render(); }
-    function step(d) { var L = TECH_ORDER.filter(function (t) { return !/^w[3-8]$/.test(t) || m[t]; }), i = L.indexOf(manualTab); if (i < 0) i = 0; go(L[(i + d + L.length) % L.length]); }
+    function step(d) { var L = TECH_ORDER.filter(function (t) { return !(/^w[3-8]$/.test(t) || t === "pin") || m[t]; }), i = L.indexOf(manualTab); if (i < 0) i = 0; go(L[(i + d + L.length) % L.length]); }
     Array.prototype.forEach.call(app.querySelectorAll("[data-tab]"), function (b) { b.onclick = function () { go(b.getAttribute("data-tab")); }; });
     Array.prototype.forEach.call(app.querySelectorAll("[data-go]"), function (b) { b.onclick = function () { go(b.getAttribute("data-go")); }; });
     document.getElementById("btnPrev").onclick = function () { step(-1); };
@@ -773,7 +884,10 @@ ${solo}
   }
 
   function renderPlaying() {
-    clear();
+    var gm = view.me.role === "operator" && view.game;
+    if (gm && opScreen === "hub" && hubApi && document.getElementById("zthub")) return renderHub(gm);
+    if (gm && opScreen === "mod" && pinApi && document.getElementById("ztpin") && (gm.panels[activePanel] || {}).kind === "pin") return renderPin(gm, gm.panels[activePanel]);
+    dropFx(); clear();
     if (view.me.role === "operator" && view.game) return renderOperator();
     if (view.me.role === "technician" && view.manual) return renderTechnician();
     app.appendChild(el("div", { class: "card" }, [el("div", { class: "muted", text: "Chargement…" })]));
@@ -946,6 +1060,8 @@ ${debriefHeader("z-40", `<button aria-label="Rejouer détonation" class="w-8 h-8
     document.body.classList.toggle("tech", isTech);
     document.body.classList.toggle("workbench-bg", isTech);
     document.body.classList.toggle("scr", !(session && view) || view.status === "lobby" || view.status === "ended" || view.status === "abandoned");
+    var wantO = (isOp && opScreen === "hub") ? "land" : "port";
+    if (wantO !== lastOrient) { lastOrient = wantO; setOrient(wantO); }
     soloChip();
     if (!session || !view) { stopTimer(); return renderHome(); }
     if (view.status === "lobby") { stopTimer(); resetGameFlags(); return renderLobby(); }
