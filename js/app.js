@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.58";
+  var APP_VERSION = "1.0.59";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -572,12 +572,12 @@ ${solo}
     var topLed = { live: '<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span><span class="font-label-sm text-[8px] font-bold text-primary tracking-widest uppercase">UNITÉ TACTIQUE // DÉMINEUR</span>',
       alert: '<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span><span class="font-label-sm text-[8px] font-bold text-primary tracking-widest uppercase">UNITÉ TACTIQUE // DÉMINEUR</span>',
       err: '<span class="w-1.5 h-1.5 rounded-full bg-error animate-ping"></span><span class="font-label-sm text-[8px] font-bold text-error tracking-widest uppercase">UNITÉ TACTIQUE // DÉMINEUR</span>',
-      ok: '<span class="w-1.5 h-1.5 rounded-full bg-[#00ffaa] shadow-[0_0_6px_#00ffaa]"></span><span class="font-label-sm text-[8px] font-bold text-[#00ffaa] tracking-widest uppercase">UNITÉ TACTIQUE // DÉMINEUR</span>',
+      ok: '<span class="zt-keep w-1.5 h-1.5 rounded-full bg-[#00ffaa] shadow-[0_0_6px_#00ffaa]"></span><span class="font-label-sm text-[8px] font-bold text-[#00ffaa] tracking-widest uppercase">UNITÉ TACTIQUE // DÉMINEUR</span>',
       pause: '<span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span><span class="font-label-sm text-[8px] font-bold text-amber-400 tracking-widest uppercase">UNITÉ TACTIQUE // SUSPENDUE</span>' }[mode];
     var badge = { live: '<div class="flex items-center gap-1 px-2 py-1 rounded bg-[#161a20] border border-[#2c343f]"><span class="w-1.5 h-1.5 rounded-full bg-[#00ffaa] shadow-[0_0_6px_#00ffaa]"></span><span class="font-code-serial text-[8.5px] text-[#9bb1c5] tracking-widest font-bold">ARMÉ</span></div>',
       alert: '<div class="flex items-center gap-1 px-2 py-1 rounded bg-[#191e25] border border-[#313945]"><span class="w-1.5 h-1.5 rounded-full bg-[#ff4d4d] shadow-[0_0_6px_#ff4d4d] animate-pulse"></span><span class="font-code-serial text-[8.5px] text-[#ffb4ab] tracking-widest font-bold">ALERTE</span></div>',
       err: '<div class="flex items-center gap-1 px-2 py-1 rounded bg-[#221010] border border-[#522121]"><span class="w-1.5 h-1.5 rounded-full bg-[#ff3333] shadow-[0_0_6px_#ff3333] animate-pulse"></span><span class="font-code-serial text-[8.5px] text-[#ff9999] tracking-widest font-bold">ALERTE</span></div>',
-      ok: '<div class="flex items-center gap-1 px-2 py-1 rounded bg-[#13281f] border border-[#00ffaa]/50 shadow-[0_0_8px_rgba(0,255,170,0.3)]"><span class="w-1.5 h-1.5 rounded-full bg-[#00ffaa] shadow-[0_0_6px_#00ffaa]"></span><span class="font-code-serial text-[8.5px] text-[#00ffaa] tracking-widest font-bold">RÉSOLU</span></div>',
+      ok: '<div class="flex items-center gap-1 px-2 py-1 rounded bg-[#13281f] border border-[#00ffaa]/50 shadow-[0_0_8px_rgba(0,255,170,0.3)]"><span class="zt-keep w-1.5 h-1.5 rounded-full bg-[#00ffaa] shadow-[0_0_6px_#00ffaa]"></span><span class="font-code-serial text-[8.5px] text-[#00ffaa] tracking-widest font-bold">RÉSOLU</span></div>',
       pause: '<div class="flex items-center gap-1 px-2 py-1 rounded bg-[#261f14] border border-[#6b4e20]"><span class="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_6px_#ffaa00] animate-ping"></span><span class="font-code-serial text-[8.5px] text-amber-300 tracking-widest font-bold">PAUSE</span></div>' }[mode];
 
     // --- bloc télémétrie
@@ -625,14 +625,14 @@ ${solo}
       var cls, led, ico, nameCls, wCls, bar;
       if (on) {
         cls = "module-cell-recess rounded-lg p-1.5 flex flex-col items-center justify-between active:scale-[0.97] transition-transform text-left cursor-pointer border-2 " + (ok ? "border-[#00ffaa] bg-gradient-to-b from-[#0d2a20] to-[#14181f] shadow-[0_0_14px_rgba(0,255,170,0.35)]" : "border-primary bg-gradient-to-b from-[#2a1c0d] to-[#14181f] shadow-[0_0_14px_rgba(255,159,50,0.4)]");
-        led = ok ? '<span class="w-1.5 h-1.5 rounded-full bg-[#00ffaa] shadow-[0_0_6px_#00ffaa]"></span>' : '<span class="pilot-led-orange animate-pulse"></span>';
+        led = ok ? '<span class="zt-keep w-1.5 h-1.5 rounded-full bg-[#00ffaa] shadow-[0_0_6px_#00ffaa]"></span>' : '<span class="pilot-led-orange animate-pulse"></span>';
         nameCls = ok ? "font-black text-[#00ffaa]" : "font-black text-primary";
         ico = ok ? '<span class="material-symbols-outlined text-[13px] text-[#00ffaa] font-black drop-shadow-[0_0_4px_rgba(0,255,170,0.8)]">check_circle</span>' : '<span class="material-symbols-outlined text-[13px] text-primary font-black animate-spin" style="animation-duration: 8s;">sync</span>';
         wCls = ok ? "font-black text-[#d1fae5]" : "font-black text-[#ffdcbf]";
         bar = ok ? '<div class="w-full h-1 rounded-full bg-[#00ffaa] shadow-[0_0_8px_#00ffaa] mt-1"></div>' : '<div class="w-full h-1 rounded-full bg-primary shadow-[0_0_10px_#ff9f32] mt-1 animate-pulse"></div>';
       } else if (ok) {
         cls = "module-cell-recess rounded-lg p-1.5 flex flex-col items-center justify-between active:scale-[0.97] transition-transform text-left cursor-pointer border border-[#1b3d2f]";
-        led = '<span class="w-1.5 h-1.5 rounded-full bg-[#00ffaa] shadow-[0_0_6px_#00ffaa]"></span>'; nameCls = "font-bold text-[#00ffaa]";
+        led = '<span class="zt-keep w-1.5 h-1.5 rounded-full bg-[#00ffaa] shadow-[0_0_6px_#00ffaa]"></span>'; nameCls = "font-bold text-[#00ffaa]";
         ico = '<span class="material-symbols-outlined text-[13px] text-[#00ffaa] font-black drop-shadow-[0_0_4px_rgba(0,255,170,0.8)]">check_circle</span>';
         wCls = "font-black text-[#d1fae5]"; bar = '<div class="w-full h-1 rounded-full bg-[#00ffaa] shadow-[0_0_8px_#00ffaa] mt-1"></div>';
       } else {

@@ -58,9 +58,8 @@ body:has(#zthub) #toast{top:50% !important;bottom:auto !important;left:auto !imp
 #zthub .led.red.alt .lr{animation:blg2 1.2s steps(1,end) infinite}
 #zthub .led.green .lg{animation:pu2 2.4s ease-in-out infinite}
 #zthub #fx.fast .led.red .lr{animation-duration:.5s}
-#zthub #fx.al30 .led.green .lg{display:none}
-#zthub #fx.al30 .led.red .lr,#zthub #fx.al30 .led.green .lr{display:inline;animation:blg var(--p,1s) steps(1,end) infinite}
-#zthub #fx.al30 .led.red.alt .lr,#zthub #fx.al30 .led.green.alt .lr{animation-name:blg2}
+#zthub #fx.al30 .led.red .lr{animation:blg var(--p,1s) steps(1,end) infinite}
+#zthub #fx.al30 .led.red.alt .lr{animation-name:blg2}
 @keyframes pu2{0%,100%{opacity:.7}50%{opacity:1}}
 #zthub #fx .at{font-family:"ZTOrb",ui-monospace,monospace;font-weight:400;font-size:26px;fill:#a9acae;letter-spacing:.03em}
 #zthub #fx .bt{font-family:"ZTOrb",ui-monospace,monospace;font-weight:700;text-anchor:middle}

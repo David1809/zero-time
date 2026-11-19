@@ -1,0 +1,2 @@
+-- 022 : règles des voyants du digicode variables selon les chiffres du numéro de série (zt.pin_lamps ; manual_pin ; view_for).
+-- Retour : voyants rouges = chiffres pairs, bleus = chiffres >= 6 (voir 019b).
