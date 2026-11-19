@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0c0e">
+<title>ZERO TIME — Digicode v2 (maquette)</title>
+<style>
+html,body{margin:0;height:100%;background:#0b0c0e;overscroll-behavior:none}
+body{display:flex;justify-content:center;align-items:flex-start}
+#app{width:min(100vw,calc(100vh*1080/1916));max-width:100%;position:relative}
+#end{position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:18px;background:rgba(0,0,0,.86);color:#fff;font:700 38px/1.1 ZTDBarlow,'Barlow Condensed',sans-serif;letter-spacing:.06em;text-align:center;z-index:9}
+#end.show{display:flex}
+#end.win{color:#00ffaa}#end.lose{color:#ff3333}
+#end button{font:600 24px ZTDBarlow,sans-serif;letter-spacing:.08em;padding:12px 28px;border:2px solid currentColor;background:transparent;color:inherit;border-radius:8px}
+#toast{position:fixed;left:50%;top:14px;transform:translateX(-50%);background:rgba(10,10,10,.92);color:#ffd08a;border:1px solid #6a4a1a;padding:8px 16px;border-radius:8px;font:600 20px ZTDBarlow,sans-serif;letter-spacing:.04em;opacity:0;transition:opacity .2s;pointer-events:none;z-index:8;white-space:nowrap}
+#toast.show{opacity:1}
+#hud{position:fixed;right:8px;bottom:6px;color:#888;font:12px monospace;z-index:7;text-align:right}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast"></div>
+<div id="hud"></div>
+<div id="end"><div id="endt"></div><button id="again">REJOUER</button></div>
+<script src="digicode2.js"></script>
+<script>
+/* Simulateur de serveur : en jeu, tout ceci est fait par les fonctions zt_* côté Supabase. */
+(function(){
+  var q=new URLSearchParams(location.search), LEN=+(q.get("len")||4);
+  var ui=ZTDigicode.mount(document.getElementById("app"),{len:LEN,demo:q.get("demo")==="1"});
+  var code,errors,toastT;
+  function gen(){var d=[0,1,2,3,4,5,6,7,8,9],s="";while(s.length<LEN){s+=d.splice(Math.floor(Math.random()*d.length),1)[0];}return s;}
+  function lamps(){var r=0,b=0;code.split("").forEach(function(c){if(+c%2===0)r++;if(+c>=6)b++;});return {red:r,blue:b};}
+  function toast(t){var e=document.getElementById("toast");e.textContent=t;e.classList.add("show");clearTimeout(toastT);toastT=setTimeout(function(){e.classList.remove("show");},2200);}
+  function hud(){document.getElementById("hud").textContent=(q.get("show")==="1"?"code "+code+" · ":"")+"erreurs "+errors+"/3";}
+  function start(){
+    code=q.get("code")||gen();errors=0;
+    if(!(q.get("demo")==="1"&&!window.__started))ui.reset();window.__started=1;ui.setLamps(lamps());hud();
+    document.getElementById("end").className="";document.getElementById("end").style.display="";
+  }
+  function end(win){var e=document.getElementById("end");document.getElementById("endt").textContent=win?"BOMBE DÉSAMORCÉE":"EXPLOSION";e.className="show "+(win?"win":"lose");e.style.display="flex";}
+  ui.on("submit",function(v){
+    var ver="";
+    for(var i=0;i<v.length;i++)ver+=v[i]===code[i]?"g":(code.indexOf(v[i])>-1?"o":"x");
+    var ok=v===code;
+    ui.result({verdicts:ver,solved:ok});
+    if(ok){setTimeout(function(){end(true);},1400);return;}
+    errors++;hud();
+    var pen=errors===1?20:errors===2?30:0;
+    if(errors>=3){setTimeout(function(){end(false);},900);}
+    else toast("Erreur "+errors+"/3 : −"+pen+" s");
+  });
+  document.getElementById("again").onclick=start;
+  window.__ui=ui;
+  start();
+  if(q.get("type")){q.get("type").split("").forEach(function(c){ui.press(c);});if(q.get("go")==="1")ui.press("ok");}
+  if(q.get("demo")==="1"){/* image brute tant qu'on n'a pas touché */}
+})();
+</script>
+</body>
+</html>
