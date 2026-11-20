@@ -1,0 +1,1 @@
+-- 025 : manuel digicode — règle P.1 « 4 chiffres TOUS DIFFÉRENTS » mise en avant. Rollback : restaurer manual_pin() de la migration 019b (P.1 voyants, P.2 chiffres).
