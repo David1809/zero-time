@@ -112,7 +112,7 @@ body:has(#zthub) #toast{top:50% !important;bottom:auto !important;left:auto !imp
       '<g class="lockpl"><rect x="1359" y="222" width="272" height="126" rx="7" fill="#0d0e10" stroke="#2b2d31" stroke-width="2"/><rect x="1481" y="352" width="150" height="44" rx="4" fill="#17191c"/><path d="M1452 284 v-14 a14 14 0 0 1 28 0 v14" fill="none" stroke="#6d7177" stroke-width="5"/><rect x="1447" y="284" width="38" height="30" rx="4" fill="#6d7177"/><circle cx="1466" cy="299" r="4" fill="#0d0e10"/><text x="1619" y="385" class="lk" style="text-anchor:end;font-size:21px">VERROUILLÉ</text></g>'.replace(/<g class="lockpl">/, '<g class="lockpl" id="lk-hor" transform="translate(0 298)">') +
       '<g id="rotpl"><rect x="286" y="788" width="328" height="118" rx="4" fill="#3d352c" style="filter:blur(1.5px)"/>' +
       '<text x="450" y="830" class="rtl" style="text-anchor:middle">ROTARY</text>' +
-      ["a","b","c","d"].map(function (k, i) { return '<image href="assets/rotary3/knob_' + k + '.png" x="' + (342 + i * 72 - 31) + '" y="' + (868 - 31) + '" width="62" height="62"/>'; }).join("") + '</g>' +
+      ["a","b","c","d"].map(function (k, i) { return '<image href="assets/rotary4/knob_' + k + '.png" x="' + (342 + i * 72 - 31) + '" y="' + (868 - 31) + '" width="62" height="62"/>'; }).join("") + '</g>' +
       ledSvg("alim", 597, 183) + ledSvg("deto", 597, 481) + ledSvg("digi", 1632, 183, true) + ledSvg("hor", 1634, 481) + ledSvg("rot", 597, 773) +
       '<g id="armb" class="lock">'+
       '<rect x="728" y="756" width="120" height="154" rx="14" fill="#131313"/>'+

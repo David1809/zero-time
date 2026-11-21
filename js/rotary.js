@@ -3,18 +3,22 @@
    4 molettes, voyants, bouton de validation, chrono. API : ZTRotary.mount(el, opts) */
 (function () {
   "use strict";
-  var P = "assets/rotary3/";
+  var P = "assets/rotary4/";
   var KNOBS = { A: [271, 557], B: [679, 557], C: [275, 1043], D: [679, 1042] };
   var TRI = { A: [269, 404.5], B: [676.5, 404.5], C: [270.5, 883], D: [675.5, 883] }; // petit triangle (corps) au-dessus de chaque couronne
   var NAMES = ["A", "B", "C", "D"];
-  // 10 crans = les 10 symboles gravés sur la couronne (décalage depuis le centre de la molette, en px du visuel 941 × 1672).
-  // s = identité du symbole (0 triangle · 1 cercle · 2 carré · 3 croix · 4 losange · 5 onde · 6 étoile · 7 cible) ; étoile et losange sont gravés deux fois.
+  // 8 crans = les 8 symboles gravés sur la couronne, régulièrement répartis ; s = identité du symbole (index).
   var SYMS = [
-    { n: "triangle", s: 0, dx: -2, dy: -113, a: 0 }, { n: "cercle", s: 1, dx: 89, dy: -97, a: 43 }, { n: "carré", s: 2, dx: 133, dy: -24, a: 80 },
-    { n: "croix", s: 3, dx: 138, dy: 25, a: 100 }, { n: "losange", s: 4, dx: 115, dy: 98, a: 130 }, { n: "onde", s: 5, dx: 59, dy: 144, a: 158 },
-    { n: "étoile", s: 6, dx: -41, dy: 146, a: 196 }, { n: "cible", s: 7, dx: -115, dy: 94, a: 231 }, { n: "étoile", s: 6, dx: -144, dy: 10, a: 266 },
-    { n: "losange", s: 4, dx: -113, dy: -79, a: 305 }
+    { n: "triangle", s: 0 }, { n: "cercle", s: 1 }, { n: "carré", s: 2 }, { n: "croix", s: 3 },
+    { n: "losange", s: 4 }, { n: "onde", s: 5 }, { n: "étoile", s: 6 }, { n: "cible", s: 7 }
   ];
+  // par molette et par cran : [décalage x, décalage y depuis le centre de la molette (px du visuel 941 × 1672), angle du repère]
+  var OFF = {
+    A: [[-2,-113,359],[101,-86,50],[139,16,97],[97,114,140],[-1,158,180],[-102,116,221],[-137,16,263],[-99,-82,310]],
+    B: [[-2,-113,359],[102,-86,50],[139,16,97],[98,114,139],[0,157,180],[-100,116,221],[-136,16,263],[-97,-82,310]],
+    C: [[-4,-120,358],[103,-95,47],[140,11,94],[98,111,139],[-3,156,181],[-105,114,223],[-143,11,266],[-102,-89,311]],
+    D: [[-2,-119,359],[104,-93,48],[141,12,95],[98,111,139],[-1,155,180],[-103,115,222],[-140,12,265],[-100,-87,311]]
+  };
   var LEDS = { sys: [119, 1393, "orange"], sync: [119, 1452, "orange"], ready: [119, 1512, "green"] };
   var BTN = [473, 1449];
 
@@ -111,9 +115,9 @@
     }
     function btnState(s) { btn.className = "zr-btn " + s; }
     function paint(i, animate) {
-      var kn = knobs[i], sy = SYMS[S.pos[i]];
-      kn.cap.style.transform = "rotate(" + sy.a + "deg)";
-      kn.sym.style.left = "calc(" + (kn.c[0] + sy.dx) + " / 941 * 100%)"; kn.sym.style.top = "calc(" + (kn.c[1] + sy.dy) + " / 1672 * 100%)";
+      var kn = knobs[i], sy = SYMS[S.pos[i]], o = OFF[NAMES[i]][S.pos[i]];
+      kn.cap.style.transform = "rotate(" + o[2] + "deg)";
+      kn.sym.style.left = "calc(" + (kn.c[0] + o[0]) + " / 941 * 100%)"; kn.sym.style.top = "calc(" + (kn.c[1] + o[1]) + " / 1672 * 100%)";
       kn.hit.setAttribute("aria-valuenow", S.pos[i]); kn.hit.setAttribute("aria-valuetext", sy.n);
     }
     function paintLinks() { pairs.forEach(function (p, j) { lines[j].classList.toggle("on", !!S.linked(p[0], p[1], S.pos)); }); }
@@ -123,8 +127,8 @@
       if (!silent) { click("tick"); buzz(8); S.onChange(S.pos.slice(), i); disarm(); knobs[i].tri.classList.remove("ok"); }
       return true;
     }
-    function nearest(deg) {
-      var best = 0, bd = 999; for (var j = 0; j < SYMS.length; j++) { var d = Math.abs(((deg - SYMS[j].a + 540) % 360) - 180); if (d < bd) { bd = d; best = j; } } return best;
+    function nearest(deg, i) {
+      var best = 0, bd = 999, of = OFF[NAMES[i]]; for (var j = 0; j < SYMS.length; j++) { var d = Math.abs(((deg - of[j][2] + 540) % 360) - 180); if (d < bd) { bd = d; best = j; } } return best;
     }
     // interaction : glisser en cercle (ou toucher un symbole) pour amener la molette sur le cran voulu
     knobs.forEach(function (kn, i) {
@@ -133,9 +137,9 @@
       function dist(e) { var r = kn.hit.getBoundingClientRect(); return Math.hypot(e.clientX - (r.left + r.width / 2), e.clientY - (r.top + r.height / 2)) / (r.width / 2); }
       kn.hit.addEventListener("pointerdown", function (e) {
         if (S.locked) { buzz(15); return; }
-        ctx(); active = true; kn.hit.setPointerCapture(e.pointerId); kn.k.classList.add("rot"); if (dist(e) > 0.28) setPos(i, nearest(angleOf(e)));
+        ctx(); active = true; kn.hit.setPointerCapture(e.pointerId); kn.k.classList.add("rot"); if (dist(e) > 0.28) setPos(i, nearest(angleOf(e), i));
       });
-      kn.hit.addEventListener("pointermove", function (e) { if (active && !S.locked && dist(e) > 0.2) setPos(i, nearest(angleOf(e))); });
+      kn.hit.addEventListener("pointermove", function (e) { if (active && !S.locked && dist(e) > 0.2) setPos(i, nearest(angleOf(e), i)); });
       function end() { if (!active) return; active = false; kn.k.classList.remove("rot"); kn.tri.classList.toggle("ok", !!(opts.isCorrect && opts.isCorrect(i, S.pos[i]))); }
       kn.hit.addEventListener("pointerup", end); kn.hit.addEventListener("pointercancel", end);
       kn.hit.addEventListener("keydown", function (e) {
