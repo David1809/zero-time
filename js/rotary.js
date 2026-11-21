@@ -18,7 +18,21 @@
   // ---- son : clic métallique synthétisé (aucun fichier à télécharger) ----
   var ac = null;
   function ctx() { if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} } if (ac && ac.state === "suspended") ac.resume(); return ac; }
+  // vrai clic métallique (assets/sfx/knob_click.wav) pour chaque cran des potentiomètres ; synthèse en secours
+  var clickBuf = null, clickLoading = false;
+  function loadClick() {
+    var a = ctx(); if (!a || clickBuf || clickLoading) return; clickLoading = true;
+    fetch("assets/sfx/knob_click.wav?v=1").then(function (r) { return r.arrayBuffer(); }).then(function (b) {
+      return new Promise(function (ok, ko) { a.decodeAudioData(b, ok, ko); });
+    }).then(function (buf) { clickBuf = buf; }, function () { clickLoading = false; });
+  }
+  function sample() {
+    var a = ctx(); if (!a || !clickBuf) return false;
+    var s = a.createBufferSource(), g = a.createGain(); s.buffer = clickBuf; s.playbackRate.value = 0.96 + Math.random() * 0.08; g.gain.value = 1;
+    s.connect(g); g.connect(a.destination); s.start(); return true;
+  }
   function click(kind) {
+    if (kind === "tick" && sample()) return;
     var a = ctx(); if (!a) return; var t = a.currentTime;
     var heavy = kind === "btn", f = heavy ? 900 : 2600;
     var n = a.createBufferSource(), len = Math.floor(a.sampleRate * 0.05), buf = a.createBuffer(1, len, a.sampleRate), d = buf.getChannelData(0);
@@ -43,7 +57,7 @@
       pos: [0, 0, 0, 0], locked: false, phase: "idle", armTimer: 0, t0: 0,
       onChange: opts.onChange || function () {}, onValidate: opts.onValidate || null, linked: opts.linked || function () { return false; }
     };
-    root.innerHTML = "";
+    root.innerHTML = ""; loadClick();
     var zr = el("zr"); root.appendChild(zr);
     var bar = el("zr-bar"); zr.appendChild(bar);
     if (opts.onBack || opts.backLabel) {
