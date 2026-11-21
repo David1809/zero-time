@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.68";
+  var APP_VERSION = "1.0.69";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -261,7 +261,7 @@ ${solo}
 
   var COLORS = { red: "Rouge", blue: "Bleu", yellow: "Jaune", white: "Blanc", black: "Noir" };
   var activePanel = 0, selectedWire = null, manualTab = "w4";
-  var opScreen = "hub", hubApi = null, pinApi = null, pinBusy = false, openedSolved = false, backTimer = null, lastOrient = null, pinEnds = 0, pinBuf = "";
+  var opScreen = "hub", hubApi = null, pinApi = null, rotApi = null, rotTarget = null, pinBusy = false, openedSolved = false, backTimer = null, lastOrient = null, pinEnds = 0, pinBuf = "";
   var timerId = null, offsetMs = 0, bestOff = null;
   var errFlash = null, alertFlash = null;
   var seenEvent, alerted = {}, alertInit = false, tickSent = false, cutting = false;
@@ -414,7 +414,7 @@ ${solo}
       var pr = so.lock(m === "land" ? "landscape" : "portrait"); if (pr && pr.catch) pr.catch(function () {});
     } catch (e) {}
   }
-  function dropFx() { stopTimer(); if (hubApi) { hubApi.destroy(); hubApi = null; } pinApi = null; }
+  function dropFx() { stopTimer(); if (hubApi) { hubApi.destroy(); hubApi = null; } pinApi = null; rotApi = null; }
   function goHub() { if (pinApi) pinBuf = pinApi.getState().buf; if (backTimer) { clearTimeout(backTimer); backTimer = null; } opScreen = "hub"; selectedWire = null; render(); }
   function panelId(p) { return p.kind === "pin" ? "digi" : ({ 3: "alim", 4: "hor", 5: "deto" })[p.wires.length]; }
   function consumeEvent(g) {
@@ -465,6 +465,7 @@ ${solo}
         remaining: function () { return pinEnds - (Date.now() + offsetMs); },
         notice: function (m) { toast(m); },
         onOpen: function (id) {
+          if (id === "rot") { opScreen = "rot"; render(); return; }
           var i = idx[id]; if (i === undefined) return;
           var gp = view.game.panels;
           activePanel = i; openedSolved = id === "alim" ? gp.every(function (q) { return q.kind === "pin" || q.state === "solved"; }) : gp[i].state === "solved"; selectedWire = null; opScreen = "mod"; render();
@@ -484,6 +485,26 @@ ${solo}
     }
     pinEnds = endsAt;
     hubApi.update({ serial: (g.panels[0] || {}).serial, mods: mods, errors: g.errors, paused: pz, frozenMs: view.paused && view.paused.remaining_ms || 0 });
+  }
+
+  // --- Module Rotary (écran opérateur ; combinaison de démonstration, pas encore branché au serveur) ---
+  function renderRotary(g) {
+    syncClock(g); consumeEvent(g);
+    pinEnds = new Date(g.ends_at).getTime();
+    if (!rotApi || !document.getElementById("ztrot")) {
+      stopTimer(); clear();
+      app.innerHTML = '<div id="ztrot"></div>';
+      if (!rotTarget) rotTarget = [0, 1, 2, 3].map(function () { return Math.floor(Math.random() * 10); });
+      rotApi = ZTRotary.mount(document.getElementById("ztrot"), {
+        onBack: goHub,
+        onValidate: function (p) { return p.every(function (v, i) { return v === rotTarget[i]; }); }
+      });
+      timerId = setInterval(function () {
+        var ms = Math.max(0, pinEnds - (Date.now() + offsetMs));
+        if (rotApi && !view.paused) rotApi.setTime(ms);
+        if (ms <= 0 && !view.paused) expire();
+      }, 100);
+    }
   }
 
   // --- Module Digicode (portrait) ---
@@ -534,6 +555,7 @@ ${solo}
     syncClock(g);
     var endsAt = new Date(g.ends_at).getTime(); pinEnds = endsAt;
     if (opScreen === "hub") return renderHub(g);
+    if (opScreen === "rot") return renderRotary(g);
     if ((g.panels[activePanel] || {}).kind === "pin") return renderPin(g, g.panels[activePanel]);
     var wirePanels = g.panels.filter(function (p) { return p.kind !== "pin"; });
     var solved = wirePanels.filter(function (p) { return p.state === "solved"; }).length;
@@ -920,6 +942,7 @@ ${solo}
   function renderPlaying() {
     var gm = view.me.role === "operator" && view.game;
     if (gm && opScreen === "hub" && hubApi && document.getElementById("zthub")) return renderHub(gm);
+    if (gm && opScreen === "rot" && rotApi && document.getElementById("ztrot")) return renderRotary(gm);
     if (gm && opScreen === "mod" && pinApi && document.getElementById("ztpin") && (gm.panels[activePanel] || {}).kind === "pin") return renderPin(gm, gm.panels[activePanel]);
     dropFx(); clear();
     if (view.me.role === "operator" && view.game) return renderOperator();
