@@ -85,7 +85,7 @@
       var c = KNOBS[nm], k = el("zr-k"); k.style.cssText = "position:absolute;inset:0;pointer-events:none";
       var ring = at(el("zr-at zr-ring"), c[0], c[1], 226);
       var cap = at(el("zr-at"), c[0], c[1], 198); var ci = img("knob_" + nm.toLowerCase() + ".png"); ci.className = "zr-cap"; cap.appendChild(ci);
-      var tri = at(el("zr-at zr-tri"), c[0] + 1, c[1] - 169, 52); tri.appendChild(img("tri2_" + nm.toLowerCase() + ".png"));
+      var tri = at(el("zr-at zr-tri"), c[0] + 1, c[1] - 169, 52); tri.appendChild(img("tri3_" + nm.toLowerCase() + ".png"));
       var sym = at(el("zr-at zr-sym"), c[0], c[1], 64);
       var hit = at(el("zr-at zr-hit"), c[0], c[1], 280); hit.style.pointerEvents = "auto"; hit.setAttribute("role", "slider"); hit.tabIndex = 0; hit.setAttribute("aria-label", "Sélecteur " + nm);
       k.appendChild(ring); k.appendChild(tri); k.appendChild(cap); k.appendChild(sym); k.appendChild(hit); stage.appendChild(k);
