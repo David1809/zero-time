@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.71";
+  var APP_VERSION = "1.0.72";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -142,13 +142,24 @@
     };
     $("zt-version").onclick = function () {
       $("zt-version-txt").textContent = "MISE À JOUR…";
-      var done = function () { location.replace(location.pathname + "?u=" + Date.now()); };
+      var done = function () { try { sessionStorage.setItem("zt-upd", "1"); } catch (e) {} location.replace(location.pathname + "?u=" + Date.now()); };
       Promise.all([
         (navigator.serviceWorker ? navigator.serviceWorker.getRegistrations().then(function (rs) { return Promise.all(rs.map(function (x) { return x.unregister(); })); }) : null),
         (window.caches ? caches.keys().then(function (ks) { return Promise.all(ks.map(function (k) { return caches.delete(k); })); }) : null)
       ]).then(done, done);
     };
   }
+
+  // Après une mise à jour forcée : bandeau fixe (indépendant de la mise en page) qui confirme la version pendant 5 s
+  (function () {
+    var f = false; try { f = sessionStorage.getItem("zt-upd") === "1"; sessionStorage.removeItem("zt-upd"); } catch (e) {}
+    if (!f) return;
+    try { history.replaceState(null, "", location.pathname); } catch (e) {}
+    var b = document.createElement("div");
+    b.style.cssText = "position:fixed;left:50%;top:max(env(safe-area-inset-top,0px),10px);transform:translateX(-50%);z-index:99999;background:#0b0a08;border:1px solid #ff9f32;color:#ff9f32;font:700 13px 'JetBrains Mono',monospace;letter-spacing:.08em;padding:9px 14px;border-radius:8px;box-shadow:0 4px 18px #000;pointer-events:none";
+    b.textContent = "MISE À JOUR OK · v" + APP_VERSION;
+    document.body.appendChild(b); setTimeout(function () { b.remove(); }, 5000);
+  })();
 
   function roleLabel(r) { return r === "operator" ? "Opérateur" : r === "technician" ? "Technicien" : "—"; }
 
