@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.78";
+  var APP_VERSION = "1.0.79";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -508,8 +508,8 @@ ${solo}
       if (!rotTarget) rotTarget = [1, 3, 6, 5]; // combinaison de test : A cercle · B croix · C étoile · D onde
       rotApi = ZTRotary.mount(document.getElementById("ztrot"), {
         onBack: goHub,
-        isCorrect: function (i, v) { return v === rotTarget[i]; },
-        onValidate: function (p) { return p.every(function (v, i) { return v === rotTarget[i]; }); }
+        isCorrect: function (i, v) { return ZTRotary.SYMBOLS[v].s === rotTarget[i]; },
+        onValidate: function (p) { return p.every(function (v, i) { return ZTRotary.SYMBOLS[v].s === rotTarget[i]; }); }
       });
       timerId = setInterval(function () {
         var ms = Math.max(0, pinEnds - (Date.now() + offsetMs));

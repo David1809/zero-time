@@ -3,17 +3,20 @@
    4 molettes, voyants, bouton de validation, chrono. API : ZTRotary.mount(el, opts) */
 (function () {
   "use strict";
-  var P = "assets/rotary2/";
-  var KNOBS = { A: [253, 478], B: [690, 478], C: [253, 1003], D: [690, 1003] };
+  var P = "assets/rotary3/";
+  var KNOBS = { A: [271, 557], B: [679, 557], C: [275, 1043], D: [679, 1042] };
+  var TRI = { A: [269, 404.5], B: [676.5, 404.5], C: [270.5, 883], D: [675.5, 883] }; // petit triangle (corps) au-dessus de chaque couronne
   var NAMES = ["A", "B", "C", "D"];
-  // 8 crans = les 8 symboles gravés sur la couronne (décalage depuis le centre de la molette, en px du visuel 941 × 1672)
+  // 10 crans = les 10 symboles gravés sur la couronne (décalage depuis le centre de la molette, en px du visuel 941 × 1672).
+  // s = identité du symbole (0 triangle · 1 cercle · 2 carré · 3 croix · 4 losange · 5 onde · 6 étoile · 7 cible) ; étoile et losange sont gravés deux fois.
   var SYMS = [
-    { n: "triangle", dx: 1, dy: -126, a: 0 }, { n: "cercle", dx: 107, dy: -93, a: 49 }, { n: "carré", dx: 144, dy: 1, a: 90 },
-    { n: "croix", dx: 111, dy: 98, a: 131 }, { n: "losange", dx: 1, dy: 148, a: 180 }, { n: "onde", dx: -108, dy: 100, a: 227 },
-    { n: "étoile", dx: -145, dy: 1, a: 270 }, { n: "cible", dx: -107, dy: -95, a: 311 }
+    { n: "triangle", s: 0, dx: -2, dy: -113, a: 0 }, { n: "cercle", s: 1, dx: 89, dy: -97, a: 43 }, { n: "carré", s: 2, dx: 133, dy: -24, a: 80 },
+    { n: "croix", s: 3, dx: 138, dy: 25, a: 100 }, { n: "losange", s: 4, dx: 115, dy: 98, a: 130 }, { n: "onde", s: 5, dx: 59, dy: 144, a: 158 },
+    { n: "étoile", s: 6, dx: -41, dy: 146, a: 196 }, { n: "cible", s: 7, dx: -115, dy: 94, a: 231 }, { n: "étoile", s: 6, dx: -144, dy: 10, a: 266 },
+    { n: "losange", s: 4, dx: -113, dy: -79, a: 305 }
   ];
-  var LEDS = { sys: [102, 1387, "orange"], sync: [102, 1456, "orange"], ready: [102, 1525, "green"] };
-  var BTN = [468, 1450];
+  var LEDS = { sys: [119, 1393, "orange"], sync: [119, 1452, "orange"], ready: [119, 1512, "green"] };
+  var BTN = [473, 1449];
 
   // ---- son : clic métallique synthétisé (aucun fichier à télécharger) ----
   var ac = null;
@@ -74,7 +77,7 @@
     // liaisons entre molettes
     var NS = "http://www.w3.org/2000/svg", svg = document.createElementNS(NS, "svg"); svg.setAttribute("class", "zr-links"); svg.setAttribute("viewBox", "0 0 941 1672");
     var pairs = [[0, 1], [2, 3], [0, 2], [1, 3]], lines = pairs.map(function (p) {
-      var a = KNOBS[NAMES[p[0]]], b = KNOBS[NAMES[p[1]]], dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy), u = [dx / L, dy / L], m = 128;
+      var a = KNOBS[NAMES[p[0]]], b = KNOBS[NAMES[p[1]]], dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy), u = [dx / L, dy / L], m = 112;
       var ln = document.createElementNS(NS, "line"); ln.setAttribute("x1", a[0] + u[0] * m); ln.setAttribute("y1", a[1] + u[1] * m); ln.setAttribute("x2", b[0] - u[0] * m); ln.setAttribute("y2", b[1] - u[1] * m);
       svg.appendChild(ln); return ln;
     });
@@ -83,25 +86,25 @@
     // molettes
     var knobs = NAMES.map(function (nm, i) {
       var c = KNOBS[nm], k = el("zr-k"); k.style.cssText = "position:absolute;inset:0;pointer-events:none";
-      var ring = at(el("zr-at zr-ring"), c[0], c[1], 226);
-      var cap = at(el("zr-at"), c[0], c[1], 198); var ci = img("knob_" + nm.toLowerCase() + ".png"); ci.className = "zr-cap"; cap.appendChild(ci);
-      var tri = at(el("zr-at zr-tri"), c[0] + 1.5, c[1] - 172, 56); tri.appendChild(img("tri4_" + nm.toLowerCase() + ".png"));
+      var ring = at(el("zr-at zr-ring"), c[0], c[1], 200);
+      var cap = at(el("zr-at"), c[0], c[1], 180); var ci = img("knob_" + nm.toLowerCase() + ".png"); ci.className = "zr-cap"; cap.appendChild(ci);
+      var tri = at(el("zr-at zr-tri"), TRI[nm][0], TRI[nm][1], 56); tri.appendChild(img("tri_" + nm.toLowerCase() + ".png"));
       var sym = at(el("zr-at zr-sym"), c[0], c[1], 64);
-      var hit = at(el("zr-at zr-hit"), c[0], c[1], 280); hit.style.pointerEvents = "auto"; hit.setAttribute("role", "slider"); hit.tabIndex = 0; hit.setAttribute("aria-label", "Sélecteur " + nm);
+      var hit = at(el("zr-at zr-hit"), c[0], c[1], 290); hit.style.pointerEvents = "auto"; hit.setAttribute("role", "slider"); hit.tabIndex = 0; hit.setAttribute("aria-label", "Sélecteur " + nm);
       k.appendChild(ring); k.appendChild(tri); k.appendChild(cap); k.appendChild(sym); k.appendChild(hit); stage.appendChild(k);
       return { k: k, tri: tri, cap: ci, sym: sym, hit: hit, c: c };
     });
     // voyants
     var leds = {};
     Object.keys(LEDS).forEach(function (id) {
-      var d = LEDS[id], w = at(el("zr-at zr-led"), d[0], d[1], 80); w.appendChild(img("led_off.png"));
+      var d = LEDS[id], w = at(el("zr-at zr-led"), d[0], d[1], 64); w.appendChild(img("led_off.png"));
       var on = img(d[2] === "green" ? "led_green.png" : "led_orange.png"); on.className = "on"; w.appendChild(on); stage.appendChild(w); leds[id] = w;
     });
     // bouton
     var btn = el("zr-btn idle"); btn.style.cssText = "position:absolute;inset:0;pointer-events:none"; stage.appendChild(btn);
-    var arm = at(el("zr-at zr-arm"), BTN[0], BTN[1], 252); btn.appendChild(arm);
-    var lensW = at(el("zr-at"), BTN[0], BTN[1], 184); var lens = img("lens.png"); lens.className = "zr-lens"; lensW.appendChild(lens); btn.appendChild(lensW);
-    var bhit = at(el("zr-at zr-bhit"), BTN[0], BTN[1], 250); bhit.style.pointerEvents = "auto"; bhit.setAttribute("role", "button"); bhit.setAttribute("aria-label", "Validation"); btn.appendChild(bhit);
+    var arm = at(el("zr-at zr-arm"), BTN[0], BTN[1], 200); btn.appendChild(arm);
+    var lensW = at(el("zr-at"), BTN[0], BTN[1], 140); var lens = img("lens.png"); lens.className = "zr-lens"; lensW.appendChild(lens); btn.appendChild(lensW);
+    var bhit = at(el("zr-at zr-bhit"), BTN[0], BTN[1], 190); bhit.style.pointerEvents = "auto"; bhit.setAttribute("role", "button"); bhit.setAttribute("aria-label", "Validation"); btn.appendChild(bhit);
 
     function led(id, mode, bp) { // mode : on | off | blink
       var e = leds[id]; e.classList.toggle("on", mode === "on" || mode === "blink"); e.classList.toggle("blink", mode === "blink"); e.style.setProperty("--bp", (bp || 0.5) + "s");

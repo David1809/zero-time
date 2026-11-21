@@ -15,13 +15,13 @@
 .zr-at{position:absolute;left:calc(var(--x) / 941 * 100%);top:calc(var(--y) / 1672 * 100%);width:calc(var(--w) / 941 * 100%);height:calc(var(--w) / 1672 * 100%);transform:translate(-50%,-50%)}
 .zr-at img{display:block;width:100%;height:100%;pointer-events:none}
 /* chrono */
-.zr-tpatch{left:calc(668 / 941 * 100%);top:calc(80 / 1672 * 100%);width:calc(194 / 941 * 100%);height:calc(72 / 1672 * 100%);
-  background:radial-gradient(120% 140% at 50% 45%,#150e06,#0c0804);box-shadow:0 0 6px 4px #0c0804}
-.zr-time{left:calc(668 / 941 * 100%);top:calc(80 / 1672 * 100%);width:calc(194 / 941 * 100%);height:calc(72 / 1672 * 100%);display:flex;align-items:baseline;justify-content:center;padding-top:calc(11 / 941 * 100cqw);box-sizing:border-box;
-  font-family:'JetBrains Mono',ui-monospace,monospace;font-weight:700;line-height:1;color:#f77d19;font-variant-numeric:tabular-nums;
-  text-shadow:0 0 8px rgba(247,125,25,.9),0 0 22px rgba(247,125,25,.6),0 0 42px rgba(247,125,25,.35)}
-.zr-tm{font-size:calc(48 / 941 * 100cqw);letter-spacing:-.04em}
-.zr-tc{font-size:calc(20 / 941 * 100cqw);margin-left:.3em;letter-spacing:.02em}
+.zr-tpatch{left:calc(680 / 941 * 100%);top:calc(104 / 1672 * 100%);width:calc(186 / 941 * 100%);height:calc(84 / 1672 * 100%);
+  background:radial-gradient(120% 140% at 50% 45%,#1b0f05,#130a03);box-shadow:0 0 6px 4px #130a03}
+.zr-time{left:calc(680 / 941 * 100%);top:calc(104 / 1672 * 100%);width:calc(186 / 941 * 100%);height:calc(84 / 1672 * 100%);display:flex;align-items:baseline;justify-content:center;padding-top:calc(18 / 941 * 100cqw);box-sizing:border-box;
+  font-family:'JetBrains Mono',ui-monospace,monospace;font-weight:700;line-height:1;color:#f58715;font-variant-numeric:tabular-nums;
+  text-shadow:0 0 8px rgba(245,135,21,.9),0 0 22px rgba(245,135,21,.6),0 0 42px rgba(245,135,21,.35)}
+.zr-tm{font-size:calc(46 / 941 * 100cqw);letter-spacing:-.04em}
+.zr-tc{font-size:calc(19 / 941 * 100cqw);margin-left:.3em;letter-spacing:.02em}
 .zr-time.al{color:#ff4a3a;text-shadow:0 0 10px rgba(255,60,40,.7);animation:zr-bl var(--zp,1s) steps(1,end) infinite}
 /* molettes */
 .zr-cap{transition:transform .09s cubic-bezier(.3,1.6,.5,1);will-change:transform}

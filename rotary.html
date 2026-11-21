@@ -11,9 +11,9 @@
   var target = [1, 3, 6, 5]; // test : A cercle · B croix · C étoile · D onde
   var R = ZTRotary.mount(document.getElementById("app"), {
     backLabel: "← BOMBE", onBack: function () { location.href = "./"; },
-    isCorrect: function (i, v) { return v === target[i]; }, onValidate: function (p) { return p.every(function (v, i) { return v === target[i]; }); }
+    isCorrect: function (i, v) { return ZTRotary.SYMBOLS[v].s === target[i]; }, onValidate: function (p) { return p.every(function (v, i) { return ZTRotary.SYMBOLS[v].s === target[i]; }); }
   });
   var end = Date.now() + 135000;
   setInterval(function () { R.setTime(end - Date.now()); }, 200); R.setTime(135000);
-  if (/debug/.test(location.search)) { var d = document.createElement("div"); d.className = "zr-dbg"; d.textContent = "SOLUTION " + target.map(function (v) { return ZTRotary.SYMBOLS[v].n; }).join(" · "); document.body.appendChild(d); }
+  if (/debug/.test(location.search)) { var d = document.createElement("div"); d.className = "zr-dbg"; d.textContent = "SOLUTION " + target.map(function (v) { return ["triangle","cercle","carré","croix","losange","onde","étoile","cible"][v]; }).join(" · "); document.body.appendChild(d); }
 </script></body></html>
