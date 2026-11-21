@@ -8,10 +8,10 @@
 <script src="js/rotary.js?v=1"></script>
 <script>
   // Démo autonome : combinaison tirée au hasard, chrono de 2 min 15. (?debug affiche la solution)
-  var target = [0, 1, 2, 3].map(function () { return Math.floor(Math.random() * 8); });
+  var target = [1, 3, 6, 5]; // test : A cercle · B croix · C étoile · D onde
   var R = ZTRotary.mount(document.getElementById("app"), {
     backLabel: "← BOMBE", onBack: function () { location.href = "./"; },
-    onValidate: function (p) { return p.every(function (v, i) { return v === target[i]; }); }
+    isCorrect: function (i, v) { return v === target[i]; }, onValidate: function (p) { return p.every(function (v, i) { return v === target[i]; }); }
   });
   var end = Date.now() + 135000;
   setInterval(function () { R.setTime(end - Date.now()); }, 200); R.setTime(135000);
