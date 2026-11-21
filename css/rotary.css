@@ -28,7 +28,6 @@
 .zr-k.lock .zr-cap{filter:brightness(.78) saturate(.8)}
 .zr-hit{border-radius:50%;z-index:6;cursor:grab;touch-action:none}
 .zr-ring{border-radius:50%;pointer-events:none;box-shadow:0 0 0 0 rgba(255,150,40,0);transition:box-shadow .15s}
-.zr-k.ok .zr-ring{box-shadow:0 0 0 3px rgba(0,255,170,.4),0 0 22px 6px rgba(0,255,170,.25)}
 .zr-sym{width:calc(64 / 941 * 100%);height:calc(72 / 1672 * 100%);transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;mix-blend-mode:screen;
   background:radial-gradient(circle,rgba(255,170,50,.85) 0,rgba(255,120,20,.42) 38%,rgba(255,100,10,0) 70%);transition:left .09s,top .09s,opacity .15s}
 .zr-k.ok .zr-sym{background:radial-gradient(circle,rgba(120,255,200,.8) 0,rgba(0,220,140,.4) 38%,rgba(0,200,120,0) 70%)}
