@@ -1,0 +1,3 @@
+-- ZERO TIME — mode TV : public.zt_tv(p_code) renvoie l'état public de la bombe (chrono, erreurs, modules, fin de partie)
+-- sans aucun secret (ni fils, ni code PIN). Lecture seule, appelée toutes les secondes par tv.html.
+-- (SQL appliqué directement sur Supabase via MCP ; ce fichier est le journal.)

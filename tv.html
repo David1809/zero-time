@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000"><title>ZERO TIME · TV</title>
+<style>
+html,body{margin:0;height:100%;background:#000;color:#f3f5f5;font-family:"JetBrains Mono",ui-monospace,monospace;overflow:hidden}
+#zthub .z{pointer-events:none}
+#zthub #hubpause button{display:none}
+#msg{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;background:rgba(0,0,0,.82);letter-spacing:.08em}
+#msg.off{display:none}
+#msg h1{margin:0;font-size:clamp(34px,7vw,110px)}
+#msg p{margin:0;font-size:clamp(16px,2.4vw,34px);color:#aab}
+#msg.ok h1{color:#00ffaa;text-shadow:0 0 22px rgba(0,255,170,.7)}
+#msg.ko h1{color:#ff3333;text-shadow:0 0 22px rgba(255,51,51,.8)}
+#msg input{font:700 clamp(28px,5vw,70px) "JetBrains Mono",monospace;text-transform:uppercase;text-align:center;width:5em;background:#111;color:#ff9f32;border:2px solid #ff9f32;border-radius:12px;padding:8px;letter-spacing:.3em}
+#msg button{font:700 clamp(16px,2.4vw,30px) "JetBrains Mono",monospace;padding:10px 26px;border-radius:10px;border:2px solid #ff9f32;background:transparent;color:#ff9f32;cursor:pointer}
+#tvc{position:fixed;right:10px;bottom:6px;z-index:60;font-size:12px;color:#555;letter-spacing:.1em}
+</style></head><body>
+<div id="app"></div><div id="msg"></div><div id="tvc"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/hub.js?v=81"></script>
+<script>
+(function () {
+  "use strict";
+  var cfg = window.ZT_CONFIG, sb = window.supabase.createClient(cfg.url, cfg.key, { auth: { persistSession: false } });
+  var app = document.getElementById("app"), msg = document.getElementById("msg"), tvc = document.getElementById("tvc");
+  var code = (new URLSearchParams(location.search).get("c") || "").toUpperCase().replace(/[^A-Z]/g, "").slice(0, 4);
+  var hub = null, ends = 0, off = 0, timer = null, frozen = null;
+
+  function say(cls, h, p) { msg.className = cls || ""; msg.innerHTML = "<h1>" + h + "</h1>" + (p ? "<p>" + p + "</p>" : ""); }
+  function hide() { msg.className = "off"; }
+  function ask() {
+    msg.className = "";
+    msg.innerHTML = '<h1>ZERO TIME · TV</h1><p>Entre le code de la salle</p><input id="ci" maxlength="4" autocomplete="off" autocapitalize="characters" placeholder="ABCD"><button id="cb" type="button">AFFICHER LA BOMBE</button>';
+    var go = function () { var v = document.getElementById("ci").value.toUpperCase().replace(/[^A-Z]/g, ""); if (v.length === 4) location.search = "?c=" + v; };
+    document.getElementById("cb").onclick = go; document.getElementById("ci").onkeydown = function (e) { if (e.key === "Enter") go(); };
+  }
+  if (code.length !== 4) return ask();
+  tvc.textContent = "SALLE " + code;
+
+  function mountHub() {
+    if (hub) return;
+    hub = ZTHub.mount(app, { remaining: function () { return frozen !== null ? frozen : ends - (Date.now() + off); } });
+  }
+  function apply(d) {
+    off = new Date(d.server_now).getTime() - Date.now();
+    if (d.status === "lobby") { say("", "EN ATTENTE", "Salle " + code + " — la partie n'a pas commencé"); return; }
+    if (d.status === "abandoned") { say("ko", "MISSION ABANDONNÉE", ""); return; }
+    mountHub();
+    ends = new Date(d.ends_at).getTime();
+    var mods = { alim: { done: !!d.alim_done } }; if (d.has_digi) mods.digi = { done: !!d.digi_done };
+    hub.update({ serial: d.serial, mods: mods, errors: d.errors, paused: d.paused ? { pseudo: "UN JOUEUR", can_abandon: false } : null, frozenMs: d.remaining_ms || 0 });
+    if (d.status === "ended") {
+      if (d.outcome === "defused") say("ok", "BOMBE DÉSAMORCÉE", d.solved + "/" + d.total + " modules · " + d.errors + " erreur" + (d.errors > 1 ? "s" : ""));
+      else say("ko", "EXPLOSION", d.cause === "time" ? "Le temps est écoulé" : "Trop d'erreurs");
+      frozen = d.outcome === "defused" ? (d.remaining_ms || 0) : 0;
+    } else { frozen = null; hide(); }
+  }
+  function poll() {
+    sb.rpc("zt_tv", { p_code: code }).then(function (r) {
+      if (r.error) return;                       // réseau coupé : on réessaie
+      if (!r.data) { say("ko", "SALLE INTROUVABLE", "Code " + code); return; }
+      apply(r.data);
+    });
+  }
+  poll(); timer = setInterval(poll, 1000);
+  document.addEventListener("click", function () { var e = document.documentElement; if (!document.fullscreenElement && e.requestFullscreen && msg.classList.contains("off")) e.requestFullscreen().catch(function () {}); });
+})();
+</script></body></html>
