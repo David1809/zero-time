@@ -3,7 +3,7 @@
    4 molettes, voyants, bouton de validation, chrono. API : ZTRotary.mount(el, opts) */
 (function () {
   "use strict";
-  var P = "assets/rotary/";
+  var P = "assets/rotary2/";
   var KNOBS = { A: [253, 478], B: [690, 478], C: [253, 1003], D: [690, 1003] };
   var NAMES = ["A", "B", "C", "D"];
   // 8 crans = les 8 symboles gravés sur la couronne (décalage depuis le centre de la molette, en px du visuel 941 × 1672)
