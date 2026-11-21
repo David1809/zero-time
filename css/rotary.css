@@ -5,21 +5,21 @@
 .zr-bar{flex:none;width:100%;box-sizing:border-box;height:calc(max(env(safe-area-inset-top,0px),6px) + 40px);padding:max(env(safe-area-inset-top,0px),6px) 10px 0;display:flex;align-items:center}
 .zr-back{height:32px;padding:0 12px;font:700 13px "JetBrains Mono",ui-monospace,monospace;background:#1a1e24;border:1px solid #373f4a;color:#ff9f32;border-radius:8px;letter-spacing:.06em;white-space:nowrap;cursor:pointer}
 .zr-wrap{flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center}
-.zr-stage{position:relative;width:min(100vw,calc((100dvh - 52px) * 1241 / 1267));aspect-ratio:1241/1267;
+.zr-stage{position:relative;width:min(100vw,calc((100dvh - 52px) * 941 / 1672));aspect-ratio:941/1672;
   filter:drop-shadow(0 10px 28px #000);container-type:inline-size}
 .zr-stage.shake{animation:zr-shake .45s steps(2,end) 1}
 @keyframes zr-shake{0%{transform:translate(0,0)}25%{transform:translate(-5px,2px)}50%{transform:translate(5px,-2px)}75%{transform:translate(-3px,0)}100%{transform:none}}
 .zr-stage>*{position:absolute}
 .zr-panel{inset:0;width:100%;height:100%;display:block;pointer-events:none}
 /* positions en % de l'image 1241 × 1267 (variables posées en JS) */
-.zr-at{position:absolute;left:calc(var(--x) / 1241 * 100%);top:calc(var(--y) / 1267 * 100%);width:calc(var(--w) / 1241 * 100%);height:calc(var(--w) / 1267 * 100%);transform:translate(-50%,-50%)}
+.zr-at{position:absolute;left:calc(var(--x) / 941 * 100%);top:calc(var(--y) / 1672 * 100%);width:calc(var(--w) / 941 * 100%);height:calc(var(--w) / 1672 * 100%);transform:translate(-50%,-50%)}
 .zr-at img{display:block;width:100%;height:100%;pointer-events:none}
 /* chrono */
-.zr-tpatch{left:calc(990 / 1241 * 100%);top:calc(33 / 1267 * 100%);width:calc(164 / 1241 * 100%);height:calc(64 / 1267 * 100%);
+.zr-tpatch{left:calc(668 / 941 * 100%);top:calc(80 / 1672 * 100%);width:calc(194 / 941 * 100%);height:calc(72 / 1672 * 100%);
   background:radial-gradient(120% 140% at 50% 45%,#150e06,#0c0804);box-shadow:0 0 6px 4px #0c0804}
-.zr-time{left:calc(990 / 1241 * 100%);top:calc(33 / 1267 * 100%);width:calc(164 / 1241 * 100%);height:calc(64 / 1267 * 100%);display:flex;align-items:center;justify-content:center;
-  font-family:'Saira Stencil One','JetBrains Mono',monospace;font-size:calc(58 / 1241 * 100cqw);line-height:1;letter-spacing:.02em;color:#ef8e2d;
-  text-shadow:0 0 8px rgba(239,142,45,.55),0 0 2px #ffb25a;font-variant-numeric:tabular-nums}
+.zr-time{left:calc(668 / 941 * 100%);top:calc(80 / 1672 * 100%);width:calc(194 / 941 * 100%);height:calc(72 / 1672 * 100%);display:flex;align-items:center;justify-content:center;
+  font-family:'Saira Stencil One','JetBrains Mono',monospace;font-size:calc(60 / 941 * 100cqw);line-height:1;letter-spacing:.02em;color:#f77d19;
+  text-shadow:0 0 8px rgba(247,125,25,.55),0 0 2px #ffb25a;font-variant-numeric:tabular-nums}
 .zr-time.al{color:#ff4a3a;text-shadow:0 0 10px rgba(255,60,40,.7);animation:zr-bl var(--zp,1s) steps(1,end) infinite}
 /* molettes */
 .zr-cap{transition:transform .09s cubic-bezier(.3,1.6,.5,1);will-change:transform}
@@ -29,7 +29,7 @@
 .zr-ring{border-radius:50%;pointer-events:none;box-shadow:0 0 0 0 rgba(255,150,40,0);transition:box-shadow .15s}
 .zr-k.rot .zr-ring{box-shadow:0 0 0 3px rgba(255,150,40,.35),0 0 22px 6px rgba(255,130,30,.28)}
 .zr-k.ok .zr-ring{box-shadow:0 0 0 3px rgba(0,255,170,.4),0 0 22px 6px rgba(0,255,170,.25)}
-.zr-sym{width:calc(64 / 1241 * 100%);height:calc(64 / 1267 * 100%);transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;mix-blend-mode:screen;
+.zr-sym{width:calc(64 / 941 * 100%);height:calc(72 / 1672 * 100%);transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;mix-blend-mode:screen;
   background:radial-gradient(circle,rgba(255,170,50,.85) 0,rgba(255,120,20,.42) 38%,rgba(255,100,10,0) 70%);transition:left .09s,top .09s,opacity .15s}
 .zr-k.ok .zr-sym{background:radial-gradient(circle,rgba(120,255,200,.8) 0,rgba(0,220,140,.4) 38%,rgba(0,200,120,0) 70%)}
 .zr-links{inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
