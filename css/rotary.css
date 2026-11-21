@@ -23,11 +23,9 @@
 .zr-time.al{color:#ff4a3a;text-shadow:0 0 10px rgba(255,60,40,.7);animation:zr-bl var(--zp,1s) steps(1,end) infinite}
 /* molettes */
 .zr-cap{transition:transform .09s cubic-bezier(.3,1.6,.5,1);will-change:transform}
-.zr-k.rot .zr-cap{filter:drop-shadow(0 0 7px rgba(255,150,40,.55)) brightness(1.06)}
 .zr-k.lock .zr-cap{filter:brightness(.78) saturate(.8)}
 .zr-hit{border-radius:50%;z-index:6;cursor:grab;touch-action:none}
 .zr-ring{border-radius:50%;pointer-events:none;box-shadow:0 0 0 0 rgba(255,150,40,0);transition:box-shadow .15s}
-.zr-k.rot .zr-ring{box-shadow:0 0 0 3px rgba(255,150,40,.35),0 0 22px 6px rgba(255,130,30,.28)}
 .zr-k.ok .zr-ring{box-shadow:0 0 0 3px rgba(0,255,170,.4),0 0 22px 6px rgba(0,255,170,.25)}
 .zr-sym{width:calc(64 / 941 * 100%);height:calc(72 / 1672 * 100%);transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;mix-blend-mode:screen;
   background:radial-gradient(circle,rgba(255,170,50,.85) 0,rgba(255,120,20,.42) 38%,rgba(255,100,10,0) 70%);transition:left .09s,top .09s,opacity .15s}
