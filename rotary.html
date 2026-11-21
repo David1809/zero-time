@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#050403"><title>ZERO TIME · ROTARY</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Saira+Stencil+One&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/rotary.css?v=1"></head>
+<body><div id="app"></div>
+<script src="js/rotary.js?v=1"></script>
+<script>
+  // Démo autonome : combinaison tirée au hasard, chrono de 2 min 15. (?debug affiche la solution)
+  var target = [0, 1, 2, 3].map(function () { return Math.floor(Math.random() * 10); });
+  var R = ZTRotary.mount(document.getElementById("app"), {
+    backLabel: "← BOMBE", onBack: function () { location.href = "./"; },
+    onValidate: function (p) { return p.every(function (v, i) { return v === target[i]; }); }
+  });
+  var end = Date.now() + 135000;
+  setInterval(function () { R.setTime(end - Date.now()); }, 200); R.setTime(135000);
+  if (/debug/.test(location.search)) { var d = document.createElement("div"); d.className = "zr-dbg"; d.textContent = "SOLUTION " + target.map(function (v) { return ZTRotary.SYMBOLS[v].n; }).join(" · "); document.body.appendChild(d); }
+</script></body></html>

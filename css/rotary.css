@@ -1,0 +1,60 @@
+/* ROTARY — habillage = visuel de référence ; seuls les éléments mobiles sont superposés */
+@font-face{font-family:ZTWBarlow;src:url(../assets/digicode/barlow-600.woff2) format("woff2");font-weight:600;font-display:swap}
+html,body{margin:0;height:100%;background:#050403;overscroll-behavior:none}
+.zr{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;background:radial-gradient(120% 80% at 50% 40%,#12100c 0%,#050403 70%);
+  user-select:none;-webkit-user-select:none;touch-action:none;-webkit-tap-highlight-color:transparent;overflow:hidden}
+.zr-bar{flex:none;width:100%;box-sizing:border-box;height:calc(max(env(safe-area-inset-top,0px),6px) + 40px);padding:max(env(safe-area-inset-top,0px),6px) 10px 0;display:flex;align-items:center}
+.zr-back{height:32px;padding:0 12px;font:700 13px "JetBrains Mono",ui-monospace,monospace;background:#1a1e24;border:1px solid #373f4a;color:#ff9f32;border-radius:8px;letter-spacing:.06em;white-space:nowrap;cursor:pointer}
+.zr-wrap{flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center}
+.zr-stage{position:relative;width:min(100vw,calc((100dvh - 52px) * 1241 / 1267));aspect-ratio:1241/1267;
+  filter:drop-shadow(0 10px 28px #000);container-type:inline-size}
+.zr-stage.shake{animation:zr-shake .45s steps(2,end) 1}
+@keyframes zr-shake{0%{transform:translate(0,0)}25%{transform:translate(-5px,2px)}50%{transform:translate(5px,-2px)}75%{transform:translate(-3px,0)}100%{transform:none}}
+.zr-stage>*{position:absolute}
+.zr-panel{inset:0;width:100%;height:100%;display:block;pointer-events:none}
+/* positions en % de l'image 1241 × 1267 (variables posées en JS) */
+.zr-at{position:absolute;left:calc(var(--x) / 1241 * 100%);top:calc(var(--y) / 1267 * 100%);width:calc(var(--w) / 1241 * 100%);height:calc(var(--w) / 1267 * 100%);transform:translate(-50%,-50%)}
+.zr-at img{display:block;width:100%;height:100%;pointer-events:none}
+/* chrono */
+.zr-tpatch{left:calc(990 / 1241 * 100%);top:calc(33 / 1267 * 100%);width:calc(164 / 1241 * 100%);height:calc(64 / 1267 * 100%);
+  background:radial-gradient(120% 140% at 50% 45%,#150e06,#0c0804);box-shadow:0 0 6px 4px #0c0804}
+.zr-time{left:calc(990 / 1241 * 100%);top:calc(33 / 1267 * 100%);width:calc(164 / 1241 * 100%);height:calc(64 / 1267 * 100%);display:flex;align-items:center;justify-content:center;
+  font-family:'Saira Stencil One','JetBrains Mono',monospace;font-size:calc(58 / 1241 * 100cqw);line-height:1;letter-spacing:.02em;color:#ef8e2d;
+  text-shadow:0 0 8px rgba(239,142,45,.55),0 0 2px #ffb25a;font-variant-numeric:tabular-nums}
+.zr-time.al{color:#ff4a3a;text-shadow:0 0 10px rgba(255,60,40,.7);animation:zr-bl var(--zp,1s) steps(1,end) infinite}
+/* molettes */
+.zr-cap{transition:transform .09s cubic-bezier(.3,1.6,.5,1);will-change:transform}
+.zr-k.rot .zr-cap{filter:drop-shadow(0 0 7px rgba(255,150,40,.55)) brightness(1.06)}
+.zr-k.lock .zr-cap{filter:brightness(.78) saturate(.8)}
+.zr-hit{border-radius:50%;z-index:6;cursor:grab;touch-action:none}
+.zr-ring{border-radius:50%;pointer-events:none;box-shadow:0 0 0 0 rgba(255,150,40,0);transition:box-shadow .15s}
+.zr-k.rot .zr-ring{box-shadow:0 0 0 3px rgba(255,150,40,.35),0 0 22px 6px rgba(255,130,30,.28)}
+.zr-k.ok .zr-ring{box-shadow:0 0 0 3px rgba(0,255,170,.4),0 0 22px 6px rgba(0,255,170,.25)}
+.zr-sym{width:calc(64 / 1241 * 100%);height:calc(64 / 1267 * 100%);transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;mix-blend-mode:screen;
+  background:radial-gradient(circle,rgba(255,170,50,.85) 0,rgba(255,120,20,.42) 38%,rgba(255,100,10,0) 70%);transition:left .09s,top .09s,opacity .15s}
+.zr-k.ok .zr-sym{background:radial-gradient(circle,rgba(120,255,200,.8) 0,rgba(0,220,140,.4) 38%,rgba(0,200,120,0) 70%)}
+.zr-links{inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.zr-links line{stroke:#d98a3a;stroke-width:3;stroke-dasharray:10 8;opacity:0;transition:opacity .2s;filter:drop-shadow(0 0 5px rgba(255,140,40,.8))}
+.zr-links line.on{opacity:.9;animation:zr-dash 1.2s linear infinite}
+@keyframes zr-dash{to{stroke-dashoffset:-36}}
+/* voyants */
+.zr-led .on{position:absolute;inset:0;opacity:0;transition:opacity .12s}
+.zr-led.on .on{opacity:1}
+.zr-led.blink .on{animation:zr-bl var(--bp,.5s) steps(1,end) infinite}
+@keyframes zr-bl{0%,49%{opacity:1}50%,100%{opacity:0}}
+/* bouton de validation */
+.zr-lens{transition:transform .08s,filter .15s}
+.zr-btn.idle .zr-lens{filter:brightness(.9) saturate(.95)}
+.zr-btn.armed .zr-lens{animation:zr-pulse .5s ease-in-out infinite}
+.zr-btn.busy .zr-lens{filter:brightness(.45) saturate(.7)}
+.zr-btn.ok .zr-lens{filter:hue-rotate(92deg) brightness(1.05) saturate(1.1)}
+.zr-btn.fail .zr-lens{animation:zr-fail .5s steps(1,end) 2}
+.zr-btn.down .zr-lens{transform:scale(.93);filter:brightness(1.25)}
+@keyframes zr-pulse{0%,100%{filter:brightness(.8) saturate(.9)}50%{filter:brightness(1.45) saturate(1.2) drop-shadow(0 0 14px rgba(255,150,30,.9))}}
+@keyframes zr-fail{0%{filter:brightness(.4) saturate(.6)}50%{filter:brightness(1.3)}}
+.zr-bhit{border-radius:50%;z-index:6;cursor:pointer}
+.zr-arm{border-radius:50%;pointer-events:none;box-shadow:0 0 0 0 rgba(255,150,40,0)}
+.zr-btn.armed .zr-arm{animation:zr-arm .5s ease-in-out infinite}
+@keyframes zr-arm{0%,100%{box-shadow:0 0 0 2px rgba(255,150,40,.2),0 0 12px 2px rgba(255,130,30,.2)}50%{box-shadow:0 0 0 4px rgba(255,170,60,.7),0 0 30px 8px rgba(255,130,30,.55)}}
+.zr-dbg{position:fixed;left:6px;bottom:4px;font:10px "JetBrains Mono",monospace;color:#6e6757;letter-spacing:.1em}
+@media (prefers-reduced-motion:reduce){.zr-cap{transition:none}.zr-btn.armed .zr-lens,.zr-btn.armed .zr-arm{animation:none}}
