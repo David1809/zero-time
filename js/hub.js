@@ -128,6 +128,7 @@ body:has(#zthub) #toast{top:50% !important;bottom:auto !important;left:auto !imp
       '<ellipse cx="0" cy="9" rx="40" ry="38" fill="#3a0503"/>'+
       '<g class="cap"><circle r="41" fill="url(#esr)" stroke="#5a0300" stroke-width="2"/><ellipse cx="-12" cy="-17" rx="17" ry="9" fill="#fff" opacity=".4" transform="rotate(-30 -12 -17)"/></g>'+
       '</g>' +
+      '<g id="pil"></g>' +
       '<circle class="a1" cx="1036" cy="238" r="26" fill="url(#offR)"/><ellipse class="a4" cx="1049" cy="96" rx="22" ry="26" fill="url(#offY)"/></svg>' +
       '<button class="z" data-t="todo" data-n="Alimentation" data-id="alim" style="left:13.608%;top:13.241%;width:19.604%;height:26.389%" aria-label="Alimentation"></button>'+
       '<button class="z" data-t="locked" data-n="Détonateur" data-id="deto" style="left:13.608%;top:40.741%;width:19.604%;height:25.741%" aria-label="Détonateur"></button>'+
@@ -148,6 +149,19 @@ body:has(#zthub) #toast{top:50% !important;bottom:auto !important;left:auto !imp
     function buzz(n) { try { navigator.vibrate && navigator.vibrate(n); } catch (e) {} }
     function say(m) { /* pas de pop-up : le retour est la vibration et la secousse */ }
     function nleft() { return Object.keys(NAME).filter(function (k) { return !(S.mods[k] && S.mods[k].done); }).length; }
+    function piles(n) {
+      n = n | 0; if (S.piles === n) return; S.piles = n;
+      var g = $("#pil"); if (!g) return;
+      if (n < 2 || n > 4 || n === 3) { g.innerHTML = ""; return; }
+      var X0 = 688, X1 = 1250, W = n === 4 ? 124 : 158, gap = (X1 - X0 - n * W) / (n + 1), h = '<rect x="' + X0 + '" y="578" width="' + (X1 - X0) + '" height="92" fill="#141517"/>';
+      for (var i = 0; i < n; i++) {
+        var x = X0 + gap + i * (W + gap), c = W * 0.34;
+        h += '<rect x="' + (x - 7) + '" y="613" width="9" height="30" fill="#aab0b4"/><rect x="' + (x + W - 2) + '" y="613" width="9" height="30" fill="#aab0b4"/>' +
+          '<rect x="' + x + '" y="588" width="' + c + '" height="78" rx="8" fill="#c79a2e"/><rect x="' + (x + c) + '" y="588" width="' + (W - c) + '" height="78" rx="8" fill="#0d0d0e"/>' +
+          '<rect x="' + (x + 4) + '" y="594" width="' + (c - 8) + '" height="10" rx="5" fill="#f0d27a" opacity=".55"/><rect x="' + (x + c + 6) + '" y="594" width="' + (W - c - 12) + '" height="8" rx="4" fill="#fff" opacity=".12"/>';
+      }
+      g.innerHTML = h;
+    }
     function armUI() {
       var left = nleft(), open = left === 0, a = $("#armb"), e = $("#es");
       a.classList.toggle("lock", !open); a.classList.toggle("open", open); e.classList.toggle("lock", !open); e.classList.toggle("open", open);
@@ -203,7 +217,7 @@ body:has(#zthub) #toast{top:50% !important;bottom:auto !important;left:auto !imp
     var api = {
       update: function (s) {
         if (s.serial) $("#sn").textContent = s.serial; S.mods = s.mods || S.mods; S.paused = s.paused || null; S.frozenMs = s.frozenMs || 0;
-        leds(); errs(s.errors || 0);
+        leds(); errs(s.errors || 0); piles(s.piles);
         var pb = $("#hubpause"); pb.classList.toggle("on", !!S.paused);
         if (S.paused) { $("#hpt").textContent = "⏸ EN ATTENTE DE " + String(S.paused.pseudo || "").toUpperCase(); $("#hpa").style.display = S.paused.can_abandon ? "" : "none"; }
         tick();

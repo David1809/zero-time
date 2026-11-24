@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.81";
+  var APP_VERSION = "1.0.82";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -270,8 +270,8 @@ ${solo}
     }
   }
 
-  var COLORS = { red: "Rouge", blue: "Bleu", yellow: "Jaune", white: "Blanc", black: "Noir" };
-  var activePanel = 0, selectedWire = null, manualTab = "w4";
+  var COLORS = { red: "Rouge", blue: "Bleu", yellow: "Jaune", white: "Blanc", black: "Noir", green: "Vert" };
+  var activePanel = 0, selectedWire = null;
   var opScreen = "hub", hubApi = null, pinApi = null, rotApi = null, rotTarget = null, pinBusy = false, openedSolved = false, backTimer = null, lastOrient = null, pinEnds = 0, pinBuf = "";
   var timerId = null, offsetMs = 0, bestOff = null;
   var errFlash = null, alertFlash = null;
@@ -284,7 +284,7 @@ ${solo}
     });
   }
   function buzz(p) { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} }
-  function resetGameFlags() { techTouched = false; endFxKey = null; errFlash = null; alertFlash = null; seenEvent = undefined; alerted = {}; alertInit = false; tickSent = false; opScreen = "hub"; openedSolved = false; pinBusy = false; pinBuf = ""; if (backTimer) { clearTimeout(backTimer); backTimer = null; } dropFx(); }
+  function resetGameFlags() { endFxKey = null; errFlash = null; alertFlash = null; seenEvent = undefined; alerted = {}; alertInit = false; tickSent = false; opScreen = "hub"; openedSolved = false; pinBusy = false; pinBuf = ""; if (backTimer) { clearTimeout(backTimer); backTimer = null; } dropFx(); }
 
   function stopTimer() { if (timerId) { clearInterval(timerId); timerId = null; } }
   function fmt(ms) {
@@ -354,7 +354,7 @@ ${solo}
   }
   [6, 7, 8].forEach(function (n) { GEOM[n] = mkGeom(n); ORDER[n] = []; for (var i = 1; i <= n; i++) ORDER[n].push(i); });
   var MOD_NAME = { 3: "Alimentation", 4: "Horloge", 5: "Détonateur", 6: "Capteur", 7: "Relais", 8: "Charge" };
-  var BASE = { red: "#250202", yellow: "#240c01", blue: "#040914", black: "#000000", white: "#475569" };
+  var BASE = { red: "#250202", yellow: "#240c01", blue: "#040914", black: "#000000", white: "#475569", green: "#03180a" };
 
   function r1(v) { return Math.round(v * 10) / 10; }
   function cubic(p, t0, t1) { // sous-courbe [t0,t1] d'une Bézier cubique (de Casteljau)
@@ -395,7 +395,7 @@ ${solo}
   function lugsL(isCut) { return '<div class="flex flex-col items-center gap-0.5' + (isCut ? " opacity-40" : "") + '"><span class="w-1.5 h-1 rounded-xs terminal-lug"></span><span class="w-1.5 h-1 rounded-xs bg-[#111418]' + (isCut ? "" : " border border-[#3b434e]") + '"></span></div>'; }
   function lugsR(isCut) { return '<div class="flex flex-col items-center gap-0.5' + (isCut ? " opacity-40" : "") + '"><span class="w-1.5 h-1 rounded-xs bg-[#111418]' + (isCut ? "" : " border border-[#3b434e]") + '"></span><span class="w-1.5 h-1 rounded-xs terminal-lug"></span></div>'; }
 
-  var GRADS = "<linearGradient id=\"grad-wire-red\" x1=\"0%\" x2=\"0%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#3d0303\"/><stop offset=\"12%\" stop-color=\"#880f0f\"/><stop offset=\"26%\" stop-color=\"#dc2626\"/><stop offset=\"38%\" stop-color=\"#f87171\"/><stop offset=\"46%\" stop-color=\"#ffffff\"/><stop offset=\"56%\" stop-color=\"#ef4444\"/><stop offset=\"78%\" stop-color=\"#b91c1c\"/><stop offset=\"92%\" stop-color=\"#650909\"/><stop offset=\"100%\" stop-color=\"#2d0202\"/></linearGradient><linearGradient id=\"grad-wire-white\" x1=\"0%\" x2=\"0%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#8fa0b5\"/><stop offset=\"15%\" stop-color=\"#dbe4ee\"/><stop offset=\"30%\" stop-color=\"#f8fafc\"/><stop offset=\"46%\" stop-color=\"#ffffff\"/><stop offset=\"58%\" stop-color=\"#ffffff\"/><stop offset=\"76%\" stop-color=\"#e2e8f0\"/><stop offset=\"92%\" stop-color=\"#94a3b8\"/><stop offset=\"100%\" stop-color=\"#64748b\"/></linearGradient><linearGradient id=\"grad-wire-yellow\" x1=\"0%\" x2=\"0%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#451a03\"/><stop offset=\"14%\" stop-color=\"#92400e\"/><stop offset=\"28%\" stop-color=\"#d97706\"/><stop offset=\"40%\" stop-color=\"#fbbf24\"/><stop offset=\"48%\" stop-color=\"#ffffff\"/><stop offset=\"58%\" stop-color=\"#f59e0b\"/><stop offset=\"80%\" stop-color=\"#b45309\"/><stop offset=\"94%\" stop-color=\"#712e06\"/><stop offset=\"100%\" stop-color=\"#2d1001\"/></linearGradient><linearGradient id=\"grad-wire-blue\" x1=\"0%\" x2=\"0%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#050e20\"/><stop offset=\"14%\" stop-color=\"#1e3a8a\"/><stop offset=\"28%\" stop-color=\"#2563eb\"/><stop offset=\"40%\" stop-color=\"#60a5fa\"/><stop offset=\"48%\" stop-color=\"#ffffff\"/><stop offset=\"58%\" stop-color=\"#3b82f6\"/><stop offset=\"80%\" stop-color=\"#1d4ed8\"/><stop offset=\"94%\" stop-color=\"#112763\"/><stop offset=\"100%\" stop-color=\"#040b19\"/></linearGradient><linearGradient id=\"grad-wire-black\" x1=\"0%\" x2=\"0%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#000000\"/><stop offset=\"14%\" stop-color=\"#0e1116\"/><stop offset=\"32%\" stop-color=\"#181d24\"/><stop offset=\"45%\" stop-color=\"#374151\"/><stop offset=\"52%\" stop-color=\"#4b5563\"/><stop offset=\"65%\" stop-color=\"#1a1f26\"/><stop offset=\"85%\" stop-color=\"#0f1217\"/><stop offset=\"100%\" stop-color=\"#000000\"/></linearGradient><linearGradient id=\"copper-wires\" x1=\"0%\" x2=\"100%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#b45309\"/><stop offset=\"35%\" stop-color=\"#fde047\"/><stop offset=\"65%\" stop-color=\"#ea580c\"/><stop offset=\"100%\" stop-color=\"#78350f\"/></linearGradient>";
+  var GRADS = "<linearGradient id=\"grad-wire-red\" x1=\"0%\" x2=\"0%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#3d0303\"/><stop offset=\"12%\" stop-color=\"#880f0f\"/><stop offset=\"26%\" stop-color=\"#dc2626\"/><stop offset=\"38%\" stop-color=\"#f87171\"/><stop offset=\"46%\" stop-color=\"#ffffff\"/><stop offset=\"56%\" stop-color=\"#ef4444\"/><stop offset=\"78%\" stop-color=\"#b91c1c\"/><stop offset=\"92%\" stop-color=\"#650909\"/><stop offset=\"100%\" stop-color=\"#2d0202\"/></linearGradient><linearGradient id=\"grad-wire-white\" x1=\"0%\" x2=\"0%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#8fa0b5\"/><stop offset=\"15%\" stop-color=\"#dbe4ee\"/><stop offset=\"30%\" stop-color=\"#f8fafc\"/><stop offset=\"46%\" stop-color=\"#ffffff\"/><stop offset=\"58%\" stop-color=\"#ffffff\"/><stop offset=\"76%\" stop-color=\"#e2e8f0\"/><stop offset=\"92%\" stop-color=\"#94a3b8\"/><stop offset=\"100%\" stop-color=\"#64748b\"/></linearGradient><linearGradient id=\"grad-wire-yellow\" x1=\"0%\" x2=\"0%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#451a03\"/><stop offset=\"14%\" stop-color=\"#92400e\"/><stop offset=\"28%\" stop-color=\"#d97706\"/><stop offset=\"40%\" stop-color=\"#fbbf24\"/><stop offset=\"48%\" stop-color=\"#ffffff\"/><stop offset=\"58%\" stop-color=\"#f59e0b\"/><stop offset=\"80%\" stop-color=\"#b45309\"/><stop offset=\"94%\" stop-color=\"#712e06\"/><stop offset=\"100%\" stop-color=\"#2d1001\"/></linearGradient><linearGradient id=\"grad-wire-green\" x1=\"0%\" x2=\"0%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#031a0a\"/><stop offset=\"14%\" stop-color=\"#14532d\"/><stop offset=\"28%\" stop-color=\"#16a34a\"/><stop offset=\"40%\" stop-color=\"#4ade80\"/><stop offset=\"48%\" stop-color=\"#ffffff\"/><stop offset=\"58%\" stop-color=\"#22c55e\"/><stop offset=\"80%\" stop-color=\"#15803d\"/><stop offset=\"94%\" stop-color=\"#0b3d1c\"/><stop offset=\"100%\" stop-color=\"#031209\"/></linearGradient><linearGradient id=\"grad-wire-blue\" x1=\"0%\" x2=\"0%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#050e20\"/><stop offset=\"14%\" stop-color=\"#1e3a8a\"/><stop offset=\"28%\" stop-color=\"#2563eb\"/><stop offset=\"40%\" stop-color=\"#60a5fa\"/><stop offset=\"48%\" stop-color=\"#ffffff\"/><stop offset=\"58%\" stop-color=\"#3b82f6\"/><stop offset=\"80%\" stop-color=\"#1d4ed8\"/><stop offset=\"94%\" stop-color=\"#112763\"/><stop offset=\"100%\" stop-color=\"#040b19\"/></linearGradient><linearGradient id=\"grad-wire-black\" x1=\"0%\" x2=\"0%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#000000\"/><stop offset=\"14%\" stop-color=\"#0e1116\"/><stop offset=\"32%\" stop-color=\"#181d24\"/><stop offset=\"45%\" stop-color=\"#374151\"/><stop offset=\"52%\" stop-color=\"#4b5563\"/><stop offset=\"65%\" stop-color=\"#1a1f26\"/><stop offset=\"85%\" stop-color=\"#0f1217\"/><stop offset=\"100%\" stop-color=\"#000000\"/></linearGradient><linearGradient id=\"copper-wires\" x1=\"0%\" x2=\"100%\" y1=\"0%\" y2=\"100%\"><stop offset=\"0%\" stop-color=\"#b45309\"/><stop offset=\"35%\" stop-color=\"#fde047\"/><stop offset=\"65%\" stop-color=\"#ea580c\"/><stop offset=\"100%\" stop-color=\"#78350f\"/></linearGradient>";
   var DEFS = '<defs>' +
     '<filter height="200%" id="cavity-shadow" width="140%" x="-20%" y="-40%"><feGaussianBlur in="SourceAlpha" stdDeviation="5"/><feOffset dx="0" dy="7" result="offsetblur"/><feComponentTransfer><feFuncA slope="0.82" type="linear"/></feComponentTransfer><feMerge><feMergeNode/></feMerge></filter>' +
     '<filter height="220%" id="crossing-shadow" width="160%" x="-30%" y="-50%"><feGaussianBlur in="SourceAlpha" stdDeviation="3"/><feOffset dx="0" dy="5" result="offsetblur"/><feComponentTransfer><feFuncA slope="0.9" type="linear"/></feComponentTransfer><feMerge><feMergeNode/></feMerge></filter>' +
@@ -495,7 +495,7 @@ ${solo}
       });
     }
     pinEnds = endsAt;
-    hubApi.update({ serial: (g.panels[0] || {}).serial, mods: mods, errors: g.errors, paused: pz, frozenMs: view.paused && view.paused.remaining_ms || 0 });
+    hubApi.update({ piles: g.batteries, serial: (g.panels[0] || {}).serial, mods: mods, errors: g.errors, paused: pz, frozenMs: view.paused && view.paused.remaining_ms || 0 });
   }
 
   // --- Module Rotary (écran opérateur ; combinaison de démonstration, pas encore branché au serveur) ---
@@ -834,121 +834,19 @@ ${solo}
 
   // ===== Carnet du technicien (design TE04 Stitch : papier recyclé manuscrit) =====
   function escH(t) { return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
-  var WCOL = { rouge: "red", blanc: "white", bleu: "blue", jaune: "yellow", noir: "black" };
-  function inkText(t) {
-    return escH(t).replace(/\b(rouge|blanc|bleu|jaune|noir)\b/g, function (w) { return '<span class="wire-sketch wire-' + WCOL[w] + ' w-7 mx-1"></span>'; })
-      .replace(/(\d)(er|e)\b/g, "$1<sup>$2</sup>");
-  }
-  function ruleParts(r) {
-    var k = r.t.indexOf(" : "), cond = k < 0 ? r.t : r.t.slice(0, k), act = k < 0 ? "" : r.t.slice(k + 3);
-    act = act.replace(/^coupe /, "couper "); act = act.charAt(0).toUpperCase() + act.slice(1);
-    return { cond: cond, act: act, dflt: /^Sinon$/.test(cond) };
-  }
-  function ruleLi(r, idx, circle) {
-    var p = ruleParts(r), n = String(r.n).split(".").pop();
-    var bg = p.dflt ? "bg-slate-200/40 p-1.5 rounded border border-slate-400/30" : (idx % 2 === 0 ? "bg-amber-50/40 p-1.5 rounded border border-dashed border-amber-900/20" : "p-1.5 rounded");
-    var cond = p.dflt ? '<span class="font-bold underline">Sinon</span> :' : inkText(p.cond) + " :";
-    var act = '<div class="font-notes text-sm text-inkRed font-bold ' + (circle ? "pl-2" : "pl-3") + ' pt-0.5">➔ ' + inkText(p.act) + "</div>";
-    if (circle) return '<li class="flex items-start gap-2.5 ' + bg + '"><span class="font-notes font-bold text-inkBlue text-base bg-amber-200/60 w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5">' + n + '</span><div class="leading-snug"><span>' + cond + "</span>" + act + "</div></li>";
-    return '<li class="' + bg + '"><span class="font-notes font-bold text-inkBlue text-base bg-amber-200/60 px-1.5 rounded">' + n + "</span> <span>" + cond + "</span>" + act + "</li>";
-  }
-  var TECH_ORDER = ["lecture", "w3", "w4", "w5", "w6", "w7", "w8", "pin"];
-  var TECH_META = {
-    lecture: { tab: "📌 Lire un panneau", title: "Section 02 — Lire un Panneau", sub: "Protocole de communication avec l'opérateur", pg: "p. 02", ind: "Page 2 / 8 — Lire un panneau" },
-    w3: { tab: "Alimentation", title: "Section 03 — Alimentation", sub: "Configuration compacte à 3 connexions", pg: "p. 03", ind: "Page 3 / 8 — Alimentation" },
-    w4: { tab: "Horloge", title: "Section 04 — Horloge", sub: "Règles de désamorçage de la baie câblée à 4 connexions", pg: "p. 04", ind: "Page 4 / 8 — Horloge" },
-    w5: { tab: "Détonateur", title: "Section 05 — Détonateur", sub: "Harnais principal lourd à 5 connexions", pg: "p. 05", ind: "Page 5 / 8 — Détonateur" },
-    w6: { tab: "Capteur", title: "Section 06 — Capteur", sub: "Faisceau étendu à 6 connexions", pg: "p. 06", ind: "Page 6 / 8 — Capteur" },
-    w7: { tab: "Relais", title: "Section 07 — Relais", sub: "Faisceau dense à 7 connexions", pg: "p. 07", ind: "Page 7 / 8 — Relais" },
-    w8: { tab: "Charge", title: "Section 08 — Charge", sub: "Harnais maximal à 8 connexions", pg: "p. 08", ind: "Page 8 / 8 — Charge" },
-    pin: { tab: "Digicode", title: "Section 09 — Digicode", sub: "Module à code de 4 chiffres : voyants et historique des essais", pg: "p. 09", ind: "Page 9 / 9 — Digicode" },
-    index: { tab: "", title: "Sommaire du Manuel", sub: "Index rapide des modules de déminage", pg: "INDEX", ind: "Sommaire général" }
-  };
-  var techQuery = "", techTouched = false;
-  function techHead(k, extra) {
-    var m = TECH_META[k];
-    return '<div class="border-b-2 border-inkBlue/30 pb-2 mb-3 flex items-baseline justify-between"><div><div class="font-hand text-3xl font-bold text-inkBlue tracking-wide flex items-center gap-2"><span>' + m.title + "</span>" + (extra || "") + '</div><p class="font-notes text-xs text-slate-600 italic">' + m.sub + '</p></div><div class="font-typewriter text-xs text-slate-500 font-bold">' + m.pg + "</div></div>";
-  }
-  function techPageHtml(k, m) {
-    if ((/^w[3-8]$/.test(k) || k === "pin") && !m[k]) {
-      return techHead(k) + '<div class="mt-6 p-4 rounded border-2 border-dashed border-inkRed/50 bg-red-50/40 text-center font-hand text-xl text-inkRed leading-snug">🔒 Cette page est chez un autre technicien.<br><span class="text-base text-slate-700">Demande-lui de te lire ses règles : annonce le nombre de fils et les couleurs.</span></div>';
-    }
-    if (k === "w4") {
-      return techHead(k, '<span class="inline-block px-1.5 py-0.5 rounded text-[11px] font-notes text-inkRed border border-inkRed/40 bg-red-50/50 rotate-[-2deg]">URGENT</span>') +
-        '<ol class="space-y-3 font-hand text-lg text-inkBlue">' + m.w4.map(function (r, i) { return ruleLi(r, i, true); }).join("") + "</ol>" +
-        '<div class="mt-4 pt-2 border-t border-inkBlue/20 flex items-center justify-end"><div class="font-notes text-[11px] text-inkRed font-bold">✓ Révision atelier 03/A</div></div>';
-    }
-    if (k === "w3" || k === "w5" || k === "w6" || k === "w7" || k === "w8") {
-      return techHead(k) + '<ol class="space-y-' + (k === "w5" ? "2.5" : "3") + ' font-hand text-lg text-inkBlue">' + m[k].map(function (r, i) { return ruleLi(r, i, false); }).join("") + "</ol>";
-    }
-    if (k === "pin") {
-      var P = m.pin;
-      return techHead(k) + '<ol class="space-y-3 font-hand text-lg text-inkBlue">' + P.rules.map(function (r, i) {
-        return '<li class="' + (i % 2 === 0 ? "bg-amber-50/40 p-1.5 rounded border border-dashed border-amber-900/20" : "p-1.5 rounded") + '"><span class="font-notes font-bold text-inkBlue text-base bg-amber-200/60 px-1.5 rounded">' + escH(String(r.n).split(".").pop()) + "</span> " + escH(r.t) + "</li>";
-      }).join("") + '</ol>' + (m.pin_clues && m.pin_clues.length ? '<div class="mt-3 p-2 rounded border border-amber-900/30 bg-amber-50/60 font-hand text-base text-inkBlue"><div class="font-notes text-xs font-bold text-inkRed uppercase tracking-wider mb-1">Tableau des lettres (cette partie)</div>' + m.pin_clues.map(function (c) { return '<div class="flex gap-2 items-baseline py-0.5 border-b border-dotted border-inkBlue/30"><span class="font-typewriter font-black text-xl text-inkRed w-6 text-center">' + escH(c.l) + '</span><span>' + escH(c.t) + '</span></div>'; }).join("") + (m.solo_serial ? '<div class="mt-1 font-notes text-xs text-slate-600">Mode solo : numéro de série = ' + escH(m.solo_serial) + '</div>' : '') + '</div>' : '') + '<div class="mt-3 p-2 rounded border border-slate-400/40 bg-slate-200/40 font-hand text-base text-inkBlue space-y-1"><div class="font-notes text-xs font-bold text-inkRed uppercase tracking-wider">Lecture de l\'historique</div>' + P.verdicts.map(function (t) { return "<div>" + escH(t) + "</div>"; }).join("") + '</div><p class="mt-3 font-notes text-xs text-inkRed font-bold">' + escH(P.penalties) + "</p>";
-    }
-    if (k === "lecture") {
-      var L = ["Étape A : Annoncer le module", "Étape B : Relever le numéro de série", "Étape C : Lister les couleurs"];
-      return techHead(k) + '<div class="space-y-3 font-hand text-lg text-inkBlue leading-snug">' + m.read.map(function (t, i) {
-        return '<div class="bg-amber-100/40 p-2.5 rounded border border-amber-800/30"><span class="font-notes text-xs font-bold text-inkRed uppercase tracking-wider block">' + L[i % 3] + '</span><p class="mt-1">' + escH(t) + "</p></div>";
-      }).join("") + "</div>";
-    }
-    var items = [["lecture", "📌", "Lire un panneau", "(protocole série, comptage)", "p. 02"], ["w3", "⚡", "Alimentation", "(combinaisons de base)", "p. 03"], ["w4", "⚡", "Horloge", "(série pair/impair & règles)", "p. 04"], ["w5", "⚡", "Détonateur", "(harnais complexe à 5 brins)", "p. 05"], ["w6", "⚡", "Capteur", "(faisceau à 6 brins)", "p. 06"], ["w7", "⚡", "Relais", "(faisceau à 7 brins)", "p. 07"], ["w8", "⚡", "Charge", "(harnais à 8 brins)", "p. 08"], ["pin", "🔢", "Digicode", "(voyants rouges/bleus, essais)", "p. 09"]];
-    return techHead("index") +
-      '<div class="mb-4 bg-amber-50/70 p-2.5 rounded border border-amber-900/30 shadow-inner"><label class="block font-notes text-xs text-slate-700 font-bold mb-1">🔍 Recherche de mot-clé ou module :</label><div class="relative"><input type="text" id="indexSearchInput" placeholder="Ex: 4 fils, série, pair..." class="w-full bg-transparent border-b-2 border-inkBlue text-inkBlue font-hand text-xl px-1 py-0.5 focus:outline-none focus:border-inkRed placeholder-slate-400"/><span class="absolute right-1 top-1 text-xs text-slate-400 font-notes italic">écrire ici</span></div></div>' +
-      '<ul id="indexList" class="space-y-2.5 font-hand text-lg text-inkBlue">' + items.map(function (x) {
-        var lk = (/^w[3-8]$/.test(x[0]) || x[0] === "pin") && !m[x[0]];
-        return '<li class="index-item flex items-center justify-between border-b border-dotted border-inkBlue/40 pb-1 cursor-pointer' + (lk ? " opacity-50" : "") + '" data-go="' + x[0] + '"><span class="flex items-center gap-2"><span>' + (lk ? "🔒" : x[1]) + "</span> <b>" + x[2] + '</b> <span class="font-notes text-xs text-slate-500">' + (lk ? "(chez un autre technicien)" : x[3]) + '</span></span><span class="font-typewriter text-sm font-bold text-inkBlue">' + x[4] + "</span></li>";
-      }).join("") + '<li class="index-item flex items-center justify-between border-b border-dotted border-inkBlue/40 pb-1 opacity-50"><span class="flex items-center gap-2"><span>🔒</span> Module Clavier & Symboles</span><span class="font-typewriter text-sm text-slate-400">p. 09</span></li></ul>';
-  }
-
   function renderTechnician() {
     stopTimer();
-    var m = view.manual; if (m.pages && !m[manualTab] && (/^w[3-8]$/.test(manualTab) || manualTab === "pin") && !techTouched) { manualTab = m.pages[0] === 9 ? "pin" : "w" + m.pages[0]; }
-    var k = TECH_META[manualTab] ? manualTab : "w4", meta = TECH_META[k], paused = view.paused;
-    var lock = function (t) { return (/^w[3-8]$/.test(t) || t === "pin") && !m[t]; };
-    var tabs = TECH_ORDER.filter(function (t) { return t === k || !lock(t); }).map(function (t) {
-      var lab = TECH_META[t].tab + (lock(t) ? " 🔒" : "");
-      return t === k
-        ? '<button data-tab="' + t + '" class="tab-btn tab-active px-3 py-1.5 text-sm font-hand text-inkBlue bg-[#f4ecdf] border-t-2 border-x-2 border-amber-800/40 rounded-t-lg shadow-sm whitespace-nowrap">' + lab + "</button>"
-        : '<button data-tab="' + t + '" class="tab-btn px-2.5 py-1 text-xs font-hand text-slate-400 bg-[#352d24] border-t border-x border-[#524436] rounded-t-md whitespace-nowrap">' + lab + "</button>";
-    }).join("");
-    var lex = m.lexicon.concat([m.penalties]).map(function (t) { return "<div>• " + escH(t) + "</div>"; }).join("");
-    var pauseBox = paused ? '<div class="absolute inset-x-3 top-3 z-40 bg-amber-100 border-2 border-inkRed rounded p-2.5 text-center shadow-lg"><div class="font-hand text-2xl font-bold text-inkRed">⏸ En attente de ' + escH(paused.pseudo) + '</div><div class="font-notes text-xs text-slate-700">La partie est en pause. Le temps ne s\'écoule plus.</div>' + (paused.can_abandon ? '<button id="zt-t-abort" class="mt-2 px-3 py-1 rounded border-2 border-inkRed text-inkRed font-notes text-xs font-bold">Abandonner la partie</button>' : "") + "</div>" : "";
-    app.innerHTML =
-      '<header class="flex items-center justify-between px-2 pt-1 pb-1 z-20"><div class="flex items-center space-x-2"><span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.8)]"></span><span class="font-tech text-xs tracking-wider text-slate-400 font-bold uppercase">UNITÉ SUPPORT // TECHNICIEN</span><span class="font-tech text-[10px] text-slate-500 border border-slate-700/80 px-1 rounded">MANUEL TE04</span></div>' +
-      '<button data-tab="index" class="relative ribbon-bookmark px-3 py-1.5 rounded-t-sm text-amber-100 font-tech text-xs tracking-widest font-bold uppercase flex items-center gap-1 active:translate-y-0.5 transition-transform" title="Ouvrir le Sommaire"><svg class="w-3.5 h-3.5 fill-amber-200" viewBox="0 0 20 20"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z"/></svg><span>INDEX</span></button></header>' +
-      '<nav class="flex items-end space-x-1 px-3 z-10 overflow-x-auto pt-1" id="tabBar">' + tabs + "</nav>" +
-      '<div class="relative flex-1 paper-sheet paper-edge mx-1.5 mb-1.5 p-0 overflow-hidden flex flex-col z-20" id="tech-sheet" style="min-height:0"><div class="paperclip"></div><div class="coffee-stain top-4 right-10"></div><div class="tape-strip absolute -top-1 -left-2 w-14 h-5 rotate-[-25deg] z-10 pointer-events-none"></div>' + pauseBox +
-      '<div class="paper-content-scroll ruled-lines p-4 sm:p-5 flex flex-col justify-between" id="pageContainer"><div class="page-view flex-1 flex flex-col">' + techPageHtml(k, m) + "</div>" +
-      '<footer class="mt-4 pt-3 border-t-2 border-dashed border-amber-900/30 bg-amber-100/30 p-2 rounded"><div class="flex items-center gap-1.5 mb-1"><span class="font-notes text-xs font-bold text-inkRed">📖 RAPPEL LEXIQUE & CONVENTIONS :</span></div><div class="grid grid-cols-2 gap-2 font-hand text-sm text-slate-700">' + lex + "</div></footer></div>" +
-      '<div class="border-t border-amber-900/20 bg-[#ede4d4] px-4 py-2 flex items-center justify-between text-xs font-notes text-inkBlue"><button id="btnPrev" class="flex items-center gap-1 font-bold text-inkBlue active:scale-95 transition-transform"><span>⟵</span> <span>Précédent</span></button><div class="flex items-center gap-1 font-typewriter text-[11px] text-slate-600 bg-amber-200/50 px-2 py-0.5 rounded border border-amber-800/30"><span>' + meta.ind + '</span></div><button id="btnNext" class="flex items-center gap-1 font-bold text-inkBlue active:scale-95 transition-transform"><span>Suivant</span> <span>⟶</span></button></div></div>';
-
-    function go(t) { manualTab = t; techTouched = true; render(); }
-    function step(d) { var L = TECH_ORDER.filter(function (t) { return !(/^w[3-8]$/.test(t) || t === "pin") || m[t]; }), i = L.indexOf(manualTab); if (i < 0) i = 0; go(L[(i + d + L.length) % L.length]); }
-    Array.prototype.forEach.call(app.querySelectorAll("[data-tab]"), function (b) { b.onclick = function () { go(b.getAttribute("data-tab")); }; });
-    Array.prototype.forEach.call(app.querySelectorAll("[data-go]"), function (b) { b.onclick = function () { go(b.getAttribute("data-go")); }; });
-    document.getElementById("btnPrev").onclick = function () { step(-1); };
-    document.getElementById("btnNext").onclick = function () { step(1); };
-    var ab = document.getElementById("zt-t-abort");
-    if (ab) ab.onclick = function () {
-      if (!window.confirm("Abandonner la partie ?")) return;
-      sb.rpc("zt_abandon", { p_code: session.code, p_token: session.token }).then(function (r) { if (r.error) return fail(r.error); view = r.data; render(); });
-    };
-    var inp = document.getElementById("indexSearchInput");
-    if (inp) {
-      var filt = function () {
-        techQuery = inp.value;
-        Array.prototype.forEach.call(app.querySelectorAll("#indexList .index-item"), function (it) { it.style.display = it.textContent.toLowerCase().indexOf(techQuery.toLowerCase()) >= 0 ? "flex" : "none"; });
-      };
-      inp.value = techQuery; filt(); inp.oninput = filt;
-    }
-    var sx = 0, sy = 0, pc = document.getElementById("pageContainer");
-    pc.addEventListener("touchstart", function (e) { sx = e.changedTouches[0].screenX; sy = e.changedTouches[0].screenY; }, { passive: true });
-    pc.addEventListener("touchend", function (e) {
-      var dx = e.changedTouches[0].screenX - sx, dy = e.changedTouches[0].screenY - sy;
-      if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) step(dx < 0 ? 1 : -1);
-    }, { passive: true });
+    var m = view.manual;
+    app.innerHTML = "";
+    var host = el("div", {});
+    app.appendChild(host);
+    window.ZTCarnet.mount({
+      root: host, manual: m, paused: view.paused,
+      onAbort: function () {
+        if (!window.confirm("Abandonner la partie ?")) return;
+        sb.rpc("zt_abandon", { p_code: session.code, p_token: session.token }).then(function (r) { if (r.error) return fail(r.error); view = r.data; render(); });
+      }
+    });
   }
 
   function renderPlaying() {

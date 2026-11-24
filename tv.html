@@ -19,7 +19,7 @@ html,body{margin:0;height:100%;background:#000;color:#f3f5f5;font-family:"JetBra
 <div id="app"></div><div id="msg"></div><div id="tvc"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="js/config.js"></script>
-<script src="js/hub.js?v=81"></script>
+<script src="js/hub.js?v=82"></script>
 <script>
 (function () {
   "use strict";
@@ -50,7 +50,7 @@ html,body{margin:0;height:100%;background:#000;color:#f3f5f5;font-family:"JetBra
     mountHub();
     ends = new Date(d.ends_at).getTime();
     var mods = { alim: { done: !!d.alim_done } }; if (d.has_digi) mods.digi = { done: !!d.digi_done };
-    hub.update({ serial: d.serial, mods: mods, errors: d.errors, paused: d.paused ? { pseudo: "UN JOUEUR", can_abandon: false } : null, frozenMs: d.remaining_ms || 0 });
+    hub.update({ piles: d.batteries, serial: d.serial, mods: mods, errors: d.errors, paused: d.paused ? { pseudo: "UN JOUEUR", can_abandon: false } : null, frozenMs: d.remaining_ms || 0 });
     if (d.status === "ended") {
       if (d.outcome === "defused") say("ok", "BOMBE DÉSAMORCÉE", d.solved + "/" + d.total + " modules · " + d.errors + " erreur" + (d.errors > 1 ? "s" : ""));
       else say("ko", "EXPLOSION", d.cause === "time" ? "Le temps est écoulé" : "Trop d'erreurs");

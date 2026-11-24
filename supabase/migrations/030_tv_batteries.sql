@@ -1,0 +1,2 @@
+-- zt_tv expose le nombre de piles (2-4) pour l'affichage TV
+-- (définition complète appliquée en base : voir zt_tv + 'batteries', r.batteries)

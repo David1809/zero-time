@@ -32,7 +32,7 @@ h2,h3{margin:0}h3{font-size:16px;color:var(--orange)}
 .wire .num{font-size:22px;font-weight:700;width:26px}
 .wire .bar{flex:1;height:14px;border-radius:7px;border:2px solid var(--txt2)}
 .wire .state{width:24px;font-size:22px;color:var(--orange)}
-.w-red .bar{background:#F04444}.w-blue .bar{background:#3B82F6}.w-yellow .bar{background:#F5D90A}.w-white .bar{background:#F3F5F5}.w-black .bar{background:#0B0F14}
+.w-red .bar{background:#F04444}.w-blue .bar{background:#3B82F6}.w-yellow .bar{background:#F5D90A}.w-white .bar{background:#F3F5F5}.w-black .bar{background:#0B0F14}.w-green .bar{background:#22C55E}
 .wire.cut{opacity:.45}.wire.cut .bar{background:repeating-linear-gradient(90deg,var(--sec) 0 10px,transparent 10px 20px)!important}
 .rules,.lex{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:10px;line-height:1.35}
 .lex{list-style:disc}
