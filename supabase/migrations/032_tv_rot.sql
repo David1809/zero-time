@@ -1,0 +1,1 @@
+-- zt_tv expose aussi rot_done (voir migration 032 appliquée en base : + select state from zt.rot, 'rot_done')

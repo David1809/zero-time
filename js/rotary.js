@@ -61,7 +61,7 @@
   function mount(root, opts) {
     opts = opts || {};
     var S = {
-      pos: [0, 0, 0, 0], locked: false, phase: "idle", armTimer: 0, t0: 0,
+      pos: [0, 0, 0, 0], drag: 0, locked: false, phase: "idle", armTimer: 0, t0: 0,
       onChange: opts.onChange || function () {}, onValidate: opts.onValidate || null, linked: opts.linked || function () { return false; }
     };
     root.innerHTML = ""; loadClick();
@@ -70,6 +70,7 @@
     if (opts.onBack || opts.backLabel) {
       var bk = el("zr-back", "button"); bk.type = "button"; bk.textContent = opts.backLabel || "← BOMBE"; bk.addEventListener("click", function () { opts.onBack && opts.onBack(); }); bar.appendChild(bk);
     }
+    var vd = el("zr-vd", "span"); bar.appendChild(vd);
     var wrap = el("zr-wrap"); zr.appendChild(wrap);
     var stage = el("zr-stage"); wrap.appendChild(stage);
     var panel = img("panel.jpg"); panel.className = "zr-panel"; stage.appendChild(panel);
@@ -132,15 +133,15 @@
     }
     // interaction : glisser en cercle (ou toucher un symbole) pour amener la molette sur le cran voulu
     knobs.forEach(function (kn, i) {
-      var active = false;
+      var active = false, p0 = 0;
       function angleOf(e) { var r = kn.hit.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2; return (Math.atan2(e.clientX - cx, -(e.clientY - cy)) * 180 / Math.PI + 360) % 360; }
       function dist(e) { var r = kn.hit.getBoundingClientRect(); return Math.hypot(e.clientX - (r.left + r.width / 2), e.clientY - (r.top + r.height / 2)) / (r.width / 2); }
       kn.hit.addEventListener("pointerdown", function (e) {
         if (S.locked) { buzz(15); return; }
-        ctx(); active = true; kn.hit.setPointerCapture(e.pointerId); kn.k.classList.add("rot"); if (dist(e) > 0.28) setPos(i, nearest(angleOf(e), i));
+        ctx(); active = true; S.drag++; p0 = S.pos[i]; kn.hit.setPointerCapture(e.pointerId); kn.k.classList.add("rot"); if (dist(e) > 0.28) setPos(i, nearest(angleOf(e), i));
       });
       kn.hit.addEventListener("pointermove", function (e) { if (active && !S.locked && dist(e) > 0.2) setPos(i, nearest(angleOf(e), i)); });
-      function end() { if (!active) return; active = false; kn.k.classList.remove("rot"); kn.tri.classList.toggle("ok", !!(opts.isCorrect && opts.isCorrect(i, S.pos[i]))); }
+      function end() { if (!active) return; active = false; S.drag--; kn.k.classList.remove("rot"); kn.tri.classList.toggle("ok", !!(opts.isCorrect && opts.isCorrect(i, S.pos[i]))); if (opts.onGesture && S.pos[i] !== p0) opts.onGesture(i, S.pos[i]); }
       kn.hit.addEventListener("pointerup", end); kn.hit.addEventListener("pointercancel", end);
       kn.hit.addEventListener("keydown", function (e) {
         if (S.locked) return; if (e.key === "ArrowRight" || e.key === "ArrowUp") { setPos(i, S.pos[i] + 1); e.preventDefault(); } else if (e.key === "ArrowLeft" || e.key === "ArrowDown") { setPos(i, S.pos[i] - 1); e.preventDefault(); }
@@ -186,6 +187,8 @@
     function fmt(ms) { ms = Math.max(0, ms); var s = Math.floor(ms / 1000), c = Math.floor((ms % 1000) / 10); return [("0" + Math.floor(s / 60)).slice(-2) + ":" + ("0" + (s % 60)).slice(-2), "." + ("0" + c).slice(-2)]; }
     return {
       setTime: function (ms) { var f = fmt(ms); tMain.textContent = f[0]; tCs.textContent = f[1]; var al = ms <= 30000 && ms > 0; timeEl.classList.toggle("al", al); if (al) timeEl.style.setProperty("--zp", (0.14 + 0.86 * Math.min(1, ms / 30000)) + "s"); },
+      applyRemote: function (arr) { if (S.drag > 0) return; var ch = false; arr.forEach(function (p, i) { if (setPos(i, p, true)) ch = true; }); if (ch) { click("tick"); buzz(8); } },
+      note: function (t) { vd.textContent = t || ""; },
       setPositions: function (arr) { arr.forEach(function (p, i) { setPos(i, p, true); }); },
       getPositions: function () { return S.pos.slice(); },
       lock: function (b) { S.locked = !!b; knobs.forEach(function (k) { k.k.classList.toggle("lock", !!b); }); },

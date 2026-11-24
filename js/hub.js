@@ -6,7 +6,7 @@
  */
 (function () {
   "use strict";
-  var NAME = { alim: "Alimentation", digi: "Digicode" };
+  var NAME = { alim: "Alimentation", digi: "Digicode", rot: "Rotary" };
   var LOCKED = { deto: "Détonateur", hor: "Horloge" };
   var CSS = `
 @font-face{font-family:"ZTOrb";src:url(assets/hub/jetbrains-400.woff2) format("woff2");font-weight:400;font-display:block}
@@ -119,7 +119,7 @@ body:has(#zthub) #toast{top:50% !important;bottom:auto !important;left:auto !imp
       '<rect x="866" y="820" width="336" height="94" fill="#131313"/>'+
       '<rect x="1062" y="754" width="174" height="68" fill="url(#pbg)"/>'+
       '<text class="st" id="at1" x="872" y="868">VERROUILLÉ</text>'+
-      '<text class="at sub" id="at2" x="872" y="902">0/4 MODULES NEUTRALISÉS</text>'+
+      '<text class="at sub" id="at2" x="872" y="902">0/3 MODULES NEUTRALISÉS</text>'+
       '<g id="es" class="lock" transform="translate(787 832)">'+
       '<circle class="halo" r="78" fill="url(#esh)"/>'+
       '<circle r="66" fill="url(#esb)" stroke="#4a5055" stroke-width="3"/>'+
@@ -164,7 +164,7 @@ body:has(#zthub) #toast{top:50% !important;bottom:auto !important;left:auto !imp
       var left = nleft(), open = left === 0, a = $("#armb"), e = $("#es");
       a.classList.toggle("lock", !open); a.classList.toggle("open", open); e.classList.toggle("lock", !open); e.classList.toggle("open", open);
       $("#at1").textContent = open ? "DÉVERROUILLÉ" : "VERROUILLÉ";
-      $("#at2").textContent = open ? "APPUYER SUR ARRÊT" : (2 - left) + "/2 MODULES NEUTRALISÉS";
+      $("#at2").textContent = open ? "APPUYER SUR ARRÊT" : (Object.keys(NAME).length - left) + "/" + Object.keys(NAME).length + " MODULES NEUTRALISÉS";
     }
     function leds() { Object.keys(NAME).forEach(function (k) { var g = $("#led-" + k), d = S.mods[k] && S.mods[k].done; g.classList.remove("red", "green"); g.classList.add(d ? "green" : "red"); });
       Object.keys(LOCKED).forEach(function (k) { var g = $("#led-" + k); g.classList.remove("red", "green"); }); armUI(); }

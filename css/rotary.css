@@ -58,3 +58,5 @@
 
 .zr-tri{opacity:0;transition:opacity .12s;pointer-events:none}
 .zr-tri.ok{opacity:1}
+
+.zr-vd{margin-left:auto;font:700 13px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.08em;color:#ff9f32}

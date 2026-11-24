@@ -5,7 +5,7 @@
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
   var KEY = "zt_session";
-  var APP_VERSION = "1.0.85";
+  var APP_VERSION = "1.0.86";
   var session = null; // { code, player_id, token }
   var view = null;    // dernière vue reçue du serveur (propre à ce joueur)
   var channel = null;
@@ -272,7 +272,7 @@ ${solo}
 
   var COLORS = { red: "Rouge", blue: "Bleu", yellow: "Jaune", white: "Blanc", black: "Noir", green: "Vert" };
   var activePanel = 0, selectedWire = null;
-  var opScreen = "hub", hubApi = null, pinApi = null, rotApi = null, rotTarget = null, pinBusy = false, openedSolved = false, backTimer = null, lastOrient = null, pinEnds = 0, pinBuf = "";
+  var opScreen = "hub", hubApi = null, pinApi = null, rotApi = null, pinBusy = false, openedSolved = false, backTimer = null, lastOrient = null, pinEnds = 0, pinBuf = "";
   var timerId = null, offsetMs = 0, bestOff = null;
   var errFlash = null, alertFlash = null;
   var seenEvent, alerted = {}, alertInit = false, tickSent = false, cutting = false;
@@ -469,6 +469,7 @@ ${solo}
     var pinI = -1; g.panels.forEach(function (p, i) { if (p.kind === "pin") pinI = i; });
     var firstTodo = wp.filter(function (x) { return x.p.state !== "solved"; })[0];
     mods.alim = { done: wp.length > 0 && !firstTodo }; idx.alim = (firstTodo || wp[0] || { i: 0 }).i;
+    mods.rot = { done: !!(g.rot && g.rot.state === "solved") };
     if (pinI >= 0) { mods.digi = { done: g.panels[pinI].state === "solved" }; idx.digi = pinI; }
     var pz = view.paused ? { pseudo: view.paused.pseudo, can_abandon: view.paused.can_abandon } : null;
     if (!hubApi || !document.getElementById("zthub")) {
@@ -502,20 +503,41 @@ ${solo}
   function renderRotary(g) {
     syncClock(g); consumeEvent(g);
     pinEnds = new Date(g.ends_at).getTime();
+    var rt = g.rot || { cur: [0, 0, 0, 0], state: "todo" };
     if (!rotApi || !document.getElementById("ztrot")) {
       stopTimer(); clear();
       app.innerHTML = '<div id="ztrot"></div>';
-      if (!rotTarget) rotTarget = [1, 3, 6, 5]; // combinaison de test : A cercle · B croix · C étoile · D onde
       rotApi = ZTRotary.mount(document.getElementById("ztrot"), {
         onBack: goHub,
-        isCorrect: function (i, v) { return ZTRotary.SYMBOLS[v].s === rotTarget[i]; },
-        onValidate: function (p) { return p.every(function (v, i) { return ZTRotary.SYMBOLS[v].s === rotTarget[i]; }); }
+        onGesture: function (i, p) {
+          if (view.paused) return;
+          rotApi.lock(true);
+          sb.rpc("zt_rot_move", { p_code: session.code, p_token: session.token, p_knob: i, p_pos: p }).then(function (r) {
+            if (r.error) { rotApi.lock(false); return fail(r.error); }
+            view = r.data; rotApi.lock(false); render();
+          });
+        },
+        onValidate: function () {
+          return sb.rpc("zt_rot_check", { p_code: session.code, p_token: session.token, p_action: uuid() }).then(function (r) {
+            if (r.error) { fail(r.error); return false; }
+            view = r.data;
+            var rr = view.game && view.game.rot;
+            var ok = !!(rr && rr.state === "solved");
+            if (ok) { rotApi.note(""); setTimeout(function () { if (opScreen === "rot") goHub(); }, 1600); }
+            else if (rr) rotApi.note(rr.good + " / 4 BONNES");
+            return ok;
+          });
+        }
       });
+      rotApi.setPositions(rt.cur);
+      if (rt.state === "solved") rotApi.lock(true);
       timerId = setInterval(function () {
         var ms = Math.max(0, pinEnds - (Date.now() + offsetMs));
         if (rotApi && !view.paused) rotApi.setTime(ms);
         if (ms <= 0 && !view.paused) expire();
       }, 100);
+    } else {
+      rotApi.applyRemote(rt.cur);
     }
   }
 
