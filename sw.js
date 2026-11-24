@@ -1,6 +1,6 @@
 // Service worker minimal : requis pour l'installation. Réseau d'abord (le jeu a besoin du serveur),
 // copie en cache de l'interface pour démarrer l'app même si le réseau est lent.
-var CACHE = "zt-shell-v69";
+var CACHE = "zt-shell-v70";
 self.addEventListener("install", function (e) { self.skipWaiting(); });
 self.addEventListener("activate", function (e) {
   e.waitUntil(caches.keys().then(function (ks) { return Promise.all(ks.filter(function (k) { return k !== CACHE; }).map(function (k) { return caches.delete(k); })); }).then(function () { return self.clients.claim(); }));
