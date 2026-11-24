@@ -31,9 +31,6 @@
       }).join("");
       var p = pages[current];
       if (!p) { paper.innerHTML = '<p class="note">Aucune fiche.</p>'; return; }
-      var solo = (o.manual.solo_serial || o.manual.solo_piles) ?
-        '<p class="solo">PANNEAU DE LA BOMBE — ' + (o.manual.solo_piles ? "piles : " + esc(o.manual.solo_piles) : "") +
-        (o.manual.solo_serial ? " · n° de série : " + esc(o.manual.solo_serial) : "") + "</p>" : "";
       paper.innerHTML =
         '<header class="page-head"><span class="kicker">ZERO TIME · CARNET TECHNICIEN</span><span class="page-number">FICHE ' + pad(p.n) + "</span></header>" +
         (p.stamp ? '<div class="stamp">' + esc(p.stamp) + "</div>" : "") +
@@ -41,7 +38,7 @@
         '<div class="section-title">Consignes à appliquer</div>' +
         '<ol class="rules">' + (p.rules || []).map(function (r) { return "<li>" + r + "</li>"; }).join("") + "</ol>" +
         '<div class="final-rule"><b>RÈGLE FINALE</b>' + p.end + "</div>" +
-        '<p class="note">' + (p.note || "") + "</p>" + solo;
+        '<p class="note">' + (p.note || "") + "</p>";
       car.querySelector("#ztc-count").textContent = pad(current + 1) + " / " + pad(pages.length);
       car.querySelector("#ztc-prev").disabled = current === 0;
       car.querySelector("#ztc-next").disabled = current >= pages.length - 1;
