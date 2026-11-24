@@ -153,12 +153,10 @@ body:has(#zthub) #toast{top:50% !important;bottom:auto !important;left:auto !imp
       n = n | 0; if (S.piles === n) return; S.piles = n;
       var g = $("#pil"); if (!g) return;
       if (n < 2 || n > 4 || n === 3) { g.innerHTML = ""; return; }
-      var X0 = 688, X1 = 1250, W = n === 4 ? 124 : 158, gap = (X1 - X0 - n * W) / (n + 1), h = '<rect x="' + X0 + '" y="578" width="' + (X1 - X0) + '" height="92" fill="#141517"/>';
+      var X0 = 688, X1 = 1250, BX = 708, BW = 178, CY = 628, sc = n === 4 ? 0.78 : 1, w = BW * sc, gap = (X1 - X0 - n * w) / (n + 1), h = '<defs><clipPath id="pilc"><rect x="' + BX + '" y="587" width="' + BW + '" height="82"/></clipPath></defs><rect x="' + X0 + '" y="578" width="' + (X1 - X0) + '" height="92" fill="#1d1e21"/>';
       for (var i = 0; i < n; i++) {
-        var x = X0 + gap + i * (W + gap), c = W * 0.34;
-        h += '<rect x="' + (x - 7) + '" y="613" width="9" height="30" fill="#aab0b4"/><rect x="' + (x + W - 2) + '" y="613" width="9" height="30" fill="#aab0b4"/>' +
-          '<rect x="' + x + '" y="588" width="' + c + '" height="78" rx="8" fill="#c79a2e"/><rect x="' + (x + c) + '" y="588" width="' + (W - c) + '" height="78" rx="8" fill="#0d0d0e"/>' +
-          '<rect x="' + (x + 4) + '" y="594" width="' + (c - 8) + '" height="10" rx="5" fill="#f0d27a" opacity=".55"/><rect x="' + (x + c + 6) + '" y="594" width="' + (W - c - 12) + '" height="8" rx="4" fill="#fff" opacity=".12"/>';
+        var x = X0 + gap + i * (w + gap);
+        h += '<g transform="translate(' + x + ' ' + CY + ') scale(' + sc + ') translate(' + (-BX) + ' ' + (-CY) + ')"><g clip-path="url(#pilc)"><image href="assets/hub/bombe.jpg" x="0" y="0" width="1918" height="1080"/></g></g>';
       }
       g.innerHTML = h;
     }
